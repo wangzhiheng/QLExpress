@@ -95,10 +95,10 @@ public class ExpressTest {
 	public void testReadme() throws Exception{		
 		System.out.println("------------------------------");
 		System.out.println("------------------------------");
-		System.out.println("ÇëÔÄ¶Á   QLExpressReadme.txt");
-		System.out.println("ÇëÔÄ¶Á   QLExpressReadme.txt");
-		System.out.println("ÇëÔÄ¶Á   QLExpressReadme.txt");
-		System.out.println("ÇëÔÄ¶Á   QLExpressReadme.txt");
+		System.out.println("ÇëÔÄ¶Á   QLExpressReadme.xml");
+		System.out.println("ÇëÔÄ¶Á   QLExpressReadme.xml");
+		System.out.println("ÇëÔÄ¶Á   QLExpressReadme.xml");
+		System.out.println("ÇëÔÄ¶Á   QLExpressReadme.xml");
 		System.out.println("------------------------------");
 		System.out.println("------------------------------");
 	
