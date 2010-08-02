@@ -8,7 +8,10 @@ public class BeanExample {
 	public BeanExample(String aName) {
 		name = aName;
 	}
-
+	public String testLong(long i){
+		
+		return "toString:" + i;
+	}
 	public String unionName(String otherName) {
 		return name + "-" + otherName;
 	}
