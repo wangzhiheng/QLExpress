@@ -5,17 +5,49 @@ package com.ql.util.express;
  * @author qhlhl2010@gmail.com
  *
  */
+
+
+
 @SuppressWarnings("unchecked")
-public class OperateData {
+public class OperateData implements ExpressTreeNode {
 	private Object dataObject;
 
 	private Class type;
-    public int point = -1;
+    private ExpressTreeNode parent;
+    private ExpressTreeNode[] children;
+	/**
+	 * 堆栈的最大深度
+	 */
+    public int maxStackSize = 1; 
+	
+
+	public int point = -1;
+    
 	public OperateData(Object obj, Class aType) {
 		this.type = aType;
 		this.dataObject = obj;
 	}
+	public ExpressTreeNode getParent() {
+		return parent;
+	}
 
+	public void setParent(ExpressTreeNode aParent) {
+		this.parent = aParent;
+	}
+	public ExpressTreeNode[] getChildren() {
+		return children;
+	}
+	public void setChildren(ExpressTreeNode[] children) {
+		this.children = children;
+	}
+    public int getMaxStackSize() {
+		return maxStackSize;
+	}
+	public void setMaxStackSize(int maxStackSize) {
+		this.maxStackSize = maxStackSize;
+	}
+
+	
 	public Class getType(IExpressContext parent) throws Exception {
 		if (type != null)
 			return type;
@@ -112,5 +144,51 @@ class OperatorClass extends OperateData {
 	public Object getObjectInner(IExpressContext parent) {
 		return m_class;
 	}
+}
 
+/**
+ * 占位符号
+ **/
+class MyPlace implements ExpressTreeNode{
+	ExpressItem op;
+	public int maxStackSize = 1; 
+	
+	public int getMaxStackSize() {
+		return maxStackSize;
+	}
+	public void setMaxStackSize(int maxStackSize) {
+		this.maxStackSize = maxStackSize;
+	}
+	public MyPlace(ExpressItem item){
+		this.op = item;
+	}
+	public ExpressTreeNode getParent() {
+		return op.getParent();
+	}
+
+	public void setParent(ExpressTreeNode aParent) {
+		this.op.setParent(aParent);
+	}
+	
+	public String toString(){
+		return "MyPlace:" + op.toString();
+	}
+	public ExpressTreeNode[] getChildren() {
+		return this.op.getChildren();
+	}
+	public void setChildren(ExpressTreeNode[] children) {
+		this.op.setChildren(children);
+	}
+}
+
+interface ExpressTreeNode{
+	public void setParent(ExpressTreeNode parent);
+	public ExpressTreeNode getParent();	
+	
+	public void setChildren(ExpressTreeNode[] children);
+	public ExpressTreeNode[] getChildren();
+	
+	public void setMaxStackSize(int size);
+	public int getMaxStackSize();
+	
 }

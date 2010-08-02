@@ -11,9 +11,7 @@ class GroupOperator extends Operator {
 	public GroupOperator(String aName) {
 		this.name= aName;
 	}
-
-	public Object executeInner(Object[] list)
-			throws Exception {
+	public Object executeInner(Object[] list)throws Exception {
 		Object result = new Integer(0);
 		for (int i = 0; i < list.length; i++) {
 			result = OperatorOfNumber.Add.execute(result, list[i]);
@@ -22,12 +20,10 @@ class GroupOperator extends Operator {
 	}
 }
 
-class LoveOperator extends Operator {
-	
+class LoveOperator extends Operator {	
 	public LoveOperator(String aName) {
 		this.name= aName;
 	}
-
 	public Object executeInner(Object[] list)
 			throws Exception {
 		String op1 = list[0].toString();
