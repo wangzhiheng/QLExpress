@@ -65,7 +65,8 @@ public class ExpressTest {
 				{ "new String(\"12345\").length()" ,"5"},
 				{ "'a' love 'b' love 'c' love 'd'", "d{c{b{a}b}c}d" },
 				{ "10 * (10 + 1) + 2 * (3 + 5) * 2", "142" },
-				{ "((1+1)  Ù”⁄ (4,3,5)) and isVIP(\"qhlhl2010@gmail.com\")", "false" }
+				{ "( 2   Ù”⁄ (4,3,5)) and isVIP(\"qhlhl2010@gmail.com\")", "false" },
+				{" 1!=1 and 2==2 and 1 == 2","false"}
 				};
 		IExpressContext expressContext = new ExpressContextExample(null);
 		expressContext.put("b", new Integer(200));

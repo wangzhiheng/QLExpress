@@ -529,11 +529,11 @@ class OperatorNot extends Operator {
  * 处理 And,Or,&&,||操作
  */
 @SuppressWarnings("unchecked")
-class OperatorAndOr extends Operator {
-	public OperatorAndOr(String name) {
+class OperatorAnd extends Operator {
+	public OperatorAnd(String name) {
 		this.name = name;
 	}
-	public OperatorAndOr(String aAliasName, String aName, String aErrorInfo) {
+	public OperatorAnd(String aAliasName, String aName, String aErrorInfo) {
 		this.name = aName;
 		this.aliasName = aAliasName;
 		this.errorInfo = aErrorInfo;
@@ -544,34 +544,51 @@ class OperatorAndOr extends Operator {
 
 	public Object executeInner(Object op1,
 			Object op2) throws Exception {
-		Object result = null;
-		boolean r = false;
+		boolean result = false;
 		Object o1 = op1;
 		Object o2 = op2;
 
 		if ((o1 instanceof Boolean) && (o2 instanceof Boolean)) {
-			if (this.name.equals("and") || this.name.equals("&&")
-					|| this.name.equals("而且"))
-				r = ((Boolean) o1).booleanValue()
+			result = ((Boolean) o1).booleanValue()
 						&& ((Boolean) o2).booleanValue();
-			else if (this.name.equals("or") || this.name.equals("||")
-					|| this.name.equals("或者"))
-				r = ((Boolean) o1).booleanValue()
-						|| ((Boolean) o2).booleanValue();
-			else {
-				String msg = "没有定义类型" + o1 + "和" + o2 + " 的 " + this.name
-						+ "操作";
-				throw new Exception(msg);
-			}
 		} else {
 			String msg = "没有定义类型" + o1 + "和" + o2 + " 的 " + this.name + "操作";
 			throw new Exception(msg);
 		}
-		return  new Boolean(r);
+		return  new Boolean(result);
 
 	}
 }
+class OperatorOr extends Operator {
+	public OperatorOr(String name) {
+		this.name = name;
+	}
+	public OperatorOr(String aAliasName, String aName, String aErrorInfo) {
+		this.name = aName;
+		this.aliasName = aAliasName;
+		this.errorInfo = aErrorInfo;
+	}
+	public Object executeInner(Object[] list) throws Exception {
+		return executeInner(list[0], list[1]);
+	}
 
+	public Object executeInner(Object op1,
+			Object op2) throws Exception {
+		boolean result = false;
+		Object o1 = op1;
+		Object o2 = op2;
+
+		if ((o1 instanceof Boolean) && (o2 instanceof Boolean)) {
+			result = ((Boolean) o1).booleanValue()
+						|| ((Boolean) o2).booleanValue();
+		} else {
+			String msg = "没有定义类型" + o1 + "和" + o2 + " 的 " + this.name + "操作";
+			throw new Exception(msg);
+		}
+		return  new Boolean(result);
+
+	}
+}
 /**
  * 处理 ",","(",")",";"
  */
@@ -658,10 +675,4 @@ class OperatorIn extends Operator {
 		}
 	}
 
-}
-
-/**
- * 占位符号
- **/
-class MyPlace {
 }

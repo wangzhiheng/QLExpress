@@ -13,7 +13,6 @@ import java.util.List;
 public class InstructionSet {
   private int maxStackSize  = -1;
   private List<Instruction> list = new ArrayList<Instruction>();
-  
   /**
    * 执行所有的操作指令
    * @param context
@@ -23,8 +22,11 @@ public class InstructionSet {
    */
   public Object excute(IExpressContext context,List errorList) throws Exception{
 	  RunEnvironment environmen = new RunEnvironment(this.maxStackSize);
-	  for(int i=0;i < this.list.size() ;i++){
-		  this.list.get(i).execute(environmen,context,errorList);
+	  Instruction instruction;
+	  while(environmen.getProgramPoint() < this.list.size()){
+		  instruction = this.list.get(environmen.getProgramPoint());
+		  //System.out.println("执行：" + instruction);
+		  instruction.execute(environmen,context,errorList);
 	  }
 	  return environmen.pop().getObject(context);	  
   }
@@ -50,7 +52,13 @@ public class InstructionSet {
 	  this.list.add(new InstructionOperator(operator,aOpDataNumber));
 	  if(stackSize > this.maxStackSize){
 		  this.maxStackSize = stackSize;
-	  } 
+	  }
+  }
+  public void insertInstruction(int point,Instruction instruction){
+	  this.list.add(point,instruction);
+  } 
+  public int getCurrentPoint(){
+	  return this.list.size() - 1; 
   }
   public String toString(){
 	  StringBuffer buffer = new StringBuffer();
@@ -70,10 +78,21 @@ public class InstructionSet {
  */
 class RunEnvironment {
 	private int point = -1;
+    private int programPoint = 0;
+
+
 	private OperateData[] dataContainer;
+
 	public RunEnvironment(int aStackSize){
 		dataContainer = new OperateData[aStackSize];
 	}
+	public int getProgramPoint() {
+		return programPoint;
+	}
+	public void programPointAddOne() {
+		programPoint ++ ;
+	}
+
 	public void push(OperateData data){
 		this.point++;
 		if(this.point >= this.dataContainer.length){
@@ -81,12 +100,22 @@ class RunEnvironment {
 		}
 		this.dataContainer[point] = data;
 	}
+	public OperateData peek(){
+		if(point <0){
+			throw new RuntimeException("系统异常，堆栈指针错误");
+		}
+		return this.dataContainer[point];
+		
+	}
 	public OperateData pop(){
 		if(point <0)
 			throw new RuntimeException("系统异常，堆栈指针错误");
 		OperateData result = this.dataContainer[point];
 		this.point--;
 		return result;
+	}
+	public void gotoWithOffset(int aOffset ){
+		this.programPoint = this.programPoint + aOffset;
 	}
 
 	public OperateData[] popArray(IExpressContext context,int len) throws Exception {
@@ -131,12 +160,58 @@ class InstructionLoadData extends Instruction{
 
 	public void execute(RunEnvironment environment,IExpressContext context,List errorList)throws Exception{
 		environment.push(this.operateData);
+		environment.programPointAddOne();
 	}
 	public String toString(){
 	  return "LoadData " +this.operateData.toString();	
 	}
 	
 }
+class InstructionReturn extends Instruction{
+    InstructionReturn(){
+    }
+	public void execute(RunEnvironment environment,IExpressContext context,List errorList)throws Exception{
+		//目前的模式，不需要执行任何操作
+		environment.programPointAddOne();
+	}
+	public String toString(){
+	  return "return ";	
+	}
+	
+}
+class InstructionGoToWithCondition extends Instruction{
+	/**
+	 * 跳转指令的偏移量
+	 */
+    int offset;
+    boolean condition;
+    public InstructionGoToWithCondition(boolean aCondition,int aOffset){
+    	this.offset = aOffset;
+    	this.condition = aCondition;
+    }
+
+	public void execute(RunEnvironment environment,IExpressContext context,List errorList)throws Exception{
+		Object o = environment.peek().getObject(context);		
+		if(o != null && o instanceof Boolean){
+			if(((Boolean)o).booleanValue() == this.condition){
+				environment.gotoWithOffset(this.offset);
+			}else{
+				environment.programPointAddOne();
+			}
+		}else{
+			throw new Exception("指令错误:" + o + " 不是Boolean");
+		}
+	}
+	public String toString(){
+	  String result = "GoToIf[" + this.condition +"] " ;
+	  if(this.offset >=0){
+		  result = result +"+";
+	  }
+	  result = result + this.offset;
+	  return result;
+	}
+}
+
 /**
  * 运算操作指令，今后可以根据每种类型进行扩展，以提高系统在单指令上的执行效率
  * @author qhlhl2010@gmail.com
@@ -154,9 +229,10 @@ class InstructionOperator extends Instruction{
 		OperateData[] parameters = environment.popArray(context,this.opDataNumber);		
 		OperateData result = this.operator.execute(context,parameters, errorList);
 		environment.push(result);
+		environment.programPointAddOne();
 	}
 	public String toString(){
-		String result = "OP : " + this.operator.toString() +  " OPNUMBER[" + this.opDataNumber +"] ";
+		String result = "OP : " + this.operator.toString() +  " OPNUMBER[" + this.opDataNumber +"]";
 		return result;
 	}
 }

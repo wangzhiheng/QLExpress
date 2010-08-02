@@ -66,12 +66,12 @@ final class OperatorManager {
 		this.addOperatorInner("<>", 6, 0, 2, new OperatorEqualsLessMore("<>"));
 		this.addOperatorInner("&", 7, 0, 2, null);
 		this.addOperatorInner("^", 8, 0, 2, null);
-		this.addOperatorInner("&&", 9, 0, 2, new OperatorAndOr("&&"));
-		this.addOperatorInner("and", 9, 0, 2, new OperatorAndOr("and"));
-		this.addOperatorInner("而且", 9, 0, 2, new OperatorAndOr("而且"));
-		this.addOperatorInner("||", 10, 0, 2, new OperatorAndOr("||"));
-		this.addOperatorInner("or", 10, 0, 2, new OperatorAndOr("or"));
-		this.addOperatorInner("或者", 10, 0, 2, new OperatorAndOr("或者"));
+		this.addOperatorInner("&&", 9, 0, 2, new OperatorAnd("&&"));
+		this.addOperatorInner("and", 9, 0, 2, new OperatorAnd("and"));
+		this.addOperatorInner("而且", 9, 0, 2, new OperatorAnd("而且"));
+		this.addOperatorInner("||", 10, 0, 2, new OperatorOr("||"));
+		this.addOperatorInner("or", 10, 0, 2, new OperatorOr("or"));
+		this.addOperatorInner("或者", 10, 0, 2, new OperatorOr("或者"));
 		this.addOperatorInner("=", 12, 1, 2, new OperatorEvaluate("="));
 		this.addOperatorInner(",", 15, 0, -1, new OperatorNullOp(","));
 		this.addOperatorInner(";", 20, 0, -1, new OperatorNullOp(";"));

@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.unitils.spring.annotation.SpringBeanByName;
 
 import com.ql.util.express.ExpressRunner;
 import com.ql.util.express.IExpressContext;
@@ -14,16 +15,18 @@ import com.ql.util.express.InstructionSet;
 public class RunExample implements ApplicationContextAware, Runnable {
 	private ApplicationContext applicationContext;
 	ExpressRunner runner;
+
+	public RunExample()throws Exception{
+		runner = new ExpressRunner();
+		initialRunner(runner);
+	}
 	public RunExample(ExpressRunner runner) {
 		this.runner = runner;
 	}
 	public void setApplicationContext(ApplicationContext context) {
 		this.applicationContext = context;
 	}
-
-	public static void main(String[] args) throws Exception {
-		
-		ExpressRunner runner = new ExpressRunner();
+    public static void initialRunner(ExpressRunner runner) throws Exception{
 		runner.addOperator("love", new LoveOperator("love"));
 		runner.addOperatorWithAlias("属于", "in", "用户$1不在允许的范围");
 		runner.addOperatorWithAlias("myand", "and", "用户$1不在允许的范围");
@@ -35,6 +38,10 @@ public class RunExample implements ApplicationContextAware, Runnable {
 				new String[] { "double" }, null);
 		runner.addFunctionOfClassMethod("转换为大写", BeanExample.class.getName(),
 				"upper", new String[] { "String" }, null);
+    }
+	public static void main(String[] args) throws Exception {
+    	ExpressRunner runner = new ExpressRunner();
+    	initialRunner(runner);
 		new RunExample(runner).run(1);
 		for (int i = 0; i < 1; i++) {
 			new Thread(new RunExample(runner)).start();
@@ -48,7 +55,7 @@ public class RunExample implements ApplicationContextAware, Runnable {
 		try {
 			for (int j = 0; j < num; j++) {
 				String[][] expressTest = new String[][] {
-						//{ "System.out.println(\"ss\")", "null" },
+						{ "System.out.println(\"ss\")", "null" },
 						{"unionName = new com.ql.util.express.test.BeanExample(\"张三\").unionName(\"李四\")",
 								"张三-李四" }, 
 						{ "max(2,3,4,10)", "10" },
@@ -62,7 +69,8 @@ public class RunExample implements ApplicationContextAware, Runnable {
 						{ "2 属于(3,4)", "false" },
 						{ "true myand false", "false" },
 						{ "'a' love 'b' love 'c' love 'd'", "d{c{b{a}b}c}d" },
-						{ " 10 * 10 + 1 + 2 * 3 + 5 * 2", "117" }
+						{ " 10 * 10 + 1 + 2 * 3 + 5 * 2", "117" },
+						{" 1!=1 and 2==2 and 1 == 2","false"}
 						};
 				IExpressContext expressContext = new ExpressContextExample(	this.applicationContext);
 				expressContext.put("a", j);
@@ -82,8 +90,8 @@ public class RunExample implements ApplicationContextAware, Runnable {
 									.toString()) == false) {
 						throw new Exception("处理错误,计算结果与预期的不匹配");
 					}
-					//System.out.println(s + " 执行结果 ： " + result);
-					//System.out.println("错误信息" + errorList);
+					System.out.println(s + " 执行结果 ： " + result);
+					System.out.println("错误信息" + errorList);
 				}
 			//	System.out.println(expressContext);
 			}
