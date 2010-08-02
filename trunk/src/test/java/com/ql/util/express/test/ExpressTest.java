@@ -50,6 +50,8 @@ public class ExpressTest {
 				new String[] { "double" }, null);
 		runner.addFunctionOfClassMethod("转换为大写", BeanExample.class.getName(),
 				"upper", new String[] { "String" }, null);		
+		runner.addFunctionOfClassMethod("testLong", BeanExample.class.getName(),
+				"testLong", new String[] { "long" }, null);		
 		
 		String[][] expressTest = new String[][] {
 				{ "System.out.println(\"ss\")", "null" },
@@ -67,13 +69,17 @@ public class ExpressTest {
 				{ "10 * (10 + 1) + 2 * (3 + 5) * 2", "142" },
 				{ "( 2  属于 (4,3,5)) and isVIP(\"qhlhl2010@gmail.com\")", "false" },
 				{" 1!=1 and 2==2 and 1 == 2","false"},
-				{" 1==1 or 2==2 and 1 == 2","true"}
+				{" 1==1 or 2==2 and 1 == 2","true"},
+				{ "abc == 1", "true" },
+				{ "testLong(abc)", "toString:1" },
 				};
 		IExpressContext expressContext = new ExpressContextExample(null);
 		expressContext.put("b", new Integer(200));
 		expressContext.put("c", new Integer(300));
 		expressContext.put("d", new Integer(400));
 		expressContext.put("bean", new BeanExample());
+		expressContext.put("abc",1l);
+		
 		for (int point = 0; point < expressTest.length; point++) {
 			String expressStr = expressTest[point][0];
 			List errorList = new ArrayList();
