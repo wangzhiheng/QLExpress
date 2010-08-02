@@ -364,7 +364,7 @@ public class ExpressRunner
     }
     return list.toArray();
   }
-  public ExpressTreeNode getCResult(Object[] list) throws Exception
+  protected ExpressTreeNode getCResult(Object[] list) throws Exception
   {
 	try{
     if (list == null){
@@ -455,7 +455,7 @@ public class ExpressRunner
     return null;
   }
 
-	public InstructionSet createInstructionSet(ExpressTreeNode node)throws Exception {
+  protected InstructionSet createInstructionSet(ExpressTreeNode node)throws Exception {
 		InstructionSet result = new InstructionSet();
 		createInstructionSetPrivate(result,node);
 		result.insertInstruction(result.getCurrentPoint()+1, new InstructionReturn());
@@ -491,7 +491,7 @@ public class ExpressRunner
 		}
 	}
 
-	public void printTreeNode(ExpressTreeNode node, int level) {
+	protected void printTreeNode(ExpressTreeNode node, int level) {
 		for (int i = 0; i < level; i++) {
 			System.out.print("   ");
 		}
@@ -506,12 +506,12 @@ public class ExpressRunner
 		}
 	}
 
-  public boolean isNAddOneParameterCount(ExpressItem operatorItem){
+	protected boolean isNAddOneParameterCount(ExpressItem operatorItem){
 	  if(operatorItem instanceof ExpressItemMethod || operatorItem instanceof ExpressItemNew)
 		  return true;
 	  return this.m_operatorManager.isNAddOneParameterCount(operatorItem.name);
   }
-  public String getPrintInfo(Object[] list,String splitOp){
+  protected String getPrintInfo(Object[] list,String splitOp){
   	StringBuffer buffer = new StringBuffer();
 	for(int i=0;i<list.length;i++){
 		if(i > 0){buffer.append(splitOp);}
@@ -519,7 +519,7 @@ public class ExpressRunner
 	}
 	return buffer.toString();
   }
-  public String getPrintInfo2(Object[] list,String splitOp){
+  protected String getPrintInfo2(Object[] list,String splitOp){
 	  	StringBuffer buffer = new StringBuffer();
 		for(int i=0;i<list.length;i++){
 			if(i > 0){buffer.append(splitOp);}
@@ -528,7 +528,7 @@ public class ExpressRunner
 		return buffer.toString();
 	  }
 
-  public ExpressTreeNode parseCResult(String condition)throws Exception{
+  protected ExpressTreeNode parseCResult(String condition)throws Exception{
 
 		String[] tmpList = parse(condition);
 	    if(log.isDebugEnabled()){
@@ -589,7 +589,7 @@ public class ExpressRunner
    * @return 计算的结果
    * @throws Exception
    */
-  public final Object executeWithPreCompile(IExpressContext context,Object[] expressItems,List errorList) throws Exception
+  protected final Object executeWithPreCompile(IExpressContext context,Object[] expressItems,List errorList) throws Exception
   {
     if (expressItems == null)       
     	return null;
@@ -624,7 +624,7 @@ public class ExpressRunner
 
   }
   
-  public final ExpressTreeNode preCompileOperatorTree(Object[] expressItems) throws Exception
+  protected final ExpressTreeNode preCompileOperatorTree(Object[] expressItems) throws Exception
   { 
     if (expressItems == null){    
     	throw new Exception("表达式不能为空");
@@ -689,7 +689,7 @@ public class ExpressRunner
              opStr = opStr.substring(1);
      }
   }
-  public boolean isNumber(String str){
+   protected boolean isNumber(String str){
     if(str == null || str =="")
       return false;
     char c = str.charAt(0);
