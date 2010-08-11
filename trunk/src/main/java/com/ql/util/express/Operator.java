@@ -50,8 +50,11 @@ abstract class OperatorBase {
 			if (    obj != null
 					&& obj instanceof Boolean
 					&& ((Boolean) obj).booleanValue() == false) {
-				errorList.add(ExpressUtil.replaceString(this.errorInfo,
-						toObjectList(parent, list)));
+				String tmpStr = ExpressUtil.replaceString(this.errorInfo,
+						toObjectList(parent, list));
+				if(errorList.contains(tmpStr) == false){
+				    errorList.add(tmpStr);
+				}
 			}
 		}
 		return result;
