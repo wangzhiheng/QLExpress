@@ -32,6 +32,11 @@ public class ExpressTest {
 	@org.junit.Test
 	public void testExpress() throws Exception{
 		ExpressRunner runner = new ExpressRunner();
+		
+		runner.addOperatorWithAlias("如果", "if",null);
+		runner.addOperatorWithAlias("则", "then",null);
+		runner.addOperatorWithAlias("否则", "else",null);
+
 		runner.addOperator("love", new LoveOperator("love"));
 		runner.addOperatorWithAlias("属于", "in", "用户$1不在允许的范围");
 		runner.addOperatorWithAlias("myand", "and", "用户$1不在允许的范围");
@@ -47,6 +52,7 @@ public class ExpressTest {
 				"testLong", new String[] { "long" }, null);		
 		
 		String[][] expressTest = new String[][] {
+				{ " 3+ (如果 1==2 则 4 否则 3) +8","14"},
 				{ "System.out.println(\"ss\")", "null" },
 				{"unionName = new com.ql.util.express.test.BeanExample(\"张三\").unionName(\"李四\")",
 						"张三-李四" }, 
