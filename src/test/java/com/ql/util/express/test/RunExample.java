@@ -1,16 +1,13 @@
 package com.ql.util.express.test;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.unitils.spring.annotation.SpringBeanByName;
 
 import com.ql.util.express.ExpressRunner;
 import com.ql.util.express.IExpressContext;
-import com.ql.util.express.InstructionSet;
 
 public class RunExample implements ApplicationContextAware, Runnable {
 	private ApplicationContext applicationContext;
@@ -50,6 +47,7 @@ public class RunExample implements ApplicationContextAware, Runnable {
 	public void run() {
 		run(10000);
 	}
+	@SuppressWarnings("unchecked")
 	public void run(int num) {
 		long start = System.currentTimeMillis();
 		try {

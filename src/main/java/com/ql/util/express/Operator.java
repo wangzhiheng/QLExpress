@@ -98,13 +98,14 @@ abstract class OperatorBase {
 }
 
 public abstract class Operator extends  OperatorBase{
+	@SuppressWarnings("unchecked")
 	public OperateData executeInner(IExpressContext context, OperateData[] list) throws Exception{
 		Object[] parameters = new Object[list.length];
 		for(int i = 0;i <list.length;i++){			
 			parameters[i] = list[i].getObject(context);
 		}
 		Object result = this.executeInner(parameters);
-		if(result.getClass().equals(OperateData.class)){
+		if(result != null && result.getClass().equals(OperateData.class)){
 			throw new Exception("操作符号定义的返回类型错误：" + this.getAliasName());
 		}
 		if(result == null){
@@ -181,14 +182,16 @@ class OperatorNew extends OperatorBase {
 
 		if (c == null) {
 			// "没有找到" + obj.getName() + "的构造方法："
-			String s = "没有找到" + obj.getName() + "的构造方法：" + obj.getName() + "(";
+			StringBuilder  s = new StringBuilder();
+			s.append("没有找到" + obj.getName() + "的构造方法：" + obj.getName() + "(");
 			for (int i = 0; i < types.length; i++) {
-				if (i > 0)
-					s = s + ",";
-				s = s + types[i].getName();
+				if (i > 0){
+					s.append(",");
+				}	
+				s.append(types[i].getName());
 			}
-			s = s + ")";
-			throw new Exception(s);
+			s.append(")");
+			throw new Exception(s.toString());
 		}
 
 		tmpObj = c.newInstance(objs);
@@ -244,15 +247,16 @@ class OperatorMethod extends OperatorBase {
 			}
 
 			if (m == null) {
-				String s = "没有找到" + obj.getClass().getName() + "的方法："
-						+ this.methodName + "(";
+				StringBuilder  s = new StringBuilder();
+				s.append("没有找到" + obj.getClass().getName() + "的方法："
+						+ this.methodName + "(");
 				for (int i = 0; i < types.length; i++) {
 					if (i > 0)
-						s = s + ",";
-					s = s + types[i].getName();
+						s.append(",");
+					s.append(types[i].getName());
 				}
-				s = s + ")";
-				throw new Exception(s);
+				s.append(")");
+				throw new Exception(s.toString());
 			}
 
 			if (list[0] instanceof OperatorClass) {// 调用静态方法
@@ -314,7 +318,7 @@ class OperatorAddReduce extends Operator {
 		return obj;
 	}
 }
-@SuppressWarnings("unchecked")
+
 class OperatorRound extends Operator {
 	public OperatorRound(String name) {
 		this.name = name;
@@ -369,7 +373,7 @@ class OperatorLike extends Operator {
 		else
 			result = false;
 
-		return new Boolean(result);
+		return Boolean.valueOf(result);
 	}
 
 	public String[] split(String str, String s) {
@@ -396,7 +400,6 @@ class OperatorLike extends Operator {
 /**
  * 处理 * /
  **/
-@SuppressWarnings("unchecked")
 class OperatorMultiDiv extends Operator {
 	public OperatorMultiDiv(String name) {
 		this.name = name;
@@ -424,7 +427,6 @@ class OperatorMultiDiv extends Operator {
 /**
  * 处理 =,==,>,>=,<,<=,!=,<>
  */
-@SuppressWarnings("unchecked")
 class OperatorEqualsLessMore extends Operator {
 	public OperatorEqualsLessMore(String aName) {
 		this.name = aName;
@@ -495,7 +497,7 @@ class OperatorEqualsLessMore extends Operator {
 /**
  * 处理 not,! 操作
  */
-@SuppressWarnings("unchecked")
+
 class OperatorNot extends Operator {
 	public OperatorNot(String name) {
 		this.name = name;
@@ -517,7 +519,7 @@ class OperatorNot extends Operator {
         }
 		if (Boolean.class.equals(op.getClass()) == true) {
 			boolean r = !((Boolean) op).booleanValue();
-			result = new Boolean(r);
+			result = Boolean.valueOf(r);
 		} else {
 			//
 			String msg = "没有定义类型" + op.getClass().getName() + " 的 " + this.name
@@ -531,7 +533,7 @@ class OperatorNot extends Operator {
 /**
  * 处理 And,Or,&&,||操作
  */
-@SuppressWarnings("unchecked")
+
 class OperatorAnd extends Operator {
 	public OperatorAnd(String name) {
 		this.name = name;
@@ -558,7 +560,7 @@ class OperatorAnd extends Operator {
 			String msg = "没有定义类型" + o1 + "和" + o2 + " 的 " + this.name + "操作";
 			throw new Exception(msg);
 		}
-		return  new Boolean(result);
+		return  Boolean.valueOf(result);
 
 	}
 }
@@ -588,7 +590,7 @@ class OperatorOr extends Operator {
 			String msg = "没有定义类型" + o1 + "和" + o2 + " 的 " + this.name + "操作";
 			throw new Exception(msg);
 		}
-		return  new Boolean(result);
+		return  Boolean.valueOf(result);
 
 	}
 }
@@ -600,7 +602,11 @@ class OperatorNullOp extends OperatorBase {
 	public OperatorNullOp(String name) {
 		this.name = name;
 	}
-
+	public OperatorNullOp(String aAliasName, String aName, String aErrorInfo) {
+		this.name = aName;
+		this.aliasName = aAliasName;
+		this.errorInfo = aErrorInfo;
+	}
 	public OperateData executeInner(IExpressContext parent, OperateData[] list) throws Exception {
 		return executeInner(parent);
 	}
@@ -609,7 +615,6 @@ class OperatorNullOp extends OperatorBase {
 		return null;
 	}
 }
-@SuppressWarnings("unchecked")
 class OperatorMinMax extends Operator {
 	public OperatorMinMax(String name) {
 		this.name = name;
@@ -644,7 +649,7 @@ class OperatorMinMax extends Operator {
 		return result;
 	}
 }
-@SuppressWarnings("unchecked")
+
 class OperatorIn extends Operator {
 	public OperatorIn(String aName) {
 		this.name = aName;
@@ -675,6 +680,48 @@ class OperatorIn extends Operator {
 				}
 			}
 			return Boolean.FALSE;
+		}
+	}
+
+}
+
+/**
+ * if操作
+ * @author xuannan
+ *
+ */
+class OperatorIf extends OperatorBase {
+	public OperatorIf(String aName) {
+		this.name = aName;
+	}
+
+	public OperatorIf(String aAliasName, String aName, String aErrorInfo) {
+		this.name = aName;
+		this.aliasName = aAliasName;
+		this.errorInfo = aErrorInfo;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public  OperateData executeInner(IExpressContext parent, OperateData[] list) throws Exception {
+		if(list.length <2){
+			throw new Exception("\"" + this.aliasName + "\"操作至少要两个操作数");
+		}
+		Object obj = list[0].getObject(parent);
+		if (obj == null) {
+			String msg ="\"" + this.aliasName + "\"的判断条件不能为空";
+			throw new Exception(msg);
+		} else if ((obj instanceof Boolean) == false) {
+			String msg = "\"" + this.aliasName + "\"的判断条件 必须是 Boolean,不能是：";
+			throw new Exception(msg + obj.getClass().getName());
+		} else {
+			if (((Boolean)obj).booleanValue() == true){
+				return list[1];
+			}else{
+				if(list.length == 3){
+					return list[2];
+				}
+			}
+			return null;			
 		}
 	}
 
