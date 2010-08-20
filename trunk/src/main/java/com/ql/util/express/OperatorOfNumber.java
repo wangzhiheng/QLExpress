@@ -69,7 +69,7 @@ public class OperatorOfNumber {
 					throw new Exception("NumberFormatException £º "
 							+ e.getMessage());
 				}
-				result = new Long(l);
+				result = Long.valueOf(l);
 			} else if (flag4 && (flag3 || flag5 || flag1) || flag5 && flag2) {
 				double d = 0.0D;
 				try {
@@ -147,7 +147,7 @@ public class OperatorOfNumber {
 	            }catch(NumberFormatException e) {
 	              throw new Exception("NumberFormatException £º " + e.getMessage());
 	           }
-	            result = new Long(l);
+	            result = Long.valueOf(l);
 	        } else
 	        if(flag4 && (flag3 || flag5 || flag1) || flag5 && (flag2 || flag))
 	        {
@@ -254,7 +254,7 @@ public class OperatorOfNumber {
 	            }catch(NumberFormatException e) {
 	              throw new Exception("NumberFormatException £º " + e.getMessage());
 	           }
-	            result = new Long(l);
+	            result = Long.valueOf(l);
 	        } else
 	        if(flag4 && (flag3 || flag5 || flag1) || flag5 && (flag2 || flag))
 	        {
@@ -368,7 +368,7 @@ public class OperatorOfNumber {
 	                throw new Exception("NumberFormatException £º " + e.getMessage());
 	            }
 
-	            obj = new Long(l);
+	            obj = Long.valueOf(l);
 	        } else
 	        if(flag4 && (flag3 || flag5 || flag1) || flag5 && (flag2 || flag))
 	        {
@@ -476,7 +476,7 @@ public class OperatorOfNumber {
              }catch(NumberFormatException e) {
                throw new Exception("NumberFormatException £º " + e.getMessage());
             }
-             result = new Long(l);
+             result = Long.valueOf(l);
          } else
          if(flag4 && (flag3 || flag5 || flag1) || flag5 && (flag2 || flag))
          {

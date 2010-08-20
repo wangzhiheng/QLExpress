@@ -1,14 +1,7 @@
 package com.ql.util.express.test;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-
-import org.junit.Assert;
 
 import com.ql.util.express.ExpressRunner;
 import com.ql.util.express.IExpressContext;
@@ -68,8 +61,8 @@ public class ExpressTest {
 				{ "'a' love 'b' love 'c' love 'd'", "d{c{b{a}b}c}d" },
 				{ "10 * (10 + 1) + 2 * (3 + 5) * 2", "142" },
 				{ "( 2   Ù”⁄ (4,3,5)) or isVIP(\"qhlhl2010@gmail.com\") or  isVIP(\"qhlhl2010@gmail.com\")", "false" },
-				{" 1!=1 and 2==2 and 1 == 2","false"},
-				{" 1==1 or 2==2 and 1 == 2","true"},
+				{" 1!=1 and isVIP(\"qhlhl2010@gmail.com\")","false"},
+				{" 1==1 or isVIP(\"qhlhl2010@gmail.com\") ","true"},
 				{ "abc == 1", "true" },
 				{ "testLong(abc)", "toString:1" },
 				};

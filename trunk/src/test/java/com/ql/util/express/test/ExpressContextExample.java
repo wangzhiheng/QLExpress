@@ -25,9 +25,9 @@ public class ExpressContextExample extends HashMap<String,Object> implements IEx
 	public Object get(Object name) {
 		Object result = null;
 		if(((String)name).equalsIgnoreCase("三星卖家")){
-			result = new Boolean(true);
+			result = Boolean.valueOf(true);
 		} else if (((String)name).equalsIgnoreCase("消保用户")) {
-			result = new Boolean(true);
+			result = Boolean.valueOf(true);
 		} else {
 			result = super.get(name);
 		}
@@ -44,7 +44,7 @@ public class ExpressContextExample extends HashMap<String,Object> implements IEx
 
 	public Object  put(String name, Object object) {
 	   if(name.equalsIgnoreCase("myDbData")){
-		   //example:update db data
+		   throw new RuntimeException("没有实现");
 	   }
        return  super.put(name,object);
 	}

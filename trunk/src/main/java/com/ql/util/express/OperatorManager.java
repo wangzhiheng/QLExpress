@@ -74,7 +74,11 @@ final class OperatorManager {
 		this.addOperatorInner("或者", 10, 0, 2, new OperatorOr("或者"));
 		this.addOperatorInner("=", 12, 1, 2, new OperatorEvaluate("="));
 		this.addOperatorInner(",", 15, 0, -1, new OperatorNullOp(","));
-		this.addOperatorInner(";", 20, 0, -1, new OperatorNullOp(";"));
+		this.addOperatorInner("if", 20, 0, -1, new OperatorIf("if"));
+		this.addOperatorInner("then", 20, 0, -1, new OperatorNullOp("if"));
+		this.addOperatorInner("else", 20, 0, -1, new OperatorNullOp("if"));
+		this.addOperatorInner(";", 21, 0, -1, new OperatorNullOp(";"));
+		
 		//---------------
 		this.addFunction("max", new OperatorMinMax("max"));
 		this.addFunction("min", new OperatorMinMax("min"));
@@ -108,8 +112,8 @@ final class OperatorManager {
 				 throw new Exception(name + " 不能被设置别名");
 			 }
 			 
-			 OpStr destOpStr  = new OpStr(aAliasName,orgiOpStr.PRI,orgiOpStr.Combine,orgiOpStr.OpDataMember,orgiOpStr.isNAddOneParameterCount);
-			 Operator destOperator = constructor.newInstance(aAliasName,name,errorInfo);
+			 OpStr destOpStr  = new OpStr(aAliasName,name,orgiOpStr.PRI,orgiOpStr.Combine,orgiOpStr.OpDataMember,orgiOpStr.isNAddOneParameterCount);
+			 OperatorBase destOperator = constructor.newInstance(aAliasName,name,errorInfo);
 			 
 	    	 if(this.opMap.containsKey(aAliasName)){
 	    		 throw new RuntimeException("操作符号：\"" + aAliasName + "\" 已经存在");
@@ -180,7 +184,7 @@ final class OperatorManager {
    	 if(this.opMap.containsKey(name)){
    		 throw new RuntimeException("操作符号：\"" + name + "\"已经存在");  
    	 }
-   	 this.opStrList.put(name,new OpStr(name,pri,combine,aOpDataMember,isNAddOneParameterCount));
+   	 this.opStrList.put(name,new OpStr(name,name,pri,combine,aOpDataMember,isNAddOneParameterCount));
    	 this.opMap.put(name, op);    	 
     }
 
@@ -191,16 +195,16 @@ final class OperatorManager {
     {
     	OperatorBase op = null;
       if(opItem instanceof ExpressItemField){
-        op = new OperatorField(opItem.name,((ExpressItemField)opItem).fieldName);
+        op = new OperatorField(opItem.getAliasName(),((ExpressItemField)opItem).fieldName);
       }else if(opItem instanceof ExpressItemNew){
-        op = new OperatorNew(opItem.name);
+        op = new OperatorNew(opItem.getAliasName());
       }else if(opItem instanceof ExpressItemMethod){
-        op = new OperatorMethod(opItem.name,((ExpressItemMethod)opItem).methodName);
+        op = new OperatorMethod(opItem.getAliasName(),((ExpressItemMethod)opItem).methodName);
       }else {
-        op =(OperatorBase)opMap.get(opItem.name);
+        op =(OperatorBase)opMap.get(opItem.getAliasName());
       }
       if (op == null)
-         throw new Exception("不支持的处理类型：" + opItem.name);
+         throw new Exception("不支持的处理类型：" + opItem.getAliasName());
       return op;
     }
     /**
@@ -250,6 +254,19 @@ final class OperatorManager {
           return true;
        return false;
     }
+    /**
+     * 根据别名获取真实的名称
+     * @param name
+     * @return
+     */
+    protected String getOperatorRealName(String name){
+      OpStr op = opStrList.get(name);
+      if(op != null){
+    	  return op.Name;
+      }else{
+    	  return name;
+      }
+    }
 
     /**
      *
@@ -260,7 +277,11 @@ final class OperatorManager {
     protected int compareOp(String op1,String op2) throws Exception
     {
       int result = -1;
-      if (op1.equals("(")&&(op2.equals(")")))
+      if (op1.equalsIgnoreCase("if") &&  op2.equalsIgnoreCase("then")){
+    	  result = 4; 
+      }else if(op1.equalsIgnoreCase("if") &&  op2.equalsIgnoreCase("else")){
+    	  result = 5; 
+      }else if(op1.equals("(")&&(op2.equals(")")))
           result =  2;
       else if (op1.equals("(")) //(比所有的操作符级别低
           result = 0;
@@ -310,7 +331,7 @@ final class OperatorManager {
          compareResult = ((String)op1).compareTo(op2.toString());
       else if(op1 instanceof Long){
       	if(op2 instanceof Number){
-      		compareResult = ((Long)op1).compareTo(new Long(((Number)op2).longValue()));
+      		compareResult = ((Long)op1).compareTo(Long.valueOf(((Number)op2).longValue()));
       	}
       	else{
       	  compareResult = ((Long)op1).compareTo(Long.valueOf(op2.toString()));
@@ -318,7 +339,7 @@ final class OperatorManager {
       }
       else if(op1 instanceof Integer){
       	if(op2 instanceof Number){
-      		compareResult = ((Integer)op1).compareTo(new Integer(((Number)op2).intValue()));
+      		compareResult = ((Integer)op1).compareTo(Integer.valueOf(((Number)op2).intValue()));
       	}
       	else{
       	  compareResult = ((Integer)op1).compareTo(Integer.valueOf(op2.toString()));
@@ -326,7 +347,7 @@ final class OperatorManager {
       }
       else if(op1 instanceof Double){
       	if(op2 instanceof Number){
-      		compareResult = ((Double)op1).compareTo(new Double(((Number)op2).doubleValue()));
+      		compareResult = ((Double)op1).compareTo(Double.valueOf(((Number)op2).doubleValue()));
       	}
       	else{
       	  compareResult = ((Double)op1).compareTo(Double.valueOf(op2.toString()));
@@ -357,12 +378,15 @@ final class OperatorManager {
 
  class OpStr
   { public String Name;   //操作符名称
+    public String aliasName;//操作符号别名
     public int PRI;    //操作符优先级
     public int Combine;//操作符结合性  0：从左到右；1：从右到左
     public int OpDataMember; //操作数个数
     public boolean isNAddOneParameterCount = false;
-    public OpStr(String name,int pri,int combine,int aOpDataMember,boolean aIsNAddOneParameterCount){    	
+   
+    public OpStr(String aAliasName, String name,int pri,int combine,int aOpDataMember,boolean aIsNAddOneParameterCount){    	
         this.Name = name;
+        this.aliasName = aAliasName;
         this.PRI = pri;
         this.Combine = combine;
         this.OpDataMember = aOpDataMember;
@@ -370,6 +394,6 @@ final class OperatorManager {
     }
     public OpStr(String name,int pri,int combine,int aOpDataMember)
     {
-    	this(name,pri,combine,aOpDataMember,false);
+    	this(name,name,pri,combine,aOpDataMember,false);
     }
   }

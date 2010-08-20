@@ -1,8 +1,5 @@
 package com.ql.util.express.test;
 
-
-import com.ql.util.express.IExpressContext;
-import com.ql.util.express.OperateData;
 import com.ql.util.express.Operator;
 import com.ql.util.express.OperatorOfNumber;
 
@@ -12,7 +9,7 @@ class GroupOperator extends Operator {
 		this.name= aName;
 	}
 	public Object executeInner(Object[] list)throws Exception {
-		Object result = new Integer(0);
+		Object result = Integer.valueOf(0);
 		for (int i = 0; i < list.length; i++) {
 			result = OperatorOfNumber.Add.execute(result, list[i]);
 		}

@@ -229,6 +229,14 @@ public class ExpressRunner
     public void addFunction(String name, Operator op) {
     	this.m_operatorManager.addFunction(name, op);
     };
+    
+    /**
+     * 设置指令集执行的时候，输出执行信息，但通过需要把log级别设置为 debug级别才会有输出 
+     * @param aIsTrace
+     */
+    public void setTrace(boolean aIsTrace){
+  	  Instruction.isTrace = aIsTrace;
+    }
     /**
      * 添加一个类的函数定义，例如：Math.abs(double) 映射为表达式中的 "取绝对值(-5.0)"
      * @param name 函数名称
@@ -257,7 +265,7 @@ public class ExpressRunner
     }
  
 
-  private Object[] getOpObjectList(String[] tmpList)  throws Exception
+  protected Object[] getOpObjectList(String[] tmpList)  throws Exception
   {
    
     List  list = new ArrayList();
@@ -285,7 +293,7 @@ public class ExpressRunner
       		point = point + 1;
       		
       	}else{
-          list.add(new ExpressItem(name));
+          list.add(new ExpressItem(name,this.m_operatorManager.getOperatorRealName(name)));
           point = point + 1;
       	}
       }else if (name.charAt(0) == ':') {
@@ -315,10 +323,10 @@ public class ExpressRunner
        
        point = point + 1;
      }else if(name.toLowerCase().equals("true")){
-       list.add(new OperateData(new Boolean(true),Boolean.TYPE));
+       list.add(new OperateData(Boolean.valueOf(true),Boolean.TYPE));
        point = point + 1;
      }else if (name.toLowerCase().equals("false")){
-       list.add(new OperateData(new Boolean(false), Boolean.TYPE));
+       list.add(new OperateData(Boolean.valueOf(false), Boolean.TYPE));
        point = point + 1;
       }else{
         boolean isClass = false;
@@ -389,7 +397,7 @@ public class ExpressRunner
          ExpressItem op2 = (ExpressItem)list[i] ;
          int op  =m_operatorManager.compareOp(op1.name,op2.name);
          if (op2.name.equals("(")){
-            sOpDataNumber.push(new Integer(1));            	
+            sOpDataNumber.push(Integer.valueOf(1));            	
          }   
 
          switch(op)
@@ -409,6 +417,18 @@ public class ExpressRunner
                      }
                      i++;
                      break;
+            case(4):// if 与 then
+            	op1.opDataNumber = 2;
+                i++;
+            	break;
+            case(5):// if 与 then 
+            	if(list[i -1] instanceof ExpressItem &&  ((ExpressItem)list[i -1]).name.equalsIgnoreCase("then") == true){
+            		 //在if () then else 的情况下 增加一个 void 操作数，方便后续的错误判断
+            	   sdata.push(new OperateData(null,void.class));            	     
+            	}
+            	op1.opDataNumber = 3;
+                i++;
+            	break;
             case (3):
 						if (sop.size() > 1 || sdata.size() > 1) {
 							throw new Exception("表达式设置错误，请检查函数名称是否匹配");
@@ -423,7 +443,7 @@ public class ExpressRunner
                if (op1.name.equals(",")){
                    int TmpInt = ((Integer)sOpDataNumber.pop()).intValue();
                    TmpInt = TmpInt + 1;
-                   sOpDataNumber.push(new Integer(TmpInt));
+                   sOpDataNumber.push(Integer.valueOf(TmpInt));
                }else{
                    // 为了判断表达式的语法是否正确，需要对操作数栈进行处理，不支持(2,3,4)执行结果为4的形式
                    int opDataNumber =m_operatorManager.getDataMember(op1.name);
@@ -450,7 +470,7 @@ public class ExpressRunner
       }
     }
 	  }catch(Exception e){
-		  throw new Exception("表达式语法分析错误：[" + e.getMessage() +"] 请检查：[" + getPrintInfo2(list," ")+"]");
+		  throw new Exception("表达式语法分析错误：[" + e.getMessage() +"] 请检查：[" + getPrintInfo2(list," ")+"]",e);
 	  }
     return null;
   }
@@ -468,11 +488,11 @@ public class ExpressRunner
 		  if(node.getChildren() != null){
 			  throw new Exception("表达式设置错误");
 		  }
-		  
+		}else if(node instanceof ExpressItem && ((ExpressItem)node).name.equalsIgnoreCase("if")){
+			createInstructionSetForIf(result,(ExpressItem)node);
 		}else if(node instanceof ExpressItem){
 			ExpressItem tmpExpressItem = (ExpressItem)node;
 			OperatorBase op = m_operatorManager.newInstance(tmpExpressItem);
-
 			ExpressTreeNode[] children = node.getChildren();
 			int [] finishPoint = new int[children.length];
 			for(int i =0;i < children.length;i++){
@@ -482,15 +502,45 @@ public class ExpressRunner
 			}
 			result.addOperatorInstruction(op,tmpExpressItem.opDataNumber,tmpExpressItem.getMaxStackSize());
 			if(op instanceof OperatorAnd){
-				result.insertInstruction(finishPoint[0]+1,new InstructionGoToWithCondition(false,result.getCurrentPoint() - finishPoint[0] + 1));
+				result.insertInstruction(finishPoint[0]+1,new InstructionGoToWithCondition(false,result.getCurrentPoint() - finishPoint[0] + 1,false));
 			}else if(op instanceof OperatorOr){
-				result.insertInstruction(finishPoint[0]+1,new InstructionGoToWithCondition(true,result.getCurrentPoint() - finishPoint[0] + 1));
+				result.insertInstruction(finishPoint[0]+1,new InstructionGoToWithCondition(true,result.getCurrentPoint() - finishPoint[0] + 1,false));
 			}
 		}else{
 			throw new Exception("不支持的数据类型:" + node.getClass());
 		}
 	}
 
+	/**
+	 * 生成 if 的指令集合
+	 * @param result
+	 * @param node
+	 * @throws Exception
+	 */
+	protected void createInstructionSetForIf(InstructionSet result,ExpressItem node)throws Exception {
+    	ExpressTreeNode[] children = node.getChildren();
+    	if(children.length < 2){
+    		throw new Exception("if 操作符至少需要2个操作数 " );
+    	}else if (children.length == 2) {
+    		//补充一个分支
+    		ExpressTreeNode[] oldChilder =  children;
+    		children = new ExpressTreeNode[3];
+    		children[0] = oldChilder[0];
+    		children[1] = oldChilder[1];
+    		children[2] = new OperateData(null,void.class);    			
+    	}else if(children.length > 3){
+    		throw new Exception("if 操作符最多只有3个操作数 " );
+    	}
+		int [] finishPoint = new int[children.length];
+   		createInstructionSetPrivate(result,children[0]);//condition	
+		finishPoint[0] = result.getCurrentPoint();
+		createInstructionSetPrivate(result,children[1]);//true		
+		result.insertInstruction(finishPoint[0]+1,new InstructionGoToWithCondition(false,result.getCurrentPoint() - finishPoint[0] + 2,true));
+		finishPoint[1] = result.getCurrentPoint();
+		createInstructionSetPrivate(result,children[2]);//false
+		result.insertInstruction(finishPoint[1]+1,new InstructionGoTo(result.getCurrentPoint() - finishPoint[1] + 1));  		
+   }
+    
 	protected void printTreeNode(ExpressTreeNode node, int level) {
 		for (int i = 0; i < level; i++) {
 			System.out.print("   ");
@@ -690,7 +740,7 @@ public class ExpressRunner
      }
   }
    protected boolean isNumber(String str){
-    if(str == null || str =="")
+    if(str == null || str.equals(""))
       return false;
     char c = str.charAt(0);
     if (c >= '0' && c <= '9') { //数字
@@ -706,7 +756,7 @@ public class ExpressRunner
    * @throws Exception
    * @return String[]
    */
-  private String[] parse(String str) throws Exception
+   protected String[] parse(String str) throws Exception
   {
 
     if (str == null)
@@ -793,6 +843,7 @@ public class ExpressRunner
 
  class ExpressItem implements ExpressTreeNode {
    protected String name;
+   protected String aliasName;
    protected int opDataNumber;
    public int point = -1;
    
@@ -801,12 +852,19 @@ public class ExpressRunner
    private ExpressTreeNode[] children;
    
    public ExpressItem(String aName){
+	   this(aName,aName);
+   }
+   public ExpressItem(String aAliasName, String aName){
      name = aName;
+     this.aliasName = aAliasName;
      this.opDataNumber = 0;
    }
    public String toString()
    {
-	   return name;
+	   return this.aliasName;
+   }
+   public String getAliasName(){
+	   return this.aliasName;
    }
 	public ExpressTreeNode getParent() {
 		return parent;

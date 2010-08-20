@@ -219,17 +219,18 @@ public class ExpressUtil {
 		if (index < 0)
 			return getJavaClassInner(type);
 
-		String arrayString = "[";
+		StringBuilder arrayString = new StringBuilder();
+		arrayString.append("[");
 		String baseType = type.substring(0, index);
 		while ((index = type.indexOf("[]", index + 2)) >= 0) {
-			arrayString = arrayString + "[";
+			arrayString.append("[");
 		}
 		Class baseClass = getJavaClassInner(baseType);
 
 		try {
 			String baseName = "";
 			if (baseClass.isPrimitive() == false) {
-				return loadClass(arrayString + "L" + baseClass.getName() + ";");
+				return loadClass(arrayString.toString() + "L" + baseClass.getName() + ";");
 			} else {
 				if (baseClass.equals(boolean.class)) {
 					baseName = "Z";
@@ -248,7 +249,7 @@ public class ExpressUtil {
 				} else if (baseClass.equals(short.class)) {
 					baseName = "S";
 				}
-				return loadClass(arrayString + baseName);
+				return loadClass(arrayString.toString() + baseName);
 			}
 		} catch (ClassNotFoundException ex) {
 			throw new RuntimeException(ex);

@@ -62,12 +62,16 @@ public class OperateData implements ExpressTreeNode {
 	public final Object getObject(IExpressContext context) throws Exception {
 		return getObjectInner(context);
 	}
-    public Object getObjectInner(IExpressContext context){
+    protected Object getObjectInner(IExpressContext context){
     	return this.dataObject;
     }
 
 	public String toString() {
-		return dataObject.toString();
+		if( this.dataObject == null)
+			return this.type + ":null";
+		else{
+			return this.dataObject.toString();
+		}
 	}
 
 }
@@ -108,7 +112,11 @@ class OperateDataAttr extends OperateData {
 		   if (context!= null 
 				   && context instanceof IExpressContextExtend){
 			   return ((IExpressContextExtend)context).getClassType(name);
-		   }	   
+		   }
+		   
+		   if(context == null){
+			   return null;
+		   }
 		   Object obj = context.get(name);
 		   if (obj == null)
 		     return null;

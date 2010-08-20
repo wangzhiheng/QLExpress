@@ -10,7 +10,6 @@ import java.lang.reflect.Modifier;
  */
 @SuppressWarnings("unchecked")
 class SelfDefineClassFunctionOperator extends OperatorBase{
-  String serviceName;
   String functionName;
   String[] parameterTypes;
   Class[] parameterClasses ;
@@ -20,7 +19,6 @@ class SelfDefineClassFunctionOperator extends OperatorBase{
                          String[] aParameterTypes,String aErrorInfo) throws Exception {
     this.name = aOperName;
     this.errorInfo = aErrorInfo;
-    this.serviceName = aClassName;
     this.functionName = aFunctionName;
     this.parameterTypes = aParameterTypes;
     this.parameterClasses = new Class[this.parameterTypes.length];
