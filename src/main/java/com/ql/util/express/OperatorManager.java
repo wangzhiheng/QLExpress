@@ -32,6 +32,8 @@ final class OperatorManager {
 
  public OperatorManager() {
 
+		
+	    this.addOperatorInner("def", 0, 0, 2,  new OperatorDef("def"));
 		this.addOperatorInner("new", 0, 0, -1, null);
 		this.addOperatorInner("method", 0, 0, -1,true, null);
 		this.addOperatorInner("field", 0, 0, 1, null);
@@ -39,6 +41,10 @@ final class OperatorManager {
 		this.addOperatorInner(".", 0, 0, -1, null);
 		this.addOperatorInner("(", 0, 0, -1, new OperatorNullOp("("));
 		this.addOperatorInner(")", 0, 0, -1, new OperatorNullOp(")"));
+
+		this.addOperatorInner("{", 0, 0, -1, new OperatorNullOp("("));
+		this.addOperatorInner("}", 0, 0, -1, new OperatorNullOp(")"));
+		
 		this.addOperatorInner("[", 0, 0, -1, null);
 		this.addOperatorInner("]", 0, 0, -1, null);
 		this.addOperatorInner("++", 1, 0, 1, null);
@@ -281,6 +287,14 @@ final class OperatorManager {
     	  result = 4; 
       }else if(op1.equalsIgnoreCase("if") &&  op2.equalsIgnoreCase("else")){
     	  result = 5; 
+      }else if(op1.equals("{")&&(op2.equals("}")))
+          result =  6;
+      else if (op1.equals("{")) //(比所有的操作符级别低
+          result = 0;
+      else if (op2.equals("{")) //(比所有的操作符级别低
+          result = 0;
+      else if (op2.equals("}")){ //）比所有的操作符级别高
+          result = 1;    	  
       }else if(op1.equals("(")&&(op2.equals(")")))
           result =  2;
       else if (op1.equals("(")) //(比所有的操作符级别低

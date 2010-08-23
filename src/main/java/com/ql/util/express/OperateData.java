@@ -1,5 +1,8 @@
 package com.ql.util.express;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * 数据类型定义
  * @author qhlhl2010@gmail.com
@@ -9,45 +12,15 @@ package com.ql.util.express;
 
 
 @SuppressWarnings("unchecked")
-public class OperateData implements ExpressTreeNode {
-	private Object dataObject;
-
-	private Class type;
-    private ExpressTreeNode parent;
-    private ExpressTreeNode[] children;
-	/**
-	 * 堆栈的最大深度
-	 */
-    public int maxStackSize = 1; 
-	
-
-	public int point = -1;
-    
+public class OperateData extends ExpressTreeNodeImple {
+	protected Object dataObject;
+	protected Class type;
+	//public int point = -1;    
 	public OperateData(Object obj, Class aType) {
 		this.type = aType;
 		this.dataObject = obj;
 	}
-	public ExpressTreeNode getParent() {
-		return parent;
-	}
 
-	public void setParent(ExpressTreeNode aParent) {
-		this.parent = aParent;
-	}
-	public ExpressTreeNode[] getChildren() {
-		return children;
-	}
-	public void setChildren(ExpressTreeNode[] children) {
-		this.children = children;
-	}
-    public int getMaxStackSize() {
-		return maxStackSize;
-	}
-	public void setMaxStackSize(int maxStackSize) {
-		this.maxStackSize = maxStackSize;
-	}
-
-	
 	public Class getType(IExpressContext parent) throws Exception {
 		if (type != null)
 			return type;
@@ -80,14 +53,24 @@ public class OperateData implements ExpressTreeNode {
 class OperateDataAttr extends OperateData {
 	String name;
 
+	public OperateDataAttr(String aName,Class aType) {
+		super(null,aType);
+		this.name = aName;
+	}
 	public OperateDataAttr(String name) {
 		super(null,null);
 		this.name = name;
 	}
-
+    public String getName(){
+    	return name;
+    }
 	public String toString() {
 		try {
-			return name;
+			if(this.type == null){
+				return name;
+			}else{
+			    return name + "[" + this.type + "]"  ;
+			}
 		} catch (Exception ex) {
 			return ex.getMessage();
 		}
@@ -159,14 +142,15 @@ class OperatorClass extends OperateData {
  **/
 class MyPlace implements ExpressTreeNode{
 	ExpressItem op;
-	public int maxStackSize = 1; 
-	
-	public int getMaxStackSize() {
+    public int maxStackSize = 1; 
+
+    public int getMaxStackSize() {
 		return maxStackSize;
 	}
 	public void setMaxStackSize(int maxStackSize) {
 		this.maxStackSize = maxStackSize;
 	}
+    
 	public MyPlace(ExpressItem item){
 		this.op = item;
 	}
@@ -187,16 +171,74 @@ class MyPlace implements ExpressTreeNode{
 	public void setChildren(ExpressTreeNode[] children) {
 		this.op.setChildren(children);
 	}
+	public void addChild(ExpressTreeNode child){
+		this.op.addChild(child);
+	}
 }
 
 interface ExpressTreeNode{
-	public void setParent(ExpressTreeNode parent);
-	public ExpressTreeNode getParent();	
-	
+	public ExpressTreeNode getParent();
+	public void setParent(ExpressTreeNode aParent);
+	public ExpressTreeNode[] getChildren() ;
 	public void setChildren(ExpressTreeNode[] children);
-	public ExpressTreeNode[] getChildren();
+    public int getMaxStackSize();
+	public void setMaxStackSize(int maxStackSize);
+	public void addChild(ExpressTreeNode child);
+}
+
+class ExpressTreeNodeRoot extends ExpressTreeNodeImple{
+	String name;
+	ExpressTreeNodeRoot(String aName){
+		this.name = aName;
+	}
+	public String toString(){
+		return "ExpressNode[" + this.name +"]";
+	}
+}
+class ExpressTreeNodeImple implements ExpressTreeNode{
+	private ExpressTreeNode parent;
+	private List<ExpressTreeNode> children=null;
+	/**
+	 * 堆栈的最大深度
+	 */
+    public int maxStackSize = 1; 
 	
-	public void setMaxStackSize(int size);
-	public int getMaxStackSize();
+
+	public ExpressTreeNode getParent() {
+		return parent;
+	}
+
+	public void setParent(ExpressTreeNode aParent) {
+		this.parent = aParent;
+	}
+	public ExpressTreeNode[] getChildren() {
+		if(this.children == null){
+			return null;
+		}
+		return (ExpressTreeNode[])children.toArray(new ExpressTreeNode[0]);
+	}
+	public void setChildren(ExpressTreeNode[] aChildren) {
+		if(this.children == null){
+			this.children = new ArrayList<ExpressTreeNode>();
+		}
+		if(aChildren != null){
+			for(ExpressTreeNode node : aChildren){
+				this.children.add(node);
+			}
+		}
+		
+	}
+	public void addChild(ExpressTreeNode child){
+		if(this.children == null){
+			this.children = new ArrayList<ExpressTreeNode>();
+		}
+		this.children.add(child);
+	}
+    public int getMaxStackSize() {
+		return maxStackSize;
+	}
+	public void setMaxStackSize(int maxStackSize) {
+		this.maxStackSize = maxStackSize;
+	}
 	
 }
