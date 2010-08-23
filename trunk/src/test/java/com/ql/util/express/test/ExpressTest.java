@@ -56,7 +56,7 @@ public class ExpressTest {
 		String[][] expressTest = new String[][] {
 				{ "def int defVar = 100; defVar = defVar + 100;", "200"},
 				{ " 3+ (如果 1==2 则 4 否则 3) +8","14"},
-				{ " 如果  (如果 1==2 则 false 否则 true) 则 {1 + 1;2+2} 否则 {20 + 20} ","4"},
+				{ " 如果  (如果 1==2 则 false 否则 true) 则 {2+2;} 否则 {20 + 20;} ","4"},
 				
 				{ "System.out.println(\"ss\")", "null" },
 				{"unionName = new com.ql.util.express.test.BeanExample(\"张三\").unionName(\"李四\")",
