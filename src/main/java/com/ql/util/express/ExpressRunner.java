@@ -490,6 +490,9 @@ public class ExpressRunner
                    if (opDataNumber <0){
                      opDataNumber = op1.opDataNumber;
                    } 
+                   if(op1.name.equalsIgnoreCase("return") == true ){
+                	   opDataNumber = sdata.size(); 
+                   }
                    op1.opDataNumber = opDataNumber;
                    op1.setMaxStackSize(sdata.size());
                    List<ExpressTreeNode> tmpList = new ArrayList<ExpressTreeNode>();         
@@ -619,34 +622,31 @@ public class ExpressRunner
   }
   protected InstructionSet createInstructionSet(ExpressTreeNodeRoot root)throws Exception {
 		InstructionSet result = new InstructionSet();
-		ExpressTreeNode[] list = root.getChildren();
-		
-		for(int i=0;i<list.length;i++){
-		  createInstructionSetPrivate(result,list[i]);
-		  if(i < list.length -1 ){
-			 //清除堆栈
-		     result.insertInstruction(result.getCurrentPoint()+1, new InstructionClearDataStack());
-		  }
-		}
- 	    result.insertInstruction(result.getCurrentPoint()+1, new InstructionReturn());
+  	    createInstructionSetPrivate(result,root);
 		return result;
-		
 	}
-	protected void createInstructionSetPrivate(InstructionSet result,ExpressTreeNode node)throws Exception {
+	protected boolean createInstructionSetPrivate(InstructionSet result,ExpressTreeNode node)throws Exception {
+		boolean returnVal = false;
 		if(node instanceof OperateData){
 		  result.addLoadDataInstruction((OperateData)node,node.getMaxStackSize());	
 		  if(node.getChildren() != null){
 			  throw new Exception("表达式设置错误");
 		  }
 		}else if(node instanceof ExpressItem && ((ExpressItem)node).name.equalsIgnoreCase("if")){
-			createInstructionSetForIf(result,(ExpressItem)node);			
+			returnVal = createInstructionSetForIf(result,(ExpressItem)node);			
 		}else if(node instanceof ExpressTreeNodeRoot){
-			result.insertInstruction(result.getCurrentPoint()+1, new InstructionOpenNewArea());			
+			int tmpPoint = result.getCurrentPoint()+1;
+			boolean hasDef = false;
 			for(ExpressTreeNode tmpNode : ((ExpressTreeNodeRoot)node).getChildren()){
-				createInstructionSetPrivate(result,tmpNode);
-				//result.insertInstruction(result.getCurrentPoint()+1, new InstructionClearDataStack());
+				boolean tmpHas =   createInstructionSetPrivate(result,tmpNode);
+				hasDef = hasDef || tmpHas;
+				result.insertInstruction(result.getCurrentPoint()+1, new InstructionClearDataStack());
 			}
-			result.insertInstruction(result.getCurrentPoint()+1, new InstructionCloseNewArea());			
+			if(hasDef == true){
+			    result.insertInstruction(tmpPoint, new InstructionOpenNewArea());			
+			    result.insertInstruction(result.getCurrentPoint()+1, new InstructionCloseNewArea());
+			}
+			returnVal = false;
 		}else if(node instanceof ExpressItem){
 			ExpressItem tmpExpressItem = (ExpressItem)node;
 			OperatorBase op = m_operatorManager.newInstance(tmpExpressItem);
@@ -654,18 +654,26 @@ public class ExpressRunner
 			int [] finishPoint = new int[children.length];
 			for(int i =0;i < children.length;i++){
 				ExpressTreeNode tmpNode = children[i];
-				createInstructionSetPrivate(result,tmpNode);
+				boolean tmpHas =  createInstructionSetPrivate(result,tmpNode);
+				returnVal = returnVal || tmpHas;
 				finishPoint[i] = result.getCurrentPoint();
 			}
-			result.addOperatorInstruction(op,tmpExpressItem.opDataNumber,tmpExpressItem.getMaxStackSize());
-			if(op instanceof OperatorAnd){
-				result.insertInstruction(finishPoint[0]+1,new InstructionGoToWithCondition(false,result.getCurrentPoint() - finishPoint[0] + 1,false));
-			}else if(op instanceof OperatorOr){
-				result.insertInstruction(finishPoint[0]+1,new InstructionGoToWithCondition(true,result.getCurrentPoint() - finishPoint[0] + 1,false));
+			if(op instanceof OperatorReturn){
+				result.insertInstruction(result.getCurrentPoint()+1,new InstructionReturn());	
+			}else{	
+			   result.addOperatorInstruction(op,tmpExpressItem.opDataNumber,tmpExpressItem.getMaxStackSize());
+				if(op instanceof OperatorAnd){
+					result.insertInstruction(finishPoint[0]+1,new InstructionGoToWithCondition(false,result.getCurrentPoint() - finishPoint[0] + 1,false));
+				}else if(op instanceof OperatorOr){
+					result.insertInstruction(finishPoint[0]+1,new InstructionGoToWithCondition(true,result.getCurrentPoint() - finishPoint[0] + 1,false));
+				}else if(op instanceof OperatorDef){
+					returnVal = true;
+				}
 			}
 		}else{
 			throw new Exception("不支持的数据类型:" + node.getClass());
 		}
+		return returnVal;
 	}
 
 	/**
@@ -674,7 +682,7 @@ public class ExpressRunner
 	 * @param node
 	 * @throws Exception
 	 */
-	protected void createInstructionSetForIf(InstructionSet result,ExpressItem node)throws Exception {
+	protected boolean createInstructionSetForIf(InstructionSet result,ExpressItem node)throws Exception {
     	ExpressTreeNode[] children = node.getChildren();
     	if(children.length < 2){
     		throw new Exception("if 操作符至少需要2个操作数 " );
@@ -689,14 +697,15 @@ public class ExpressRunner
     		throw new Exception("if 操作符最多只有3个操作数 " );
     	}
 		int [] finishPoint = new int[children.length];
-   		createInstructionSetPrivate(result,children[0]);//condition	
+   		boolean r1 = createInstructionSetPrivate(result,children[0]);//condition	
 		finishPoint[0] = result.getCurrentPoint();
-		createInstructionSetPrivate(result,children[1]);//true		
+		boolean r2 = createInstructionSetPrivate(result,children[1]);//true		
 		result.insertInstruction(finishPoint[0]+1,new InstructionGoToWithCondition(false,result.getCurrentPoint() - finishPoint[0] + 2,true));
 		finishPoint[1] = result.getCurrentPoint();
-		createInstructionSetPrivate(result,children[2]);//false
+		boolean r3 = createInstructionSetPrivate(result,children[2]);//false
 		result.insertInstruction(finishPoint[1]+1,new InstructionGoTo(result.getCurrentPoint() - finishPoint[1] + 1));  		
-   }
+        return r1 || r2 || r3;
+	}
     
 	protected void printTreeNode(ExpressTreeNode node, int level) {
 		for (int i = 0; i < level; i++) {
@@ -921,8 +930,12 @@ public class ExpressRunner
 
     if (str == null)
        return new String[0];
+    str = str.trim();
     if(str.endsWith(";") == false ){
       str = str +";";
+    }
+    if(str.indexOf(';') == str.length() -1 && str.indexOf("return") < 0){
+    	str =  "return " + str;
     }
     String tmpWord ="";
     String tmpOpStr ="";

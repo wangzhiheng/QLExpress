@@ -29,19 +29,17 @@ public class InstructionSet {
 	  RunEnvironment environmen = new RunEnvironment(this.maxStackSize,(InstructionSetContext)context,isTrace);
 	  Instruction instruction;
 	  while(environmen.getProgramPoint() < this.list.size()){
+		  if (environmen.isExit() == true){
+			  break;
+		  }
 		  instruction = this.list.get(environmen.getProgramPoint());
-		  //System.out.println("执行：" + instruction);
 		  instruction.execute(environmen,errorList);
 	  }
 	  if(environmen.getDataStackSize() > 1){
-		 // throw new Exception("在表达式执行完毕后，堆栈中还存在多个数据");
+		  throw new Exception("在表达式执行完毕后，堆栈中还存在多个数据");
 	  }
-		OperateData result = environmen.pop();
-		if (result != null) {
-			return result.getObject(context);
-		} else {
-			return null;
-		}
+	  return environmen.getReturnValue();
+		
   }
   /**
    * 添加操作数入栈指令
@@ -96,9 +94,14 @@ class RunEnvironment {
     private int programPoint = 0;
 	private OperateData[] dataContainer;
 	
+	private boolean isExit = false;
+	private Object returnValue = null; 
 
 	private InstructionSetContext context;
 	public RunEnvironment(int aStackSize,InstructionSetContext aContext,boolean aIsTrace){
+		if(aStackSize <0){
+			aStackSize =0;
+		}
 		dataContainer = new OperateData[aStackSize];
 		this.context = aContext;
 		this.isTrace = aIsTrace;
@@ -110,6 +113,16 @@ class RunEnvironment {
 		this.context = aContext;
 	}
 	
+	public boolean isExit() {
+		return isExit;
+	}
+	public Object getReturnValue() {
+		return returnValue;
+	}
+	public void quitExpress(Object aReturnValue){
+		this.isExit = true;
+		this.returnValue = aReturnValue;
+	}
 	public boolean isTrace(){
 		return this.isTrace;
 	}
@@ -282,6 +295,12 @@ class InstructionReturn extends Instruction{
 		//目前的模式，不需要执行任何操作
 		if(environment.isTrace()){
 			log.debug(this);
+		}
+		if(environment.getDataStackSize() >= 1){
+			
+		   environment.quitExpress(environment.pop().getObject(environment.getContext()));
+		}else{
+		   environment.quitExpress(null);
 		}
 		environment.programPointAddOne();
 	}

@@ -19,12 +19,13 @@ public class OperatorOfNumber {
 			boolean flag4;
 			boolean flag5;
 			boolean flag = flag1 = flag2 = flag3 = flag4 = flag5 = false;
-			if (op1 instanceof String || op2 instanceof String) {
-				if (op1 == null)
-					op1 = "null";
-				if (op2 == null)
-					op2 = "null";
-
+			if(op1 == null){
+				op1 = "null";
+			}
+			if(op2 == null){
+				op2 = "null";
+			}
+			if (op1 instanceof String || op2 instanceof String) {				
 				return op1.toString() + op2.toString();
 			}
 

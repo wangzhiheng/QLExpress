@@ -54,7 +54,8 @@ public class ExpressTest {
 		runner.addFunctionOfClassMethod("testLong", BeanExample.class.getName(),
 				"testLong", new String[] { "long" }, null);		
 		String[][] expressTest = new String[][] {
-				{ "def int defVar = 100; defVar = defVar + 100;", "200"},
+				{"def int defVar = 100; defVar = defVar + 100;", "200"},
+				{"def int a=0; if false then a = 5 else  a=10+1 ; return a ","11"},
 				{ " 3+ (如果 1==2 则 4 否则 3) +8","14"},
 				{ " 如果  (如果 1==2 则 false 否则 true) 则 {2+2;} 否则 {20 + 20;} ","4"},
 				
