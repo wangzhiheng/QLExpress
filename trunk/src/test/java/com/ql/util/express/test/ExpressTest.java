@@ -3,6 +3,8 @@ package com.ql.util.express.test;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Assert;
+
 import com.ql.util.express.ExpressRunner;
 import com.ql.util.express.IExpressContext;
 
@@ -13,6 +15,7 @@ public class ExpressTest {
 		String express = "10 * 10 + 1 + 2 * 3 + 5 * 2";
 		ExpressRunner runner = new ExpressRunner();
 		Object result = runner.execute(express, null, false, null);
+		Assert.assertTrue("表达式计算", result.toString().equalsIgnoreCase("117"));
 		System.out.println("表达式计算：" + express + " = " + result);
 	}
 
@@ -50,9 +53,11 @@ public class ExpressTest {
 				"upper", new String[] { "String" }, null);		
 		runner.addFunctionOfClassMethod("testLong", BeanExample.class.getName(),
 				"testLong", new String[] { "long" }, null);		
-		
 		String[][] expressTest = new String[][] {
+				{ "def int defVar = 100; defVar = defVar + 100;", "200"},
 				{ " 3+ (如果 1==2 则 4 否则 3) +8","14"},
+				{ " 如果  (如果 1==2 则 false 否则 true) 则 {1 + 1;2+2} 否则 {20 + 20} ","4"},
+				
 				{ "System.out.println(\"ss\")", "null" },
 				{"unionName = new com.ql.util.express.test.BeanExample(\"张三\").unionName(\"李四\")",
 						"张三-李四" }, 
@@ -70,7 +75,7 @@ public class ExpressTest {
 				{" 1!=1 and isVIP(\"qhlhl2010@gmail.com\")","false"},
 				{" 1==1 or isVIP(\"qhlhl2010@gmail.com\") ","true"},
 				{ "abc == 1", "true" },
-				{ "testLong(abc)", "toString:1" },
+				{ "testLong(abc)", "toString:1" }
 				};
 		IExpressContext expressContext = new ExpressContextExample(null);
 		expressContext.put("b", new Integer(200));
@@ -78,11 +83,13 @@ public class ExpressTest {
 		expressContext.put("d", new Integer(400));
 		expressContext.put("bean", new BeanExample());
 		expressContext.put("abc",1l);
+		expressContext.put("defVar",1000);
+		
 		
 		for (int point = 0; point < expressTest.length; point++) {
 			String expressStr = expressTest[point][0];
 			List errorList = new ArrayList();
-			 Object result =runner.execute(expressStr,errorList,true,expressContext);
+			 Object result =runner.execute(expressStr,errorList,true,expressContext,true);
 			if (expressTest[point][1].equalsIgnoreCase("null")
 					&& result != null
 					|| result != null

@@ -213,6 +213,23 @@ class OperatorCast extends OperatorBase {
 	}
 }
 
+class OperatorDef extends OperatorBase {
+	public OperatorDef(String aName) {
+		this.name = aName;
+	}
+
+	@SuppressWarnings("unchecked")
+	public OperateData executeInner(IExpressContext parent, OperateData[] list) throws Exception {
+		Class tmpClass = (Class) list[0].getObject(parent);
+		String varName = ((OperateDataAttr)list[1]).getName();
+		
+		((InstructionSetContext)parent).putKeyDefine(varName);
+		OperateData result = new OperateDataAttr(varName,tmpClass);
+		return result;
+	}
+}
+
+
 @SuppressWarnings("unchecked")
 class OperatorMethod extends OperatorBase {
 	String methodName;
