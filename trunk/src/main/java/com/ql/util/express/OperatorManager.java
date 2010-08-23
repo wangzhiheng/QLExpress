@@ -83,7 +83,10 @@ final class OperatorManager {
 		this.addOperatorInner("if", 20, 0, -1, new OperatorIf("if"));
 		this.addOperatorInner("then", 20, 0, -1, new OperatorNullOp("if"));
 		this.addOperatorInner("else", 20, 0, -1, new OperatorNullOp("if"));
-		this.addOperatorInner(";", 21, 0, -1, new OperatorNullOp(";"));
+		//return 的操作数量是根据堆栈的实际情况来看的，999是一个特殊标志
+		this.addOperatorInner("return", 21, 0, 999, new OperatorReturn("return"));
+		
+		this.addOperatorInner(";", 100, 0, -1, new OperatorNullOp(";"));
 		
 		//---------------
 		this.addFunction("max", new OperatorMinMax("max"));
