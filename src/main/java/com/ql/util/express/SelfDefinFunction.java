@@ -29,7 +29,7 @@ class SelfDefineClassFunctionOperator extends OperatorBase{
     method = operClass.getMethod(functionName,parameterClasses);
   }
 
-  public OperateData executeInner(IExpressContext context, OperateData[] list) throws
+  public OperateData executeInner(InstructionSetContext context, OperateData[] list) throws
       Exception {
       if(this.parameterClasses.length != list.length){
         throw new Exception("定义的参数长度与运行期传入的参数长度不一致");
@@ -80,7 +80,7 @@ class SelfDefineServiceFunctionOperator extends OperatorBase{
    
   }
 
-  public OperateData executeInner(IExpressContext context, OperateData[] list) throws
+  public OperateData executeInner(InstructionSetContext context, OperateData[] list) throws
       Exception {
       if(this.parameterClasses.length != list.length){
         throw new Exception("定义的参数长度与运行期传入的参数长度不一致");

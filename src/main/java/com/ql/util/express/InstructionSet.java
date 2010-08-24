@@ -53,6 +53,12 @@ public class InstructionSet {
 	  }	  
   }
   
+  public void addLoadAttrInstruction(OperateDataAttr operateData,int stackSize){
+	  this.list.add(new InstructionLoadAttr(operateData.name));
+	  if(stackSize > this.maxStackSize){
+		  this.maxStackSize = stackSize;
+	  }	  
+  }  
 /**
  * 添加操作运行指令
  * @param operator
@@ -106,12 +112,15 @@ class RunEnvironment {
 		this.context = aContext;
 		this.isTrace = aIsTrace;
 	}
+	
 	public InstructionSetContext getContext(){
 		return this.context;
 	}
 	public void setContext(InstructionSetContext aContext){
 		this.context = aContext;
 	}
+	
+
 	
 	public boolean isExit() {
 		return isExit;
@@ -162,7 +171,7 @@ class RunEnvironment {
 		this.programPoint = this.programPoint + aOffset;
 	}
 
-	public OperateData[] popArray(IExpressContext<Object,Object> context,int len) throws Exception {
+	public OperateData[] popArray(InstructionSetContext context,int len) throws Exception {
 		OperateData[] result = new OperateData[len];
 		int start = point - len + 1;
 		if(start <0){
@@ -223,9 +232,28 @@ class InstructionLoadData extends Instruction{
 	  }else{
 		  return "LoadData " +this.operateData.toString();	
 	  }
-	}
-	
+	}	
 }
+
+@SuppressWarnings("unchecked")
+class InstructionLoadAttr extends Instruction{
+    String attrName;
+    InstructionLoadAttr(String aName){
+    	this.attrName = aName;
+    }
+
+	public void execute(RunEnvironment environment,List errorList)throws Exception{
+		if(environment.isTrace()){
+			log.debug(this +":" + environment.getContext().get(this.attrName));						
+		}
+		environment.push(environment.getContext().getSymbol(this.attrName));
+		environment.programPointAddOne();
+	}
+	public String toString(){
+		  return "LoadAttr:" +this.attrName;	
+	}	
+}
+
 class InstructionClearDataStack extends Instruction{
 	InstructionClearDataStack(){
     }

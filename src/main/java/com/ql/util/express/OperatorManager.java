@@ -31,9 +31,8 @@ final class OperatorManager {
 	protected Map<String,OpStr> opStrList = new HashMap<String,OpStr>();
 
  public OperatorManager() {
-
-		
-	    this.addOperatorInner("def", 0, 0, 2,  new OperatorDef("def"));
+	 
+		this.addOperatorInner("def", 0, 0, 2,  new OperatorDef("def"));
 		this.addOperatorInner("new", 0, 0, -1, null);
 		this.addOperatorInner("method", 0, 0, -1,true, null);
 		this.addOperatorInner("field", 0, 0, 1, null);
@@ -83,8 +82,10 @@ final class OperatorManager {
 		this.addOperatorInner("if", 20, 0, -1, new OperatorIf("if"));
 		this.addOperatorInner("then", 20, 0, -1, new OperatorNullOp("if"));
 		this.addOperatorInner("else", 20, 0, -1, new OperatorNullOp("if"));
+		
+	 	this.addOperatorInner("alias", 21, 0, 2,  new OperatorAlias("alias"));
 		//return 的操作数量是根据堆栈的实际情况来看的，999是一个特殊标志
-		this.addOperatorInner("return", 21, 0, 999, new OperatorReturn("return"));
+		this.addOperatorInner("return", 25, 0, 999, new OperatorReturn("return"));
 		
 		this.addOperatorInner(";", 100, 0, -1, new OperatorNullOp(";"));
 		

@@ -2,6 +2,7 @@ package com.ql.util.express.test;
 
 public class BeanExample {
 	public String name = "qhlhl2010@gmail.com";
+	public BeanExampleChild child = new BeanExampleChild();
 	public BeanExample() {
 	}
 

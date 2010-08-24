@@ -1,5 +1,6 @@
 package com.ql.util.express;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,13 +16,13 @@ import java.util.List;
 public class OperateData extends ExpressTreeNodeImple {
 	protected Object dataObject;
 	protected Class type;
-	//public int point = -1;    
+
 	public OperateData(Object obj, Class aType) {
 		this.type = aType;
 		this.dataObject = obj;
 	}
 
-	public Class getType(IExpressContext parent) throws Exception {
+	public Class getType(InstructionSetContext parent) throws Exception {
 		if (type != null)
 			return type;
 
@@ -32,10 +33,10 @@ public class OperateData extends ExpressTreeNodeImple {
 			return obj.getClass();
 	}
 
-	public final Object getObject(IExpressContext context) throws Exception {
+	public final Object getObject(InstructionSetContext context) throws Exception {
 		return getObjectInner(context);
 	}
-    protected Object getObjectInner(IExpressContext context){
+    protected Object getObjectInner(InstructionSetContext context){
     	return this.dataObject;
     }
 
@@ -52,7 +53,6 @@ public class OperateData extends ExpressTreeNodeImple {
 @SuppressWarnings("unchecked")
 class OperateDataAttr extends OperateData {
 	String name;
-
 	public OperateDataAttr(String aName,Class aType) {
 		super(null,aType);
 		this.name = aName;
@@ -66,17 +66,18 @@ class OperateDataAttr extends OperateData {
     }
 	public String toString() {
 		try {
+			String str ="";
 			if(this.type == null){
-				return name;
+				str =  name;
 			}else{
-			    return name + "[" + this.type + "]"  ;
+				str = name + "[" + this.type + "]"  ;
 			}
+			return str;
 		} catch (Exception ex) {
 			return ex.getMessage();
 		}
 	}
-
-	public Object getObjectInner(IExpressContext context) {
+	public Object getObjectInner(InstructionSetContext context) {
 		if (this.name.equalsIgnoreCase("null")) {
 			return null;
 		}
@@ -85,13 +86,13 @@ class OperateDataAttr extends OperateData {
 					+ "\"请检查表达式");
 		}
 		try {
-			return context.get(this.name);
+			   return context.get(this.name);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
     
-	public Class getType(IExpressContext context) throws Exception {
+	public Class getType(InstructionSetContext context) throws Exception {
 		   if (context!= null 
 				   && context instanceof IExpressContextExtend){
 			   return ((IExpressContextExtend)context).getClassType(name);
@@ -107,15 +108,119 @@ class OperateDataAttr extends OperateData {
 		     return obj.getClass();
 	}
 
-	public void setObject(IExpressContext parent, Object object) {
+	public void setObject(InstructionSetContext parent, Object object) {
 		try {
-			parent.put(this.name, object);
+			  parent.put(this.name, object);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 }
+class OperateDataField extends OperateDataAttr {
+	Field field;
+	Object fieldObject;
+	String name;
+	
+	public OperateDataField(Field aField,Object aFieldObject) {
+		super(null,aField.getType());
+		this.name =aField.getDeclaringClass().getName() + "." + aField.getName();
+		this.fieldObject = aFieldObject;
+		this.field = aField;
+	}
+	
+    public String getName(){
+    	return name;
+    }
+	public String toString() {
+		try {			
+			return name;
+		} catch (Exception ex) {
+			return ex.getMessage();
+		}
+	}
 
+	public Object getObjectInner(InstructionSetContext context) {
+		try {
+			return this.field.get(this.fieldObject);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+    
+	public Class getType(InstructionSetContext context) throws Exception {
+		  return this.field.getType();
+	}
+
+	public void setObject(InstructionSetContext parent, Object object) {
+		try {
+			this.field.set(this.fieldObject, object);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+}
+class OperateDataLocalVar extends OperateDataAttr {
+	public OperateDataLocalVar(String name,Class type) {
+		super(name,type);
+	}
+	public String toString() {
+		try {			
+			return name +":localVar";
+		} catch (Exception ex) {
+			return ex.getMessage();
+		}
+	}
+
+	public Object getObjectInner(InstructionSetContext context) {
+		try {
+			return this.dataObject;
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+    
+	public Class getType(InstructionSetContext context) throws Exception {
+		  return this.type;
+	}
+
+	public void setObject(InstructionSetContext parent, Object value) {
+		this.dataObject = value;
+	}
+}
+@SuppressWarnings("unchecked")
+class OperateDataAlias extends OperateDataAttr {
+	OperateDataAttr realAttr;
+	public OperateDataAlias(String aName,OperateDataAttr aRealAttr) {
+		super(aName,null);
+		this.realAttr = aRealAttr;
+	}
+	public String toString() {
+		try {
+			return this.name + "[alias=" + this.realAttr.name+"]";
+		} catch (Exception ex) {
+			return ex.getMessage();
+		}
+	}
+	public Object getObjectInner(InstructionSetContext context) {
+		try {
+			return realAttr.getObject(context);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}		
+	}
+    
+	public Class getType(InstructionSetContext context) throws Exception {
+		return realAttr.getType(context);
+	}
+
+	public void setObject(InstructionSetContext context, Object object) {		
+		try {
+			realAttr.setObject(context, object);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+}
 @SuppressWarnings("unchecked")
 class OperatorClass extends OperateData {
 	private String name;
@@ -132,7 +237,7 @@ class OperatorClass extends OperateData {
 		// return name;
 	}
 
-	public Object getObjectInner(IExpressContext parent) {
+	public Object getObjectInner(InstructionSetContext parent) {
 		return m_class;
 	}
 }
