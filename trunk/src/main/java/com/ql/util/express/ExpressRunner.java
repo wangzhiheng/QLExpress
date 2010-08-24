@@ -175,7 +175,7 @@ public class ExpressRunner
   private Map<String,Object[]> expressParseResultCache = new HashMap<String,Object[]>();
   private Map<String,InstructionSet> expressInstructionSetCache = new HashMap<String,InstructionSet>();
   
-  protected OperatorManager m_operatorManager =  new OperatorManager();;
+  protected OperatorManager m_operatorManager =  new OperatorManager();
   protected ExpressImport m_import = new ExpressImport();
   protected Map m_cacheOracleParseString = new HashMap();
   public ExpressRunner(){ }
@@ -391,7 +391,9 @@ public class ExpressRunner
 	  for(int i=0;i< list.length;i++){
 		  if(list[i] instanceof ExpressItem &&  ((ExpressItem)list[i]).name.equals(";")){//生成一个新的语句
 			  stackList.peek().add(list[i]);
-			  nodeStack.peek().addChild(getCResultOne(stackList.peek().toArray()));
+			  for(ExpressTreeNode item:getCResultOne(stackList.peek().toArray())){
+			      nodeStack.peek().addChild(item);
+			  }
 			  stackList.peek().clear();
 		  }else if(list[i] instanceof ExpressItem &&  ((ExpressItem)list[i]).name.equals("{")){//生成一个新的语句
 			  nodeStack.push(new ExpressTreeNodeRoot("{}"));
@@ -400,7 +402,9 @@ public class ExpressRunner
 			  //若果 } 前面没有 ;则也作为一个完成的语句处理
 			  if(false == (list[i - 1] instanceof ExpressItem == true &&  ((ExpressItem)list[i - 1]).name.equals(";")))
 			  {   stackList.peek().add(new ExpressItem(";"));
-			      nodeStack.peek().addChild(getCResultOne(stackList.peek().toArray()));
+			      for(ExpressTreeNode item:getCResultOne(stackList.peek().toArray())){
+			          nodeStack.peek().addChild(item);
+			      }
 		      }
 			  //处理 }
 			  stackList.peek().clear();
@@ -417,12 +421,13 @@ public class ExpressRunner
 	  return result;
   }
    
-  protected ExpressTreeNode getCResultOne(Object[] list) throws Exception
+  protected ExpressTreeNode[] getCResultOne(Object[] list) throws Exception
   {
 	try{
     if (list == null){
       throw new Exception("表达式不能为空");
     }  
+    List<ExpressTreeNode> result = new ArrayList<ExpressTreeNode>();
     Stack sop = new Stack();
     Stack sdata = new Stack();
     Stack sOpDataNumber = new Stack();
@@ -484,11 +489,12 @@ public class ExpressRunner
 						if (sop.size() > 1 || sdata.size() > 1) {
 							throw new Exception("表达式设置错误，请检查函数名称是否匹配");
 						}
-						ExpressTreeNode rootNode = (ExpressTreeNode)sdata.pop();
-						if (rootNode instanceof MyPlace) {
-							rootNode = ((MyPlace) rootNode).op;
+						ExpressTreeNode tmpResultNode = (ExpressTreeNode) sdata.pop();
+						if (tmpResultNode instanceof MyPlace) {
+							tmpResultNode = ((MyPlace) tmpResultNode).op;
 						}
-						return rootNode;
+						result.add(tmpResultNode);
+						return result.toArray(new ExpressTreeNode[0]);
             case(1) :
                sop.pop();//抛出堆栈顶的操作符号
                if (op1.name.equals(",")){
@@ -517,7 +523,11 @@ public class ExpressRunner
                      tmpList.add(0,tmpNode);
                    }
                    op1.setChildren(tmpList.toArray(new ExpressTreeNode[0]));
-                   sdata.push(new MyPlace(op1));
+                   if(op1.getChildren().length <=0 ){
+                	   result.add(op1);
+                   }else{
+                      sdata.push(new MyPlace(op1));
+                   }
                }
                break;
          }
@@ -648,6 +658,8 @@ public class ExpressRunner
 		  if(node.getChildren() != null){
 			  throw new Exception("表达式设置错误");
 		  }
+		}else if(node instanceof ExpressItem && ((ExpressItem)node).name.equalsIgnoreCase("cache")){			  	
+			result.insertInstruction(result.getCurrentPoint()+1, new InstructionCachFuncitonCall());
 		}else if(node instanceof ExpressItem && ((ExpressItem)node).name.equalsIgnoreCase("if")){
 			returnVal = createInstructionSetForIf(result,(ExpressItem)node);			
 		}else if(node instanceof ExpressTreeNodeRoot){
@@ -787,10 +799,10 @@ public class ExpressRunner
   }
   
   public Object execute(String expressString,List errorList,boolean isCache,IExpressContext context) throws Exception{
-	  return execute(expressString,errorList,isCache,context,false);
+	  return execute(expressString,errorList,isCache,context,null,false);
   }
 
-  public Object execute(String expressString,List errorList,boolean isCache,IExpressContext context,boolean isTrace) throws Exception{
+  public Object execute(String expressString,List errorList,boolean isCache,IExpressContext context,FuncitonCacheManager aFunctionCacheMananger,boolean isTrace) throws Exception{
 	  InstructionSet parseResult = null;
 	  if(isCache == true){
 	    parseResult = expressInstructionSetCache.get(expressString);
@@ -807,7 +819,7 @@ public class ExpressRunner
 	  }else{
 		  parseResult = this.parseInstructionSet(expressString);
 	  }
-    return parseResult.excute(context,errorList,isTrace);
+    return parseResult.excute(this.m_operatorManager,context,errorList,aFunctionCacheMananger,isTrace);
   } 
   /**
    * 清除缓存

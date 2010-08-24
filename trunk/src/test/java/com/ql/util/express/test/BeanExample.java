@@ -14,6 +14,7 @@ public class BeanExample {
 		return "toString:" + i;
 	}
 	public String unionName(String otherName) {
+		System.out.println(" execute unionName("+ otherName+ ") .....");
 		return name + "-" + otherName;
 	}
 
@@ -22,6 +23,7 @@ public class BeanExample {
 	}
 
 	public static boolean isVIP(String name) {
+		System.out.println(" execute isVIP("+ name+ ") .....");
 		return false;
 	}
 }

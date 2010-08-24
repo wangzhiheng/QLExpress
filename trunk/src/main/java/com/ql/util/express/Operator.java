@@ -42,16 +42,41 @@ abstract class OperatorBase {
 		}
 		return result;
 	}
-	public OperateData execute(InstructionSetContext parent, OperateData[] list,
-			List errorList) throws Exception {
-		OperateData result = this.executeInner(parent, list);
+	
+	public OperateData execute(InstructionSetContext context,
+			OperateData[] list, List errorList) throws Exception {
+		OperateData result = null;
+		if (context.isStartFunctionCallCache()
+				&& context.getOperatorManager().isFunction(this.name) 
+				 || this instanceof OperatorMethod) {
+			//缓存处理
+			try {
+				Object[] tmpList = new Object[list.length];
+				for (int i = 0; i < tmpList.length; i++) {
+					tmpList[i] = list[i].getObject(context);
+				}
+				String key = FuncitonCacheManager.genKey(this.getAliasName(),
+						tmpList);
+				if (context.getEnvironmen().getFunctionCachManager().containsKey(key)) {
+					result = (OperateData) context.getEnvironmen().getFunctionCachManager().get(key);
+				}else{
+					result = this.executeInner(context, list);
+					context.getEnvironmen().getFunctionCachManager().put(key, result);
+				}
+			} finally {
+				context.stopStartFunctionCallCache();
+			}
+		}else{
+			result = this.executeInner(context, list);
+		}
+		//输出错误信息
 		if (errorList != null && this.errorInfo != null && result != null) {
-			Object obj = result.getObject(parent);
+			Object obj = result.getObject(context);
 			if (    obj != null
 					&& obj instanceof Boolean
 					&& ((Boolean) obj).booleanValue() == false) {
 				String tmpStr = ExpressUtil.replaceString(this.errorInfo,
-						toObjectList(parent, list));
+						toObjectList(context, list));
 				if(errorList.contains(tmpStr) == false){
 				    errorList.add(tmpStr);
 				}
@@ -241,7 +266,16 @@ class OperatorAlias extends OperatorBase {
 		return result;
 	}
 }
+class OperatorCache extends OperatorBase {
+	public OperatorCache(String aName) {
+		this.name = aName;
+	}
 
+	@SuppressWarnings("unchecked")
+	public OperateData executeInner(InstructionSetContext context, OperateData[] list) throws Exception {
+		throw new Exception("cache 是通过特殊指令来实现的，不能支持此方法");
+	}
+}
 @SuppressWarnings("unchecked")
 class OperatorMethod extends OperatorBase {
 	String methodName;

@@ -54,6 +54,7 @@ public class ExpressTest {
 		runner.addFunctionOfClassMethod("testLong", BeanExample.class.getName(),
 				"testLong", new String[] { "long" }, null);		
 		String[][] expressTest = new String[][] {
+				{ " cache isVIP(\"qh\") ;  cache isVIP(\"xuannan\") return cache isVIP(\"qh\") ;", "false" },				
 				{ "如果  三星卖家  则  'a' love 'b'  否则   'b' love 'd' ", "b{a}b" },
 				{"def int defVar = 100; defVar = defVar + 100;", "200"},
 				{"def int a=0; if false then a = 5 else  a=10+1 ; return a ","11"},
@@ -91,7 +92,7 @@ public class ExpressTest {
 		for (int point = 0; point < expressTest.length; point++) {
 			String expressStr = expressTest[point][0];
 			List errorList = new ArrayList();
-			 Object result =runner.execute(expressStr,errorList,true,expressContext,true);
+			 Object result =runner.execute(expressStr,errorList,true,expressContext,null,true);
 			if (expressTest[point][1].equalsIgnoreCase("null")
 					&& result != null
 					|| result != null
