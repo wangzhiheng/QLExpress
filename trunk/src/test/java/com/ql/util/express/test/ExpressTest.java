@@ -54,7 +54,7 @@ public class ExpressTest {
 		runner.addFunctionOfClassMethod("testLong", BeanExample.class.getName(),
 				"testLong", new String[] { "long" }, null);		
 		String[][] expressTest = new String[][] {
-				{ " cache isVIP(\"qh\") ;  cache isVIP(\"xuannan\") return cache isVIP(\"qh\") ;", "false" },				
+				{ " cache isVIP(\"qh\") ;  cache isVIP(\"xuannan\"); return cache isVIP(\"qh\") ;", "false" },				
 				{ "如果  三星卖家  则  'a' love 'b'  否则   'b' love 'd' ", "b{a}b" },
 				{"def int defVar = 100; defVar = defVar + 100;", "200"},
 				{"def int a=0; if false then a = 5 else  a=10+1 ; return a ","11"},
