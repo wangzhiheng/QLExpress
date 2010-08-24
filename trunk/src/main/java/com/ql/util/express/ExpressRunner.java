@@ -358,8 +358,19 @@ public class ExpressRunner
             list.add(new OperatorClass(tmpStr,tmpClass));
           }
         }else{
-          list.add(new OperateDataAttr(name));
-          point = point + 1;
+        	//讲 def，alias 后面的第一个参数当作字符串处理
+        	if(list.size() >=1 && list.get(list.size() -1 ) instanceof ExpressItem
+        	         && ((ExpressItem)list.get(list.size() -1 )).name.equalsIgnoreCase("alias")
+        	        ){
+        		list.add(new OperateData(name,String.class));
+        	}else if(list.size() >=2 && list.get(list.size() -2 ) instanceof ExpressItem
+             	   && ((ExpressItem)list.get(list.size() -2 )).name.equalsIgnoreCase("def")
+             	   ){	
+        		list.add(new OperateData(name,String.class));
+        	}else{
+                list.add(new OperateDataAttr(name));
+        	}
+           point = point + 1;
         }
       }
     }
@@ -627,7 +638,12 @@ public class ExpressRunner
 	}
 	protected boolean createInstructionSetPrivate(InstructionSet result,ExpressTreeNode node)throws Exception {
 		boolean returnVal = false;
-		if(node instanceof OperateData){
+		if(node instanceof OperateDataAttr){
+			  result.addLoadAttrInstruction((OperateDataAttr)node,node.getMaxStackSize());	
+			  if(node.getChildren() != null){
+				  throw new Exception("表达式设置错误");
+			  }
+		}else if(node instanceof OperateData){			  	
 		  result.addLoadDataInstruction((OperateData)node,node.getMaxStackSize());	
 		  if(node.getChildren() != null){
 			  throw new Exception("表达式设置错误");
@@ -666,7 +682,7 @@ public class ExpressRunner
 					result.insertInstruction(finishPoint[0]+1,new InstructionGoToWithCondition(false,result.getCurrentPoint() - finishPoint[0] + 1,false));
 				}else if(op instanceof OperatorOr){
 					result.insertInstruction(finishPoint[0]+1,new InstructionGoToWithCondition(true,result.getCurrentPoint() - finishPoint[0] + 1,false));
-				}else if(op instanceof OperatorDef){
+				}else if(op instanceof OperatorDef || op instanceof OperatorAlias){
 					returnVal = true;
 				}
 			}
@@ -808,7 +824,7 @@ public class ExpressRunner
    * @return 计算的结果
    * @throws Exception
    */
-  protected final Object executeWithPreCompile(IExpressContext context,Object[] expressItems,List errorList) throws Exception
+  protected final Object executeWithPreCompile(InstructionSetContext context,Object[] expressItems,List errorList) throws Exception
   {
     if (expressItems == null)       
     	return null;

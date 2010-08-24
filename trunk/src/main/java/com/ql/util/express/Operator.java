@@ -31,7 +31,7 @@ abstract class OperatorBase {
 
 	protected String errorInfo;
 
-	public Object[] toObjectList(IExpressContext parent, OperateData[] list)
+	public Object[] toObjectList(InstructionSetContext parent, OperateData[] list)
 			throws Exception {
 		if (list == null) {
 			return new Object[0];
@@ -42,7 +42,7 @@ abstract class OperatorBase {
 		}
 		return result;
 	}
-	public OperateData execute(IExpressContext parent, OperateData[] list,
+	public OperateData execute(InstructionSetContext parent, OperateData[] list,
 			List errorList) throws Exception {
 		OperateData result = this.executeInner(parent, list);
 		if (errorList != null && this.errorInfo != null && result != null) {
@@ -66,7 +66,7 @@ abstract class OperatorBase {
     		return this.name;
     	}
     }
-	public abstract OperateData executeInner(IExpressContext parent, OperateData[] list) throws Exception;
+	public abstract OperateData executeInner(InstructionSetContext parent, OperateData[] list) throws Exception;
 
 	public void setName(String aName) {
 		this.name = aName;
@@ -99,7 +99,7 @@ abstract class OperatorBase {
 
 public abstract class Operator extends  OperatorBase{
 	@SuppressWarnings("unchecked")
-	public OperateData executeInner(IExpressContext context, OperateData[] list) throws Exception{
+	public OperateData executeInner(InstructionSetContext context, OperateData[] list) throws Exception{
 		Object[] parameters = new Object[list.length];
 		for(int i = 0;i <list.length;i++){			
 			parameters[i] = list[i].getObject(context);
@@ -128,11 +128,11 @@ class OperatorEvaluate extends OperatorBase {
 		this.aliasName = aAliasName;
 		this.errorInfo = aErrorInfo;
 	}
-	public OperateData executeInner(IExpressContext parent, OperateData[] list) throws Exception {
+	public OperateData executeInner(InstructionSetContext parent, OperateData[] list) throws Exception {
 		return executeInner(parent, list[0], list[1]);
 	}
 
-	public OperateData executeInner(IExpressContext parent, OperateData op1,
+	public OperateData executeInner(InstructionSetContext parent, OperateData op1,
 			OperateData op2) throws Exception {
 		if(op1 instanceof OperateDataAttr){
 		  ((OperateDataAttr)op1).setObject(parent, op2.getObject(parent));
@@ -168,7 +168,7 @@ class OperatorNew extends OperatorBase {
 		this.name = aName;
 	}
 
-	public OperateData executeInner(IExpressContext parent, OperateData[] list) throws Exception {
+	public OperateData executeInner(InstructionSetContext parent, OperateData[] list) throws Exception {
 		Class obj = (Class) list[0].getObject(parent);
 		Class[] types = new Class[list.length - 1];
 		Object[] objs = new Object[list.length - 1];
@@ -205,7 +205,7 @@ class OperatorCast extends OperatorBase {
 		this.name = aName;
 	}
 
-	public OperateData executeInner(IExpressContext parent, OperateData[] list) throws Exception {
+	public OperateData executeInner(InstructionSetContext parent, OperateData[] list) throws Exception {
 		Class tmpClass = (Class) list[0].getObject(parent);
 		OperateData result = new OperateData(list[1].getObject(parent),
 				tmpClass);
@@ -219,16 +219,28 @@ class OperatorDef extends OperatorBase {
 	}
 
 	@SuppressWarnings("unchecked")
-	public OperateData executeInner(IExpressContext parent, OperateData[] list) throws Exception {
-		Class tmpClass = (Class) list[0].getObject(parent);
-		String varName = ((OperateDataAttr)list[1]).getName();
-		
-		((InstructionSetContext)parent).putKeyDefine(varName);
-		OperateData result = new OperateDataAttr(varName,tmpClass);
+	public OperateData executeInner(InstructionSetContext context, OperateData[] list) throws Exception {
+		Class tmpClass = (Class) list[0].getObject(context);
+		String varName = (String)list[1].getObject(context);		
+		OperateDataLocalVar result = new OperateDataLocalVar(varName,tmpClass);
+		context.addSymbol(varName, result);
 		return result;
 	}
 }
+class OperatorAlias extends OperatorBase {
+	public OperatorAlias(String aName) {
+		this.name = aName;
+	}
 
+	@SuppressWarnings("unchecked")
+	public OperateData executeInner(InstructionSetContext context, OperateData[] list) throws Exception {
+		String varName = (String)list[0].getObjectInner(context);	
+		OperateDataAttr realAttr = (OperateDataAttr)list[1];
+		OperateDataAttr result = new OperateDataAlias(varName,realAttr);
+		context.addSymbol(varName, result);
+		return result;
+	}
+}
 
 @SuppressWarnings("unchecked")
 class OperatorMethod extends OperatorBase {
@@ -239,7 +251,7 @@ class OperatorMethod extends OperatorBase {
 		this.methodName = aMethodName;
 	}
 
-	public OperateData executeInner(IExpressContext parent, OperateData[] list) throws Exception {
+	public OperateData executeInner(InstructionSetContext parent, OperateData[] list) throws Exception {
 		Object obj = list[0].getObject(parent);
 		if (obj == null) {
 			// 对象为空，不能执行方法
@@ -298,18 +310,18 @@ class OperatorField extends OperatorBase {
 		this.fieldName = aFieldName;
 	}
 
-	public OperateData executeInner(IExpressContext parent, OperateData[] list) throws Exception {
+	public OperateData executeInner(InstructionSetContext parent, OperateData[] list) throws Exception {
 		Object obj = list[0].getObject(parent);
 		if (list[0] instanceof OperatorClass) {
 			Field f = ((Class) obj).getField(this.fieldName);
-			return new OperateData(f.get(null), f.getType());
+			return new OperateDataField(f,null);
 		} else {
 			if (obj == null) {
 				String msg = "对象为空，不能获取属性：";
 				throw new Exception(msg + this.fieldName);
 			} else {
 				Field f = obj.getClass().getField(this.fieldName);
-				return new OperateData(f.get(obj), f.getType());
+				return new OperateDataField(f,obj);
 			}
 		}
 	}
@@ -624,7 +636,7 @@ class OperatorNullOp extends OperatorBase {
 		this.aliasName = aAliasName;
 		this.errorInfo = aErrorInfo;
 	}
-	public OperateData executeInner(IExpressContext parent, OperateData[] list) throws Exception {
+	public OperateData executeInner(InstructionSetContext parent, OperateData[] list) throws Exception {
 		return executeInner(parent);
 	}
 
@@ -642,11 +654,11 @@ class OperatorReturn extends OperatorBase{
 		this.aliasName = aAliasName;
 		this.errorInfo = aErrorInfo;
 	}
-	public OperateData executeInner(IExpressContext parent, OperateData[] list) throws Exception {
+	public OperateData executeInner(InstructionSetContext parent, OperateData[] list) throws Exception {
 		return executeInner(parent);
 	}
 
-	public OperateData executeInner(IExpressContext parent) throws Exception {
+	public OperateData executeInner(InstructionSetContext parent) throws Exception {
 		throw new Exception("return 是通过特殊指令来实现的，不能支持此方法");
 	}	
 }
@@ -737,7 +749,7 @@ class OperatorIf extends OperatorBase {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public  OperateData executeInner(IExpressContext parent, OperateData[] list) throws Exception {
+	public  OperateData executeInner(InstructionSetContext parent, OperateData[] list) throws Exception {
 		if(list.length <2){
 			throw new Exception("\"" + this.aliasName + "\"操作至少要两个操作数");
 		}
