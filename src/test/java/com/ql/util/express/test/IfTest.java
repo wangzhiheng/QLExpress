@@ -2,37 +2,27 @@ package com.ql.util.express.test;
 
 import com.ql.util.express.DefaultContext;
 import com.ql.util.express.ExpressRunner;
+import com.ql.util.express.FuncitonCacheManager;
 
 public class IfTest extends ExpressRunner {
 	@org.junit.Test
 	public void testDemo() throws Exception{
-//		String express =" def int a=0; if false then a = 5 else  a=10+1 ; return a ";
-//		String express =" def int a=100;  return a ";
-//		String express =
-//				" qh = 1; " +
-//				"如果 ( 如果 true 则 false 否则 true)  则 {" +
-//				"  3 + {3} + {4 + 1}" +
-//				" }否则{" +
-//				" qh = 3;" +
-//				" qh = qh + 100;" +
-//				"}; " +
-//				"qh = qh + 1;" +
-//				"return qh;";
-		String express =" alias qh example.child ; " +
-				"{alias qh example.child.a;" +
-				" qh =qh + \"-ssss\";" +
-				"};" +
-				" qh.a = qh.a +\"-qh\";" +
-				" return example.child.a" ;
+		//String express =" cache isVIP(\"qh\") ;  cache isVIP(\"xuannan\") cache isVIP(\"qh\") ;";
+		
+		String express =" cache new com.ql.util.express.test.BeanExample(\"张三\").unionName(\"李四\") ;" +
+				"cache new com.ql.util.express.test.BeanExample(\"张三\").unionName(\"李四\") ;"
+		+ " cache example.unionName(\"李四\") ;" +
+				" cache example.unionName(\"李四\") ;";
 		IfTest runner = new IfTest();
 		DefaultContext<String, Object>  context = new DefaultContext<String, Object>();
-		context.put("example", new BeanExample());
-		runner.addOperatorWithAlias("如果", "if",null);
-		runner.addOperatorWithAlias("则", "then",null);
-		runner.addOperatorWithAlias("否则", "else",null);
-		Object r = runner.execute(express, null, false, context,true);
+		context.put("example", new BeanExample("张三"));
+		runner.addFunctionOfClassMethod("isVIP", BeanExample.class.getName(),
+				"isVIP", new String[] { "String" }, "$1不是VIP用户");
+		FuncitonCacheManager mananger = new FuncitonCacheManager();
+		Object r = runner.execute(express, null, false, context,mananger,true);
 		System.out.println(r);
 		System.out.println(context);
 		System.out.println(((BeanExample)context.get("example")).child.a);		
+		System.out.println(mananger.functionCallCache);
 	}
 }

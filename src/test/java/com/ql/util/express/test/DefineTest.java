@@ -37,7 +37,7 @@ public class DefineTest {
 		runner.addOperatorWithAlias("如果", "if", null);
 		runner.addOperatorWithAlias("则", "then", null);
 		runner.addOperatorWithAlias("否则", "else", null);
-		Object r = runner.execute(express, null, false, context, true);
+		Object r = runner.execute(express, null, false, context,null, true);
 		Assert.assertTrue("别名实现 错误", r.toString().equalsIgnoreCase("qh-ssss-qh"));
 		System.out.println(((BeanExample) context.get("example")).child.a);
 	}

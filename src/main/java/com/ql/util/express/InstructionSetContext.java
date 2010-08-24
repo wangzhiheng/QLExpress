@@ -5,16 +5,35 @@ import java.util.Map;
 
 @SuppressWarnings("serial")
 class InstructionSetContext<K,V> extends HashMap<K,V> implements IExpressContext<K,V> {
+	 protected OperatorManager operatorManager;
+	 RunEnvironment environmen;
+	/**
+	 * 函数调用开启标志，在Method执行完毕后清除
+	 */
+    private boolean isStartCachFunctionCall = false;
+
 	IExpressContext<K,V> parent = null;
 	/**
 	 * 符号表
 	 */
 	private Map<String,OperateDataAttr> symbolTable;
 		
-	public InstructionSetContext(IExpressContext<K,V> aParent){
+	public InstructionSetContext(IExpressContext<K,V> aParent,RunEnvironment aEnvironmen ,OperatorManager aOperatorManager){
 		parent = aParent;
+		this.operatorManager = aOperatorManager;
+		this.environmen = aEnvironmen;
 	}
-		
+	public OperatorManager getOperatorManager(){
+		return this.operatorManager;
+	}
+	
+	public RunEnvironment getEnvironmen() {
+		return environmen;
+	}
+	
+	public void setEnvironmen(RunEnvironment environmen) {
+		this.environmen = environmen;
+	}
 	public void addSymbol(String varName,OperateDataAttr aliasNameObject){
 		if(this.symbolTable == null){
 			this.symbolTable = new HashMap<String,OperateDataAttr>();
@@ -36,6 +55,17 @@ class InstructionSetContext<K,V> extends HashMap<K,V> implements IExpressContext
 		}	
 		return result;
 	}
+	
+	public void  startFunctionCallCache(){
+		this.isStartCachFunctionCall = true;
+	}
+	public boolean isStartFunctionCallCache(){
+		return this.isStartCachFunctionCall;
+	}
+	public void stopStartFunctionCallCache(){
+		this.isStartCachFunctionCall = false;
+	}
+	
 	public IExpressContext<K,V> getParent(){
 		return  this.parent;
 	}

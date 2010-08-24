@@ -23,10 +23,11 @@ public class InstructionSet {
    * @return
    * @throws Exception
    */
-  public Object excute(IExpressContext context,List errorList,boolean isTrace) throws Exception{
+  public Object excute(OperatorManager aOperatorManager ,IExpressContext aContext,List errorList,FuncitonCacheManager aFunctionCacheMananger,boolean isTrace) throws Exception{
 	  //进行上下文包装，进行变量的作用域隔离，在表达式内部通过 def 定义的变量，不会影响传入的上下文。
-	  context = new InstructionSetContext<String, Object>(context);
-	  RunEnvironment environmen = new RunEnvironment(this.maxStackSize,(InstructionSetContext)context,isTrace);
+	  InstructionSetContext context = new InstructionSetContext<String, Object>(aContext,null,aOperatorManager);  
+	  RunEnvironment environmen = new RunEnvironment(this.maxStackSize,(InstructionSetContext)context,aFunctionCacheMananger,isTrace);
+	  context.setEnvironmen(environmen);
 	  Instruction instruction;
 	  while(environmen.getProgramPoint() < this.list.size()){
 		  if (environmen.isExit() == true){
@@ -34,6 +35,10 @@ public class InstructionSet {
 		  }
 		  instruction = this.list.get(environmen.getProgramPoint());
 		  instruction.execute(environmen,errorList);
+	  }
+	  if(aFunctionCacheMananger == null){
+		  //如果是指令集自身创建的缓存，则清除
+		  environmen.clearFuncitonCacheManager();
 	  }
 	  if(environmen.getDataStackSize() > 1){
 		  throw new Exception("在表达式执行完毕后，堆栈中还存在多个数据");
@@ -102,15 +107,19 @@ class RunEnvironment {
 	
 	private boolean isExit = false;
 	private Object returnValue = null; 
-
+	
 	private InstructionSetContext context;
-	public RunEnvironment(int aStackSize,InstructionSetContext aContext,boolean aIsTrace){
+	
+	FuncitonCacheManager functionCachManager;
+	
+	public RunEnvironment(int aStackSize,InstructionSetContext aContext,FuncitonCacheManager aFunctionCacheMananger,boolean aIsTrace){
 		if(aStackSize <0){
 			aStackSize =0;
 		}
 		dataContainer = new OperateData[aStackSize];
 		this.context = aContext;
 		this.isTrace = aIsTrace;
+		this.functionCachManager = aFunctionCacheMananger;
 	}
 	
 	public InstructionSetContext getContext(){
@@ -120,8 +129,19 @@ class RunEnvironment {
 		this.context = aContext;
 	}
 	
-
 	
+	public void clearFuncitonCacheManager(){
+		if(this.functionCachManager != null){
+			this.functionCachManager.clearCache();
+		}
+	}
+	public FuncitonCacheManager getFunctionCachManager() {
+		if(this.functionCachManager == null){
+			this.functionCachManager = new FuncitonCacheManager();
+		}
+		return functionCachManager;
+	}
+
 	public boolean isExit() {
 		return isExit;
 	}
@@ -285,7 +305,7 @@ class InstructionOpenNewArea extends Instruction{
 		if(environment.isTrace()){
 			log.debug(this);
 		}
-		environment.setContext(new InstructionSetContext<String,Object>(environment.getContext()));
+		environment.setContext(new InstructionSetContext<String,Object>(environment.getContext(),environment,environment.getContext().getOperatorManager()));
 		environment.programPointAddOne();
 	}
 	public String toString(){
@@ -315,6 +335,24 @@ class InstructionCloseNewArea extends Instruction{
 	  return "closeNewArea";	
 	}
 }
+
+class InstructionCachFuncitonCall extends Instruction{
+	InstructionCachFuncitonCall(){
+    }
+	@SuppressWarnings("unchecked")
+	public void execute(RunEnvironment environment,List errorList)throws Exception{
+		//目前的模式，不需要执行任何操作
+		if(environment.isTrace()){
+			log.debug(this);
+		}
+		environment.getContext().startFunctionCallCache();
+		environment.programPointAddOne();
+	}
+	public String toString(){
+	  return "cacheFunctionCall";	
+	}
+}
+
 class InstructionReturn extends Instruction{
     InstructionReturn(){
     }
@@ -441,6 +479,7 @@ class InstructionOperator extends Instruction{
 			str = str + ")";
 			log.debug(str);
 		}
+		
 		OperateData result = this.operator.execute(environment.getContext(),parameters, errorList);
 		environment.push(result);
 		environment.programPointAddOne();

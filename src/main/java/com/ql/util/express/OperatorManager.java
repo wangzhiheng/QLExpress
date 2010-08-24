@@ -32,6 +32,7 @@ final class OperatorManager {
 
  public OperatorManager() {
 	 
+	 	this.addOperatorInner("cache", 0, 0, 0,  new OperatorAlias("cache"));
 		this.addOperatorInner("def", 0, 0, 2,  new OperatorDef("def"));
 		this.addOperatorInner("new", 0, 0, -1, null);
 		this.addOperatorInner("method", 0, 0, -1,true, null);
