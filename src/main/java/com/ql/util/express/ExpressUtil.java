@@ -1,6 +1,7 @@
 package com.ql.util.express;
 
 import java.util.Vector;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Constructor;
@@ -8,6 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.commons.beanutils.PropertyUtils;
 
 /**
  * 表达式工具类
@@ -341,6 +344,30 @@ public class ExpressUtil {
 		return sb.toString();
 	}
 
+	public static Object getProperty(Object bean, String name) {
+		// 还需要增加对静态属性的获取
+		try {
+			return PropertyUtils.getProperty(bean, name);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public static void setProperty(Object bean, String name, Object value) {
+		try {
+			PropertyUtils.setProperty(bean, name, value);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public static Class getPropertyType(Object bean, String name) {
+		try {
+			return PropertyUtils.getPropertyType(bean, name);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 	public static void main(String[] args) throws Exception {
 		System.out.println(replaceString("$1强化$2实施$2", new String[] { "qq",
 				"ff" }));

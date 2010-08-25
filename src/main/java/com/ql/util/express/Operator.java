@@ -346,22 +346,11 @@ class OperatorField extends OperatorBase {
 
 	public OperateData executeInner(InstructionSetContext parent, OperateData[] list) throws Exception {
 		Object obj = list[0].getObject(parent);
-		if (list[0] instanceof OperatorClass) {
-			Field f = ((Class) obj).getField(this.fieldName);
-			return new OperateDataField(f,null);
-		} else {
-			if (obj == null) {
-				String msg = "对象为空，不能获取属性：";
-				throw new Exception(msg + this.fieldName);
-			} else {
-				Field f = obj.getClass().getField(this.fieldName);
-				return new OperateDataField(f,obj);
-			}
-		}
+		return new OperateDataField(obj,this.fieldName);
 	}
 }
 
-class OperatorAddReduce extends Operator {
+   class OperatorAddReduce extends Operator {
 	public OperatorAddReduce(String name) {
 		this.name = name;
 	}
