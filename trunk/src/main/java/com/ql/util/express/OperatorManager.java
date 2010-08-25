@@ -87,6 +87,8 @@ final class OperatorManager {
 	 	this.addOperatorInner("alias", 21, 0, 2,  new OperatorAlias("alias"));
 		//return 的操作数量是根据堆栈的实际情况来看的，999是一个特殊标志
 		this.addOperatorInner("return", 25, 0, 999, new OperatorReturn("return"));
+	 	this.addOperatorInner("macro", 26, 0, 2,  new OperatorMacro("macro"));
+
 		
 		this.addOperatorInner(";", 100, 0, -1, new OperatorNullOp(";"));
 		
@@ -186,7 +188,7 @@ final class OperatorManager {
         }	 	
      this.addFunction(name, new SelfDefineServiceFunctionOperator(name,aServiceObject,aFunctionName,aParameterTypes,errorInfo));
     }
- 
+    
     protected void addOperatorInner(String name,int pri,int combine,int aOpDataMember,OperatorBase op){
    	 this.addOperatorInner(name, pri, combine, aOpDataMember, false, op);
     }
@@ -328,7 +330,14 @@ final class OperatorManager {
            return true;
        return false;
      }
-
+   protected String getRealName(String name){
+	   OperatorBase op = this.opMap.get(name);
+	   if(op != null){
+          return op.name;
+	   }else{
+	      return name;
+	   }
+   }
      public int getDataMember(String name){
        if (isFunction(name))
           return -1;

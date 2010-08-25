@@ -2,7 +2,9 @@ package com.ql.util.express;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -17,6 +19,10 @@ public class InstructionSet {
   private int maxStackSize  = -1;
   private List<Instruction> list = new ArrayList<Instruction>();
   /**
+   * 函数和宏定义
+   */
+  private Map<String,FunctionInstructionSet> functionDefine = new HashMap<String,FunctionInstructionSet>();
+  /**
    * 执行所有的操作指令
    * @param context
    * @param errorList
@@ -26,16 +32,24 @@ public class InstructionSet {
   public Object excute(OperatorManager aOperatorManager ,IExpressContext aContext,List errorList,FuncitonCacheManager aFunctionCacheMananger,boolean isTrace) throws Exception{
 	  //进行上下文包装，进行变量的作用域隔离，在表达式内部通过 def 定义的变量，不会影响传入的上下文。
 	  InstructionSetContext context = new InstructionSetContext<String, Object>(aContext,null,aOperatorManager);  
-	  RunEnvironment environmen = new RunEnvironment(this.maxStackSize,(InstructionSetContext)context,aFunctionCacheMananger,isTrace);
+	  RunEnvironment environmen = new RunEnvironment(this.maxStackSize,this,(InstructionSetContext)context,aFunctionCacheMananger,isTrace);
 	  context.setEnvironmen(environmen);
 	  Instruction instruction;
+	  boolean isReturnExit = false;
 	  while(environmen.getProgramPoint() < this.list.size()){
 		  if (environmen.isExit() == true){
+			  isReturnExit = true;
 			  break;
 		  }
 		  instruction = this.list.get(environmen.getProgramPoint());
 		  instruction.execute(environmen,errorList);
 	  }
+	  if(isReturnExit == false){//是在执行完所有的指令后结束的代码
+		  if(environmen.getDataStackSize() > 0){
+			  environmen.setReturnValue(environmen.pop().getObject(context));
+		  }
+	  }
+	  
 	  if(aFunctionCacheMananger == null){
 		  //如果是指令集自身创建的缓存，则清除
 		  environmen.clearFuncitonCacheManager();
@@ -46,6 +60,14 @@ public class InstructionSet {
 	  return environmen.getReturnValue();
 		
   }
+  
+  public void addMacroDefine(String macroName,FunctionInstructionSet iset){
+	  this.functionDefine.put(macroName, iset);
+  }
+  public FunctionInstructionSet getMacroDefine(String macroName){
+	  return this.functionDefine.get(macroName);
+  }
+  
   /**
    * 添加操作数入栈指令
    * @param operateData
@@ -79,11 +101,20 @@ public class InstructionSet {
   public void insertInstruction(int point,Instruction instruction){
 	  this.list.add(point,instruction);
   } 
+  public Instruction getInstruction(int point){
+	  return this.list.get(point);
+  }
   public int getCurrentPoint(){
 	  return this.list.size() - 1; 
   }
   public String toString(){
+	  
 	  StringBuffer buffer = new StringBuffer();
+	  //输出宏定义
+	  for(FunctionInstructionSet set : this.functionDefine.values()){
+		  buffer.append("macro ：" + set.name).append("\n");
+		  buffer.append(set.instructionSet);
+	  }	  
 	  buffer.append("指令集： 最大数据长度:" + (this.maxStackSize)).append("\n");
 	  for(int i=0;i<list.size();i++){
 		  buffer.append(i + 1).append(":").append(list.get(i)).append("\n");
@@ -108,20 +139,28 @@ class RunEnvironment {
 	private boolean isExit = false;
 	private Object returnValue = null; 
 	
+	private InstructionSet instructionSet;
 	private InstructionSetContext context;
 	
 	FuncitonCacheManager functionCachManager;
 	
-	public RunEnvironment(int aStackSize,InstructionSetContext aContext,FuncitonCacheManager aFunctionCacheMananger,boolean aIsTrace){
+	public RunEnvironment(int aStackSize,InstructionSet aInstructionSet,InstructionSetContext aContext,FuncitonCacheManager aFunctionCacheMananger,boolean aIsTrace){
 		if(aStackSize <0){
 			aStackSize =0;
 		}
 		dataContainer = new OperateData[aStackSize];
+		this.instructionSet = aInstructionSet;
 		this.context = aContext;
 		this.isTrace = aIsTrace;
 		this.functionCachManager = aFunctionCacheMananger;
 	}
 	
+	
+	public InstructionSet getInstructionSet() {
+		return instructionSet;
+	}
+
+
 	public InstructionSetContext getContext(){
 		return this.context;
 	}
@@ -147,6 +186,9 @@ class RunEnvironment {
 	}
 	public Object getReturnValue() {
 		return returnValue;
+	}
+	public void setReturnValue(Object value){
+		this.returnValue = value;
 	}
 	public void quitExpress(Object aReturnValue){
 		this.isExit = true;
@@ -313,6 +355,28 @@ class InstructionOpenNewArea extends Instruction{
 	}
 }
 
+class InstructionCallMacro extends Instruction{
+	String name;
+	InstructionCallMacro(String aName){
+		this.name = aName;
+    }
+	@SuppressWarnings("unchecked")
+	public void execute(RunEnvironment environment,List errorList)throws Exception{
+		//目前的模式，不需要执行任何操作
+		if(environment.isTrace()){
+			log.debug(this);
+		}
+		FunctionInstructionSet functionSet = environment.getInstructionSet().getMacroDefine(this.name);
+		Object result = functionSet.instructionSet.excute(environment.getContext().getOperatorManager(),
+				environment.getContext(), errorList, environment.functionCachManager, environment.isTrace());
+		environment.push(new OperateData(result,null));
+		
+		environment.programPointAddOne();
+	}
+	public String toString(){
+	  return "call macro " + this.name ;	
+	}
+}
 /**
  * 
  * 关闭一个作用域
@@ -488,4 +552,15 @@ class InstructionOperator extends Instruction{
 		String result = "OP : " + this.operator.toString() +  " OPNUMBER[" + this.opDataNumber +"]";
 		return result;
 	}
+}	
+class FunctionInstructionSet{
+	String name;
+	String type;
+	InstructionSet instructionSet;
+	public FunctionInstructionSet(String aName,String aType,InstructionSet aInstructionSet){
+		this.name = aName;
+		this.type = aType;
+		this.instructionSet = aInstructionSet;		
+	}
 }
+	

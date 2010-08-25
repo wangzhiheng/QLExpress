@@ -1,6 +1,7 @@
 package com.ql.util.express;
 
 import java.util.Vector;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -345,9 +346,13 @@ public class ExpressUtil {
 	}
 
 	public static Object getProperty(Object bean, String name) {
-		// 还需要增加对静态属性的获取
 		try {
-			return PropertyUtils.getProperty(bean, name);
+	        if(bean instanceof Class){
+				Field f = ((Class)bean).getDeclaredField(name);
+				return f.get(null);
+	        }else{
+			   return PropertyUtils.getProperty(bean, name);
+	        }
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -355,7 +360,12 @@ public class ExpressUtil {
 
 	public static void setProperty(Object bean, String name, Object value) {
 		try {
-			PropertyUtils.setProperty(bean, name, value);
+			if(bean instanceof Class){
+				Field f = ((Class)bean).getDeclaredField(name);
+				f.set(null, value);
+	        }else{
+			   PropertyUtils.setProperty(bean, name, value);
+	        }
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
