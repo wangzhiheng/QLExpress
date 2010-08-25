@@ -1,6 +1,7 @@
 package com.ql.util.express;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -116,16 +117,16 @@ class OperateDataAttr extends OperateData {
 		}
 	}
 }
+@SuppressWarnings("unchecked")
 class OperateDataField extends OperateDataAttr {
-	Field field;
 	Object fieldObject;
-	String name;
+	String fieldName;
 	
-	public OperateDataField(Field aField,Object aFieldObject) {
-		super(null,aField.getType());
-		this.name =aField.getDeclaringClass().getName() + "." + aField.getName();
+	public OperateDataField(Object aFieldObject,String aFieldName) {
+		super(null,ExpressUtil.getPropertyType(aFieldObject, aFieldName));
+		this.name = aFieldObject.getClass().getName() + "." + aFieldName;
 		this.fieldObject = aFieldObject;
-		this.field = aField;
+		this.fieldName =aFieldName;
 	}
 	
     public String getName(){
@@ -139,26 +140,21 @@ class OperateDataField extends OperateDataAttr {
 		}
 	}
 
+
 	public Object getObjectInner(InstructionSetContext context) {
-		try {
-			return this.field.get(this.fieldObject);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+			return ExpressUtil.getProperty(this.fieldObject, this.fieldName);
 	}
     
 	public Class getType(InstructionSetContext context) throws Exception {
-		  return this.field.getType();
+		  return  this.type;
 	}
 
-	public void setObject(InstructionSetContext parent, Object object) {
-		try {
-			this.field.set(this.fieldObject, object);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+	public void setObject(InstructionSetContext parent, Object value) {
+		ExpressUtil.setProperty(fieldObject, fieldName, value);
 	}
 }
+
+@SuppressWarnings("unchecked")
 class OperateDataLocalVar extends OperateDataAttr {
 	public OperateDataLocalVar(String name,Class type) {
 		super(name,type);

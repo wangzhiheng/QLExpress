@@ -6,6 +6,14 @@ public class BeanExample {
 	public BeanExample() {
 	}
 
+	public BeanExampleChild getChild() {
+		return child;
+	}
+
+	public void setChild(BeanExampleChild child) {
+		this.child = child;
+	}
+
 	public BeanExample(String aName) {
 		name = aName;
 	}
