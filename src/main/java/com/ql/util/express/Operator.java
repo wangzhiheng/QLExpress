@@ -47,8 +47,9 @@ abstract class OperatorBase {
 			OperateData[] list, List errorList) throws Exception {
 		OperateData result = null;
 		if (context.isStartFunctionCallCache()
-				&& context.getOperatorManager().isFunction(this.name) 
-				 || this instanceof OperatorMethod) {
+				&&    ( context.getOperatorManager().isFunction(this.name) 
+				        || this instanceof OperatorMethod)
+				 ) {
 			//ª∫¥Ê¥¶¿Ì
 			try {
 				Object[] tmpList = new Object[list.length];
@@ -242,7 +243,11 @@ class OperatorDef extends OperatorBase {
 	public OperatorDef(String aName) {
 		this.name = aName;
 	}
-
+	public OperatorDef(String aAliasName, String aName, String aErrorInfo) {
+		this.name = aName;
+		this.aliasName = aAliasName;
+		this.errorInfo = aErrorInfo;
+	}
 	@SuppressWarnings("unchecked")
 	public OperateData executeInner(InstructionSetContext context, OperateData[] list) throws Exception {
 		Class tmpClass = (Class) list[0].getObject(context);
@@ -256,7 +261,11 @@ class OperatorAlias extends OperatorBase {
 	public OperatorAlias(String aName) {
 		this.name = aName;
 	}
-
+	public OperatorAlias(String aAliasName, String aName, String aErrorInfo) {
+		this.name = aName;
+		this.aliasName = aAliasName;
+		this.errorInfo = aErrorInfo;
+	}
 	@SuppressWarnings("unchecked")
 	public OperateData executeInner(InstructionSetContext context, OperateData[] list) throws Exception {
 		String varName = (String)list[0].getObjectInner(context);	
@@ -266,6 +275,26 @@ class OperatorAlias extends OperatorBase {
 		return result;
 	}
 }
+
+class OperatorMacro extends OperatorBase {
+	public OperatorMacro(String aName) {
+		this.name = aName;
+	}
+	public OperatorMacro(String aAliasName, String aName, String aErrorInfo) {
+		this.name = aName;
+		this.aliasName = aAliasName;
+		this.errorInfo = aErrorInfo;
+	}
+	@SuppressWarnings("unchecked")
+	public OperateData executeInner(InstructionSetContext context, OperateData[] list) throws Exception {
+		String varName = (String)list[0].getObjectInner(context);	
+		OperateDataAttr realAttr = (OperateDataAttr)list[1];
+		OperateDataAttr result = new OperateDataAlias(varName,realAttr);
+		context.addSymbol(varName, result);
+		return result;
+	}
+}
+
 class OperatorCache extends OperatorBase {
 	public OperatorCache(String aName) {
 		this.name = aName;

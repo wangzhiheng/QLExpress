@@ -360,11 +360,15 @@ public class ExpressRunner
         }else{
         	//讲 def，alias 后面的第一个参数当作字符串处理
         	if(list.size() >=1 && list.get(list.size() -1 ) instanceof ExpressItem
-        	         && ((ExpressItem)list.get(list.size() -1 )).name.equalsIgnoreCase("alias")
+        	         && this.m_operatorManager.getRealName(((ExpressItem)list.get(list.size() -1 )).name).equalsIgnoreCase("alias")
         	        ){
         		list.add(new OperateData(name,String.class));
+        	}else if(list.size() >=1 && list.get(list.size() -1 ) instanceof ExpressItem
+              	   &&  this.m_operatorManager.getRealName(((ExpressItem)list.get(list.size() -1 )).name).equalsIgnoreCase("macro")
+              	   ){	
+         		list.add(new OperateData(name,String.class));
         	}else if(list.size() >=2 && list.get(list.size() -2 ) instanceof ExpressItem
-             	   && ((ExpressItem)list.get(list.size() -2 )).name.equalsIgnoreCase("def")
+             	   &&  this.m_operatorManager.getRealName(((ExpressItem)list.get(list.size() -2 )).name).equalsIgnoreCase("def")
              	   ){	
         		list.add(new OperateData(name,String.class));
         	}else{
@@ -509,6 +513,9 @@ public class ExpressRunner
                    } 
                    if(op1.name.equalsIgnoreCase("return") == true ){
                 	   opDataNumber = sdata.size(); 
+                	   if(opDataNumber > 1){
+                		   opDataNumber = 1; 
+                	   }
                    }
                    op1.opDataNumber = opDataNumber;
                    op1.setMaxStackSize(sdata.size());
@@ -649,10 +656,15 @@ public class ExpressRunner
 	protected boolean createInstructionSetPrivate(InstructionSet result,ExpressTreeNode node)throws Exception {
 		boolean returnVal = false;
 		if(node instanceof OperateDataAttr){
+			FunctionInstructionSet functionSet = result.getMacroDefine(((OperateDataAttr) node).getName());
+			if(functionSet != null){//是宏定义
+				result.insertInstruction(result.getCurrentPoint()+1, new InstructionCallMacro(((OperateDataAttr) node).getName()));
+			}else{
 			  result.addLoadAttrInstruction((OperateDataAttr)node,node.getMaxStackSize());	
 			  if(node.getChildren() != null){
 				  throw new Exception("表达式设置错误");
 			  }
+			}  
 		}else if(node instanceof OperateData){			  	
 		  result.addLoadDataInstruction((OperateData)node,node.getMaxStackSize());	
 		  if(node.getChildren() != null){
@@ -660,15 +672,19 @@ public class ExpressRunner
 		  }
 		}else if(node instanceof ExpressItem && ((ExpressItem)node).name.equalsIgnoreCase("cache")){			  	
 			result.insertInstruction(result.getCurrentPoint()+1, new InstructionCachFuncitonCall());
+		}else if(node instanceof ExpressItem && ((ExpressItem)node).name.equalsIgnoreCase("macro")){
+			createInstructionSetForMacro(result,(ExpressItem)node);
 		}else if(node instanceof ExpressItem && ((ExpressItem)node).name.equalsIgnoreCase("if")){
 			returnVal = createInstructionSetForIf(result,(ExpressItem)node);			
 		}else if(node instanceof ExpressTreeNodeRoot){
 			int tmpPoint = result.getCurrentPoint()+1;
 			boolean hasDef = false;
 			for(ExpressTreeNode tmpNode : ((ExpressTreeNodeRoot)node).getChildren()){
+				if(result.getCurrentPoint() >=0 && ( result.getInstruction(result.getCurrentPoint()) instanceof InstructionClearDataStack == false)){
+				   result.insertInstruction(result.getCurrentPoint()+1, new InstructionClearDataStack());
+				}
 				boolean tmpHas =   createInstructionSetPrivate(result,tmpNode);
 				hasDef = hasDef || tmpHas;
-				result.insertInstruction(result.getCurrentPoint()+1, new InstructionClearDataStack());
 			}
 			if(hasDef == true){
 			    result.insertInstruction(tmpPoint, new InstructionOpenNewArea());			
@@ -702,6 +718,21 @@ public class ExpressRunner
 			throw new Exception("不支持的数据类型:" + node.getClass());
 		}
 		return returnVal;
+	}
+	/**
+	 * 创建宏指令
+	 * @param result
+	 * @param node
+	 * @return
+	 * @throws Exception
+	 */
+	protected boolean createInstructionSetForMacro(InstructionSet result,ExpressItem node)throws Exception {
+		String macroName =(String)((OperateData)node.getChildren()[0]).dataObject;
+		ExpressTreeNodeRoot macroRoot = new ExpressTreeNodeRoot("macro-" + macroName);
+		macroRoot.addChild(node.getChildren()[1]);
+		InstructionSet macroInstructionSet = this.createInstructionSet(macroRoot);
+		result.addMacroDefine(macroName, new FunctionInstructionSet(macroName,"macro",macroInstructionSet));
+		return false;
 	}
 
 	/**
@@ -962,9 +993,9 @@ public class ExpressRunner
     if(str.endsWith(";") == false ){
       str = str +";";
     }
-    if(str.indexOf(';') == str.length() -1 && str.indexOf("return") < 0){
-    	str =  "return " + str;
-    }
+//    if(str.indexOf(';') == str.length() -1 && str.indexOf("return") < 0){
+//    	str =  "return " + str;
+//    }
     String tmpWord ="";
     String tmpOpStr ="";
     char c;
