@@ -5,7 +5,7 @@
   <groupId>com.taobao.util</groupId>
   <artifactId>taobao-express</artifactId>
   <packaging>jar</packaging>
-  <version>1.0</version>
+  <version>1.0.1</version>
   <name>ql-express</name>
   <dependencies>
       <dependency>
