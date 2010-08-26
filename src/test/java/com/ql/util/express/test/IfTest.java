@@ -12,15 +12,14 @@ public class IfTest extends ExpressRunner {
 		runner.addOperatorWithAlias("定义宏", "macro", null);
 		ExpressLoader loader = new ExpressLoader(runner);
 		loader.parseInstructionSet("定义", "def int qh = 100;",true);
+		loader.parseInstructionSet("判断", "if true then 1 else 2; return 3;",true);		
 		loader.parseInstructionSet("累加", " qh = qh + 100;",true);
-		loader.parseInstructionSet("执行", "call \"累加\"; call \"累加\";",true);
+		loader.parseInstructionSet("执行", " return call \"累加\"; call \"累加\";",true);
 		DefaultContext<String, Object>  context = new DefaultContext<String, Object>();		
 		context.put("bean", new BeanExample("qhlhl2010@gmail.com"));
-		context.put("name","xuannn");
-		
+		context.put("name","xuannn");		
 		Object r = runner.execute(new InstructionSet[]{
 				loader.getInstructionSet("定义"),
-				loader.getInstructionSet("执行"),
 				loader.getInstructionSet("执行")
 		}, loader, context, null, null, true);
 		

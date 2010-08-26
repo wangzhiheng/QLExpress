@@ -80,27 +80,24 @@ public class InstructionSet {
 			context.addSymbol(item.name, item.instructionSet);
 		}
 		
-		boolean isReturnExit = false;
 		while (environmen.getProgramPoint() < this.list.size()) {
 			if (environmen.isExit() == true) {
-				isReturnExit = true;
 				break;
 			}
 			instruction = this.list.get(environmen.getProgramPoint());
 			instruction.execute(environmen, errorList);
 		}
-		if (isReturnExit == false && isLast == true) {// 是在执行完所有的指令后结束的代码
+		if (environmen.isExit() == false && isLast == true) {// 是在执行完所有的指令后结束的代码
 			if (environmen.getDataStackSize() > 0) {
-				environmen.setReturnValue(environmen.pop().getObject(context));
+				environmen.quitExpress(environmen.pop().getObject(context));
 			}
-			isReturnExit = true;
 		}
 		if (environmen.getDataStackSize() > 1) {
 			throw new Exception("在表达式执行完毕后，堆栈中还存在多个数据");
 		}
-		CallResult result = new CallResult();
+		CallResult result = new CallResult();		
 		result.returnValue = environmen.getReturnValue();
-		result.isExit = isReturnExit;
+		result.isExit = environmen.isExit();
 		return result;
 	}
   
