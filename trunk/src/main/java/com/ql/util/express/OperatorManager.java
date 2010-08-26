@@ -145,6 +145,7 @@ final class OperatorManager {
     	 if(this.opMap.containsKey(name)){
     		 throw new RuntimeException("操作符号：\"" + name + "\" 已经存在");
     	 }
+       op.setIsCanCache(true);
        this.m_function.add(name);
        this.opMap.put(name, op);
      }

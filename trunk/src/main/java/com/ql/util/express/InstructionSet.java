@@ -39,12 +39,12 @@ public class InstructionSet {
    * @return
    * @throws Exception
    */
-  protected static Object execute(InstructionSet[] sets, OperatorManager aOperatorManager,
+  protected static Object execute(InstructionSet[] sets,
 	IExpressContext aContext, List errorList,
 	FuncitonCacheManager aFunctionCacheMananger, boolean isTrace)
 	throws Exception {
 	  InstructionSetContext context = new InstructionSetContext<String, Object>(
-				aContext, null, aOperatorManager, aFunctionCacheMananger);;
+				aContext, null, aFunctionCacheMananger);;
 	  RunEnvironment environmen = null;
 	  Object result =null;
 	  for(int i=0;i< sets.length;i++){
@@ -361,7 +361,6 @@ class InstructionClearDataStack extends Instruction{
 			log.debug(this);
 		}
 		environment.clearDataStack();
-		environment.getContext().stopStartFunctionCallCache();
 		environment.programPointAddOne();
 	}
 	public String toString(){
@@ -384,7 +383,6 @@ class InstructionOpenNewArea extends Instruction{
 			log.debug(this);
 		}
 		environment.setContext(new InstructionSetContext<String,Object>(environment.getContext(),environment,
-				 environment.getContext().getOperatorManager(),
 				 environment.getContext().getFunctionCachManagerNoCreate()));
 		environment.programPointAddOne();
 	}
@@ -406,7 +404,7 @@ class InstructionCallMacro extends Instruction{
 		}
 		Object functionSet = environment.getContext().getSymbol(this.name);
 		
-		Object result =InstructionSet.execute(new InstructionSet[]{(InstructionSet)functionSet},environment.getContext().getOperatorManager(),
+		Object result =InstructionSet.execute(new InstructionSet[]{(InstructionSet)functionSet},
 				environment.getContext(), errorList, environment.getContext().getFunctionCachManagerNoCreate(),
 				environment.isTrace());
 		environment.push(new OperateData(result,null));

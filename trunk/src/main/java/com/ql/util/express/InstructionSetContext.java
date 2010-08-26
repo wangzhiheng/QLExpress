@@ -5,8 +5,6 @@ import java.util.Map;
 
 @SuppressWarnings("serial")
 class InstructionSetContext<K,V> extends HashMap<K,V> implements IExpressContext<K,V> {
-	 private OperatorManager operatorManager;
-
 	 private FuncitonCacheManager functionCachManager;
 	 private RunEnvironment environmen;
 	/**
@@ -19,17 +17,15 @@ class InstructionSetContext<K,V> extends HashMap<K,V> implements IExpressContext
 	 * ·ûºÅ±í
 	 */
 	private Map<String,Object> symbolTable;
+	
+	
 		
-	public InstructionSetContext(IExpressContext<K,V> aParent,RunEnvironment aEnvironmen ,OperatorManager aOperatorManager,FuncitonCacheManager aFunctionCachManager){
+	public InstructionSetContext(IExpressContext<K,V> aParent,RunEnvironment aEnvironmen ,FuncitonCacheManager aFunctionCachManager){
 		parent = aParent;
-		this.operatorManager = aOperatorManager;
 		this.environmen = aEnvironmen;
 		this.functionCachManager =  aFunctionCachManager;
 	}
-	public OperatorManager getOperatorManager(){
-		return this.operatorManager;
-	}
-	
+
 	public void clearFuncitonCacheManager(){
 		if(this.functionCachManager != null){
 			this.functionCachManager.clearCache();
