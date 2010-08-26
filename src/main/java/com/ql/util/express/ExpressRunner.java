@@ -858,7 +858,7 @@ public class ExpressRunner
 				parseResult[i] = this.parseInstructionSet(expressString[i]);
 			}
 		}
-	  return InstructionSet.execute(parseResult,this.m_operatorManager, context, errorList, aFunctionCacheMananger, isTrace);
+	  return InstructionSet.execute(parseResult, context, errorList, aFunctionCacheMananger, isTrace);
  } 
 
   /**

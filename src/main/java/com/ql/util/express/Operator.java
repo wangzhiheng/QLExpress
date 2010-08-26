@@ -30,7 +30,14 @@ abstract class OperatorBase {
 	protected String name;
 
 	protected String errorInfo;
-
+	
+	/**
+	 * 决定此操作是否能够被缓存
+	 */
+	protected boolean isCanCache = false;
+    public void setIsCanCache(boolean value){
+    	this.isCanCache = value;
+    }
 	public Object[] toObjectList(InstructionSetContext parent, OperateData[] list)
 			throws Exception {
 		if (list == null) {
@@ -41,15 +48,11 @@ abstract class OperatorBase {
 			result[i] = list[i].getObject(parent);
 		}
 		return result;
-	}
-	
+	}	
 	public OperateData execute(InstructionSetContext context,
 			OperateData[] list, List errorList) throws Exception {
 		OperateData result = null;
-		if (context.isStartFunctionCallCache()
-				&&    ( context.getOperatorManager().isFunction(this.name) 
-				        || this instanceof OperatorMethod)
-				 ) {
+		if (context.isStartFunctionCallCache()&& this.isCanCache == true) {
 			//缓存处理
 			try {
 				Object[] tmpList = new Object[list.length];
@@ -312,6 +315,7 @@ class OperatorMethod extends OperatorBase {
 	public OperatorMethod(String aName, String aMethodName) {
 		this.name = aName;
 		this.methodName = aMethodName;
+		this.isCanCache = true;
 	}
 
 	public OperateData executeInner(InstructionSetContext parent, OperateData[] list) throws Exception {
