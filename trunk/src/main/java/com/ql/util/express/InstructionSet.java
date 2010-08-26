@@ -361,6 +361,7 @@ class InstructionClearDataStack extends Instruction{
 			log.debug(this);
 		}
 		environment.clearDataStack();
+		environment.getContext().stopStartFunctionCallCache();
 		environment.programPointAddOne();
 	}
 	public String toString(){
