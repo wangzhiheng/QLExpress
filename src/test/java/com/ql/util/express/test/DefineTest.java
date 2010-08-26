@@ -75,8 +75,7 @@ public class DefineTest {
 		FuncitonCacheManager mananger = new FuncitonCacheManager();
 		Object r = runner.execute(express, null, false, context,mananger,true);
 		Assert.assertTrue("属性操作错误", r.toString().equalsIgnoreCase("ffff"));
-		Assert.assertTrue("属性操作错误", ((BeanExample)context.get("example")).child.a.toString().equalsIgnoreCase("ssssssss"));
-		
+		Assert.assertTrue("属性操作错误", ((BeanExample)context.get("example")).child.a.toString().equalsIgnoreCase("ssssssss"));		
 	}	
 	@org.junit.Test
 	public void test批量执行指令() throws Exception{

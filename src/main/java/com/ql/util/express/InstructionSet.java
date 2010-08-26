@@ -39,12 +39,12 @@ public class InstructionSet {
    * @return
    * @throws Exception
    */
-  protected static Object execute(InstructionSet[] sets,
+  protected static Object execute(InstructionSet[] sets,ExpressLoader loader,
 	IExpressContext aContext, List errorList,
 	FuncitonCacheManager aFunctionCacheMananger, boolean isTrace)
 	throws Exception {
 	  InstructionSetContext context = new InstructionSetContext<String, Object>(
-				aContext, null, aFunctionCacheMananger);;
+				aContext,loader, null, aFunctionCacheMananger);;
 	  RunEnvironment environmen = null;
 	  Object result =null;
 	  for(int i=0;i< sets.length;i++){
@@ -382,8 +382,9 @@ class InstructionOpenNewArea extends Instruction{
 		if(environment.isTrace()){
 			log.debug(this);
 		}
-		environment.setContext(new InstructionSetContext<String,Object>(environment.getContext(),environment,
-				 environment.getContext().getFunctionCachManagerNoCreate()));
+		environment.setContext(new InstructionSetContext<String, Object>(
+				environment.getContext(),environment.getContext().getExpressLoader(), environment, environment.getContext()
+						.getFunctionCachManagerNoCreate()));
 		environment.programPointAddOne();
 	}
 	public String toString(){
@@ -391,6 +392,28 @@ class InstructionOpenNewArea extends Instruction{
 	}
 }
 
+
+class InstructionCallFunction extends Instruction{
+	InstructionCallFunction(){
+    }
+	@SuppressWarnings("unchecked")
+	public void execute(RunEnvironment environment,List errorList)throws Exception{
+		
+		String functionName =  (String)environment.pop().getObjectInner(environment.getContext());
+		if(environment.isTrace()){
+			log.debug(this + functionName);
+		}
+		Object functionSet = environment.getContext().getSymbol(functionName);		
+		Object result =InstructionSet.execute(new InstructionSet[]{(InstructionSet)functionSet},environment.getContext().getExpressLoader(),
+				environment.getContext(), errorList, environment.getContext().getFunctionCachManagerNoCreate(),
+				environment.isTrace());
+		environment.push(new OperateData(result,null));		
+		environment.programPointAddOne();
+	}
+	public String toString(){
+	  return "call function " ;	
+	}
+}
 class InstructionCallMacro extends Instruction{
 	String name;
 	InstructionCallMacro(String aName){
@@ -404,7 +427,7 @@ class InstructionCallMacro extends Instruction{
 		}
 		Object functionSet = environment.getContext().getSymbol(this.name);
 		
-		Object result =InstructionSet.execute(new InstructionSet[]{(InstructionSet)functionSet},
+		Object result =InstructionSet.execute(new InstructionSet[]{(InstructionSet)functionSet},environment.getContext().getExpressLoader(),
 				environment.getContext(), errorList, environment.getContext().getFunctionCachManagerNoCreate(),
 				environment.isTrace());
 		environment.push(new OperateData(result,null));

@@ -18,12 +18,13 @@ class InstructionSetContext<K,V> extends HashMap<K,V> implements IExpressContext
 	 */
 	private Map<String,Object> symbolTable;
 	
-	
+	private ExpressLoader expressLoader;
 		
-	public InstructionSetContext(IExpressContext<K,V> aParent,RunEnvironment aEnvironmen ,FuncitonCacheManager aFunctionCachManager){
+	public InstructionSetContext(IExpressContext<K,V> aParent,ExpressLoader aExpressLoader,RunEnvironment aEnvironmen ,FuncitonCacheManager aFunctionCachManager){
 		parent = aParent;
 		this.environmen = aEnvironmen;
 		this.functionCachManager =  aFunctionCachManager;
+		this.expressLoader = aExpressLoader;
 	}
 
 	public void clearFuncitonCacheManager(){
@@ -60,6 +61,9 @@ class InstructionSetContext<K,V> extends HashMap<K,V> implements IExpressContext
 		if(this.symbolTable != null){
 			result = this.symbolTable.get(varName);
 		}
+		if( result == null && this.expressLoader != null){
+			result = this.expressLoader.getInstructionSet(varName);
+		}
 		if(result == null){
 			if( this.parent != null && this.parent instanceof InstructionSetContext){
 			    result = ((InstructionSetContext)this.parent).getSymbol(varName);
@@ -71,6 +75,10 @@ class InstructionSetContext<K,V> extends HashMap<K,V> implements IExpressContext
 		return result;
 	}
 	
+	public ExpressLoader getExpressLoader() {
+		return expressLoader;
+	}
+
 	public void  startFunctionCallCache(){
 		this.isStartCachFunctionCall = true;
 	}
