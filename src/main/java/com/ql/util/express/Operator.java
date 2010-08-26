@@ -58,11 +58,11 @@ abstract class OperatorBase {
 				}
 				String key = FuncitonCacheManager.genKey(this.getAliasName(),
 						tmpList);
-				if (context.getEnvironmen().getFunctionCachManager().containsKey(key)) {
-					result = (OperateData) context.getEnvironmen().getFunctionCachManager().get(key);
+				if (context.getFunctionCachManagerWithCreate().containsKey(key)) {
+					result = (OperateData) context.getFunctionCachManagerWithCreate().get(key);
 				}else{
 					result = this.executeInner(context, list);
-					context.getEnvironmen().getFunctionCachManager().put(key, result);
+					context.getFunctionCachManagerWithCreate().put(key, result);
 				}
 			} finally {
 				context.stopStartFunctionCallCache();

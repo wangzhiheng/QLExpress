@@ -6,6 +6,7 @@ import org.junit.Assert;
 
 import com.ql.util.express.DefaultContext;
 import com.ql.util.express.FuncitonCacheManager;
+import com.ql.util.express.InstructionSet;
 
 public class DefineTest {
 	@org.junit.Test
@@ -56,10 +57,10 @@ public class DefineTest {
 		context.put("name","xuannn");
 		Object r = runner.execute(express, null, false, context,null,true);
 		Assert.assertTrue("别名宏 错误", r.toString().equalsIgnoreCase("qhlhl2010@gmail.com-xuannn"));
-		
+		System.out.println(r);
 	}	
 	@org.junit.Test
-	public void testDemo() throws Exception{
+	public void testProperty() throws Exception{
 		//String express =" cache isVIP(\"qh\") ;  cache isVIP(\"xuannan\") cache isVIP(\"qh\") ;";
 		
 		String express =" example.child.a = \"ssssssss\";" +
@@ -77,5 +78,23 @@ public class DefineTest {
 		Assert.assertTrue("属性操作错误", ((BeanExample)context.get("example")).child.a.toString().equalsIgnoreCase("ssssssss"));
 		
 	}	
-	
+	@org.junit.Test
+	public void test批量执行指令() throws Exception{
+		IfTest runner = new IfTest();
+		runner.addOperatorWithAlias("定义宏", "macro", null);
+		DefaultContext<String, Object>  context = new DefaultContext<String, Object>();		
+		context.put("bean", new BeanExample("qhlhl2010@gmail.com"));
+		context.put("name","xuannn");
+		String[] sets =  new String[]{
+				"def int qh = 1;",	
+				"qh = qh + 10;",
+				"定义宏  惩罚   {qh = qh + 100 };",
+				"惩罚;",
+				"qh = qh + 1000;"
+		};
+		Object r = runner.execute(sets, null, true, context, null, true);
+		Assert.assertTrue("别名实现 错误", r.toString().equalsIgnoreCase("1111"));
+//		System.out.println(r);
+//		System.out.println(context);
+	}	
 }
