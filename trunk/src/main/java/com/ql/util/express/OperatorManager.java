@@ -87,8 +87,8 @@ final class OperatorManager {
 	 	this.addOperatorInner("alias", 21, 0, 2,  new OperatorAlias("alias"));
 		this.addOperatorInner("call", 25, 0, 1, new OperatorCall("call"));
 		//return 的操作数量是根据堆栈的实际情况来看的，999是一个特殊标志
-		this.addOperatorInner("return", 25, 0, 999, new OperatorReturn("return"));
-	 	this.addOperatorInner("macro", 26, 0, 2,  new OperatorMacro("macro"));
+		this.addOperatorInner("return", 26, 0, 999, new OperatorReturn("return"));
+	 	this.addOperatorInner("macro", 30, 0, 2,  new OperatorMacro("macro"));
 
 		
 		this.addOperatorInner(";", 100, 0, -1, new OperatorNullOp(";"));
