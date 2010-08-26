@@ -94,13 +94,8 @@ class OperateDataAttr extends OperateData {
 	}
     
 	public Class getType(InstructionSetContext context) throws Exception {
-		   if (context!= null 
-				   && context instanceof IExpressContextExtend){
-			   return ((IExpressContextExtend)context).getClassType(name);
-		   }
-		   
-		   if(context == null){
-			   return null;
+		   if(this.type != null){
+			   return this.type;
 		   }
 		   Object obj = context.get(name);
 		   if (obj == null)

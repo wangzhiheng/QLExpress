@@ -96,7 +96,6 @@ class InstructionSetContext<K,V> extends HashMap<K,V> implements IExpressContext
 		}
 		return null;
 	}
-
 	public void putKeyDefine(K key){
 		super.put(key,null);
 	}
