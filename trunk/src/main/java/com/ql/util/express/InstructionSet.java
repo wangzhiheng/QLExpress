@@ -9,6 +9,11 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+class CallResult{
+	Object returnValue;
+	boolean isExit;
+}
+
 /**
  * 表达式执行编译后形成的指令集合
  * @author qhlhl2010@gmail.com
@@ -22,6 +27,44 @@ public class InstructionSet {
    * 函数和宏定义
    */
   private Map<String,FunctionInstructionSet> functionDefine = new HashMap<String,FunctionInstructionSet>();
+  
+  /**
+   * 批量执行指令集合，指令集间可以共享 变量和函数
+   * @param sets
+   * @param aOperatorManager
+   * @param aContext
+   * @param errorList
+   * @param aFunctionCacheMananger
+   * @param isTrace
+   * @return
+   * @throws Exception
+   */
+  protected static Object execute(InstructionSet[] sets, OperatorManager aOperatorManager,
+	IExpressContext aContext, List errorList,
+	FuncitonCacheManager aFunctionCacheMananger, boolean isTrace)
+	throws Exception {
+	  InstructionSetContext context = new InstructionSetContext<String, Object>(
+				aContext, null, aOperatorManager, aFunctionCacheMananger);;
+	  RunEnvironment environmen = null;
+	  Object result =null;
+	  for(int i=0;i< sets.length;i++){
+		 InstructionSet tmpSet = sets[i];
+		environmen = new RunEnvironment(tmpSet.maxStackSize, tmpSet,
+				(InstructionSetContext) context, isTrace);
+		context.setEnvironmen(environmen);
+		CallResult tempResult = tmpSet.excuteInner(environmen, context, errorList, i == sets.length - 1 );
+		if(tempResult.isExit == true){
+			result =  tempResult.returnValue;
+			break;
+		}		
+	  }	
+		if (aFunctionCacheMananger == null) {
+			// 如果是指令集自身创建的缓存，则清除
+			context.clearFuncitonCacheManager();
+		}
+	  return result;
+
+  }
   /**
    * 执行所有的操作指令
    * @param context
@@ -29,37 +72,37 @@ public class InstructionSet {
    * @return
    * @throws Exception
    */
-  public Object excute(OperatorManager aOperatorManager ,IExpressContext aContext,List errorList,FuncitonCacheManager aFunctionCacheMananger,boolean isTrace) throws Exception{
-	  //进行上下文包装，进行变量的作用域隔离，在表达式内部通过 def 定义的变量，不会影响传入的上下文。
-	  InstructionSetContext context = new InstructionSetContext<String, Object>(aContext,null,aOperatorManager);  
-	  RunEnvironment environmen = new RunEnvironment(this.maxStackSize,this,(InstructionSetContext)context,aFunctionCacheMananger,isTrace);
-	  context.setEnvironmen(environmen);
-	  Instruction instruction;
-	  boolean isReturnExit = false;
-	  while(environmen.getProgramPoint() < this.list.size()){
-		  if (environmen.isExit() == true){
-			  isReturnExit = true;
-			  break;
-		  }
-		  instruction = this.list.get(environmen.getProgramPoint());
-		  instruction.execute(environmen,errorList);
-	  }
-	  if(isReturnExit == false){//是在执行完所有的指令后结束的代码
-		  if(environmen.getDataStackSize() > 0){
-			  environmen.setReturnValue(environmen.pop().getObject(context));
-		  }
-	  }
-	  
-	  if(aFunctionCacheMananger == null){
-		  //如果是指令集自身创建的缓存，则清除
-		  environmen.clearFuncitonCacheManager();
-	  }
-	  if(environmen.getDataStackSize() > 1){
-		  throw new Exception("在表达式执行完毕后，堆栈中还存在多个数据");
-	  }
-	  return environmen.getReturnValue();
+	public CallResult excuteInner(RunEnvironment environmen,InstructionSetContext context,List errorList,boolean isLast)
+			throws Exception {
+		Instruction instruction;
+		//将函数export到上下文中
+		for(FunctionInstructionSet item : this.functionDefine.values()){
+			context.addSymbol(item.name, item.instructionSet);
+		}
 		
-  }
+		boolean isReturnExit = false;
+		while (environmen.getProgramPoint() < this.list.size()) {
+			if (environmen.isExit() == true) {
+				isReturnExit = true;
+				break;
+			}
+			instruction = this.list.get(environmen.getProgramPoint());
+			instruction.execute(environmen, errorList);
+		}
+		if (isReturnExit == false && isLast == true) {// 是在执行完所有的指令后结束的代码
+			if (environmen.getDataStackSize() > 0) {
+				environmen.setReturnValue(environmen.pop().getObject(context));
+			}
+			isReturnExit = true;
+		}
+		if (environmen.getDataStackSize() > 1) {
+			throw new Exception("在表达式执行完毕后，堆栈中还存在多个数据");
+		}
+		CallResult result = new CallResult();
+		result.returnValue = environmen.getReturnValue();
+		result.isExit = isReturnExit;
+		return result;
+	}
   
   public void addMacroDefine(String macroName,FunctionInstructionSet iset){
 	  this.functionDefine.put(macroName, iset);
@@ -142,9 +185,8 @@ class RunEnvironment {
 	private InstructionSet instructionSet;
 	private InstructionSetContext context;
 	
-	FuncitonCacheManager functionCachManager;
 	
-	public RunEnvironment(int aStackSize,InstructionSet aInstructionSet,InstructionSetContext aContext,FuncitonCacheManager aFunctionCacheMananger,boolean aIsTrace){
+	public RunEnvironment(int aStackSize,InstructionSet aInstructionSet,InstructionSetContext aContext,boolean aIsTrace){
 		if(aStackSize <0){
 			aStackSize =0;
 		}
@@ -152,7 +194,6 @@ class RunEnvironment {
 		this.instructionSet = aInstructionSet;
 		this.context = aContext;
 		this.isTrace = aIsTrace;
-		this.functionCachManager = aFunctionCacheMananger;
 	}
 	
 	
@@ -166,19 +207,6 @@ class RunEnvironment {
 	}
 	public void setContext(InstructionSetContext aContext){
 		this.context = aContext;
-	}
-	
-	
-	public void clearFuncitonCacheManager(){
-		if(this.functionCachManager != null){
-			this.functionCachManager.clearCache();
-		}
-	}
-	public FuncitonCacheManager getFunctionCachManager() {
-		if(this.functionCachManager == null){
-			this.functionCachManager = new FuncitonCacheManager();
-		}
-		return functionCachManager;
 	}
 
 	public boolean isExit() {
@@ -303,17 +331,24 @@ class InstructionLoadAttr extends Instruction{
     InstructionLoadAttr(String aName){
     	this.attrName = aName;
     }
-
 	public void execute(RunEnvironment environment,List errorList)throws Exception{
-		if(environment.isTrace()){
-			log.debug(this +":" + environment.getContext().get(this.attrName));						
+		Object o = environment.getContext().getSymbol(this.attrName);
+		if(o != null && o instanceof InstructionSet){//是函数，则执行
+			if(environment.isTrace()){
+				log.debug("指令转换： LoadAttr -- >CallMacro ");						
+			}
+			new InstructionCallMacro(this.attrName).execute(environment, errorList);
+		}else{
+			if(environment.isTrace()){
+				log.debug(this +":" + environment.getContext().get(this.attrName));						
+			}
+		    environment.push((OperateDataAttr)environment.getContext().getSymbol(this.attrName));
+		    environment.programPointAddOne();
 		}
-		environment.push(environment.getContext().getSymbol(this.attrName));
-		environment.programPointAddOne();
 	}
 	public String toString(){
 		  return "LoadAttr:" +this.attrName;	
-	}	
+	}
 }
 
 class InstructionClearDataStack extends Instruction{
@@ -347,7 +382,9 @@ class InstructionOpenNewArea extends Instruction{
 		if(environment.isTrace()){
 			log.debug(this);
 		}
-		environment.setContext(new InstructionSetContext<String,Object>(environment.getContext(),environment,environment.getContext().getOperatorManager()));
+		environment.setContext(new InstructionSetContext<String,Object>(environment.getContext(),environment,
+				 environment.getContext().getOperatorManager(),
+				 environment.getContext().getFunctionCachManagerNoCreate()));
 		environment.programPointAddOne();
 	}
 	public String toString(){
@@ -366,9 +403,11 @@ class InstructionCallMacro extends Instruction{
 		if(environment.isTrace()){
 			log.debug(this);
 		}
-		FunctionInstructionSet functionSet = environment.getInstructionSet().getMacroDefine(this.name);
-		Object result = functionSet.instructionSet.excute(environment.getContext().getOperatorManager(),
-				environment.getContext(), errorList, environment.functionCachManager, environment.isTrace());
+		Object functionSet = environment.getContext().getSymbol(this.name);
+		
+		Object result =InstructionSet.execute(new InstructionSet[]{(InstructionSet)functionSet},environment.getContext().getOperatorManager(),
+				environment.getContext(), errorList, environment.getContext().getFunctionCachManagerNoCreate(),
+				environment.isTrace());
 		environment.push(new OperateData(result,null));
 		
 		environment.programPointAddOne();

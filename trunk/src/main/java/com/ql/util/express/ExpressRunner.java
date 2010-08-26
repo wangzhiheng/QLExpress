@@ -650,10 +650,10 @@ public class ExpressRunner
   }
   protected InstructionSet createInstructionSet(ExpressTreeNodeRoot root)throws Exception {
 		InstructionSet result = new InstructionSet();
-  	    createInstructionSetPrivate(result,root);
+  	    createInstructionSetPrivate(result,root,true);
 		return result;
 	}
-	protected boolean createInstructionSetPrivate(InstructionSet result,ExpressTreeNode node)throws Exception {
+	protected boolean createInstructionSetPrivate(InstructionSet result,ExpressTreeNode node,boolean isRoot)throws Exception {
 		boolean returnVal = false;
 		if(node instanceof OperateDataAttr){
 			FunctionInstructionSet functionSet = result.getMacroDefine(((OperateDataAttr) node).getName());
@@ -683,10 +683,10 @@ public class ExpressRunner
 				if(result.getCurrentPoint() >=0 && ( result.getInstruction(result.getCurrentPoint()) instanceof InstructionClearDataStack == false)){
 				   result.insertInstruction(result.getCurrentPoint()+1, new InstructionClearDataStack());
 				}
-				boolean tmpHas =   createInstructionSetPrivate(result,tmpNode);
+				boolean tmpHas =   createInstructionSetPrivate(result,tmpNode,false);
 				hasDef = hasDef || tmpHas;
 			}
-			if(hasDef == true){
+			if(hasDef == true && isRoot == false){
 			    result.insertInstruction(tmpPoint, new InstructionOpenNewArea());			
 			    result.insertInstruction(result.getCurrentPoint()+1, new InstructionCloseNewArea());
 			}
@@ -698,7 +698,7 @@ public class ExpressRunner
 			int [] finishPoint = new int[children.length];
 			for(int i =0;i < children.length;i++){
 				ExpressTreeNode tmpNode = children[i];
-				boolean tmpHas =  createInstructionSetPrivate(result,tmpNode);
+				boolean tmpHas =  createInstructionSetPrivate(result,tmpNode,false);
 				returnVal = returnVal || tmpHas;
 				finishPoint[i] = result.getCurrentPoint();
 			}
@@ -756,12 +756,12 @@ public class ExpressRunner
     		throw new Exception("if 操作符最多只有3个操作数 " );
     	}
 		int [] finishPoint = new int[children.length];
-   		boolean r1 = createInstructionSetPrivate(result,children[0]);//condition	
+   		boolean r1 = createInstructionSetPrivate(result,children[0],false);//condition	
 		finishPoint[0] = result.getCurrentPoint();
-		boolean r2 = createInstructionSetPrivate(result,children[1]);//true		
+		boolean r2 = createInstructionSetPrivate(result,children[1],false);//true		
 		result.insertInstruction(finishPoint[0]+1,new InstructionGoToWithCondition(false,result.getCurrentPoint() - finishPoint[0] + 2,true));
 		finishPoint[1] = result.getCurrentPoint();
-		boolean r3 = createInstructionSetPrivate(result,children[2]);//false
+		boolean r3 = createInstructionSetPrivate(result,children[2],false);//false
 		result.insertInstruction(finishPoint[1]+1,new InstructionGoTo(result.getCurrentPoint() - finishPoint[1] + 1));  		
         return r1 || r2 || r3;
 	}
@@ -834,24 +834,33 @@ public class ExpressRunner
   }
 
   public Object execute(String expressString,List errorList,boolean isCache,IExpressContext context,FuncitonCacheManager aFunctionCacheMananger,boolean isTrace) throws Exception{
-	  InstructionSet parseResult = null;
-	  if(isCache == true){
-	    parseResult = expressInstructionSetCache.get(expressString);
-		if(parseResult == null){
-			synchronized(expressParseResultCache){
-				parseResult = expressInstructionSetCache.get(expressString);
-				if(parseResult == null){
-					parseResult = this.parseInstructionSet(expressString);
-					expressInstructionSetCache.put(expressString, parseResult);
-					//System.out.println(parseResult);
+	 return  this.execute(new String[]{expressString}, errorList, isCache, context, aFunctionCacheMananger, isTrace);
+  }
+  public Object execute(String[] expressString,List errorList,boolean isCache,IExpressContext context,FuncitonCacheManager aFunctionCacheMananger,boolean isTrace) throws Exception{
+		InstructionSet[] parseResult = new InstructionSet[expressString.length];
+		for (int i = 0; i < parseResult.length; i++) {
+			if (isCache == true) {
+				parseResult[i] = expressInstructionSetCache.get(expressString[i]);
+				if (parseResult[i] == null) {
+					synchronized (expressParseResultCache) {
+						parseResult[i] = expressInstructionSetCache
+								.get(expressString[i]);
+						if (parseResult[i] == null) {
+							parseResult[i] = this
+									.parseInstructionSet(expressString[i]);
+							expressInstructionSetCache.put(expressString[i],
+									parseResult[i]);
+							// System.out.println(parseResult);
+						}
+					}
 				}
+			} else {
+				parseResult[i] = this.parseInstructionSet(expressString[i]);
 			}
 		}
-	  }else{
-		  parseResult = this.parseInstructionSet(expressString);
-	  }
-    return parseResult.excute(this.m_operatorManager,context,errorList,aFunctionCacheMananger,isTrace);
-  } 
+	  return InstructionSet.execute(parseResult,this.m_operatorManager, context, errorList, aFunctionCacheMananger, isTrace);
+ } 
+
   /**
    * 清除缓存
    */
