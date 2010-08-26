@@ -14,17 +14,18 @@ public class IfTest extends ExpressRunner {
 		DefaultContext<String, Object>  context = new DefaultContext<String, Object>();		
 		context.put("bean", new BeanExample("qhlhl2010@gmail.com"));
 		context.put("name","xuannn");
-		String[] sets =  new String[]{
-				"def int qh = 1;",	
-				"qh = qh + 10;",
-				"定义宏  惩罚   {qh = qh + 100 };",
-				"t = 惩罚;",
-				"qh = qh + 1000;"
-		};
-		Object r = runner.execute(sets, null, true, context, null, true);
+//		String[] sets =  new String[]{
+//				"def int qh = 1;",	
+//				"qh = qh + 10;",
+//				"定义宏  惩罚   {qh = qh + 100 };",
+//				"t = 惩罚;",
+//				"qh = qh + 1000;"
+//		};
+		String express =" cache name = bean.unionName(bean.unionName(name));cache bean.unionName(name);";
+		Object r = runner.execute(express, null, true, context, null, true);
 		
 		System.out.println(r);
 		System.out.println(context);
-		Assert.assertTrue("别名实现 错误", r.toString().equalsIgnoreCase("1111"));
+	
 	}
 }
