@@ -718,6 +718,19 @@ class OperatorReturn extends OperatorBase{
 		throw new Exception("return 是通过特殊指令来实现的，不能支持此方法");
 	}	
 }
+class OperatorCall extends OperatorBase{
+	public OperatorCall(String name) {
+		this.name = name;
+	}
+	public OperatorCall(String aAliasName, String aName, String aErrorInfo) {
+		this.name = aName;
+		this.aliasName = aAliasName;
+		this.errorInfo = aErrorInfo;
+	}
+	public OperateData executeInner(InstructionSetContext parent, OperateData[] list) throws Exception {
+		throw new Exception("return 是通过特殊指令来实现的，不能支持此方法");
+	}	
+}
 class OperatorMinMax extends Operator {
 	public OperatorMinMax(String name) {
 		this.name = name;

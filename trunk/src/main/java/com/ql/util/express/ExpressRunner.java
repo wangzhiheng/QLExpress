@@ -172,7 +172,6 @@ public class ExpressRunner
 {
 
   private static final Log log = LogFactory.getLog(ExpressRunner.class);
-  private Map<String,Object[]> expressParseResultCache = new HashMap<String,Object[]>();
   private Map<String,InstructionSet> expressInstructionSetCache = new HashMap<String,InstructionSet>();
   
   protected OperatorManager m_operatorManager =  new OperatorManager();
@@ -674,6 +673,11 @@ public class ExpressRunner
 			result.insertInstruction(result.getCurrentPoint()+1, new InstructionCachFuncitonCall());
 		}else if(node instanceof ExpressItem && ((ExpressItem)node).name.equalsIgnoreCase("macro")){
 			createInstructionSetForMacro(result,(ExpressItem)node);
+		}else if(node instanceof ExpressItem && ((ExpressItem)node).name.equalsIgnoreCase("call")){
+			for(ExpressTreeNode tmpNode :node.getChildren()){
+				createInstructionSetPrivate(result,tmpNode,false);					
+			}
+			result.insertInstruction(result.getCurrentPoint()+1, new InstructionCallFunction());
 		}else if(node instanceof ExpressItem && ((ExpressItem)node).name.equalsIgnoreCase("if")){
 			returnVal = createInstructionSetForIf(result,(ExpressItem)node);			
 		}else if(node instanceof ExpressTreeNodeRoot){
@@ -842,7 +846,7 @@ public class ExpressRunner
 			if (isCache == true) {
 				parseResult[i] = expressInstructionSetCache.get(expressString[i]);
 				if (parseResult[i] == null) {
-					synchronized (expressParseResultCache) {
+					synchronized (expressInstructionSetCache) {
 						parseResult[i] = expressInstructionSetCache
 								.get(expressString[i]);
 						if (parseResult[i] == null) {
@@ -858,14 +862,18 @@ public class ExpressRunner
 				parseResult[i] = this.parseInstructionSet(expressString[i]);
 			}
 		}
-	  return InstructionSet.execute(parseResult, context, errorList, aFunctionCacheMananger, isTrace);
+	  return this.execute(parseResult,null,context, errorList, aFunctionCacheMananger, isTrace);
  } 
+  public Object execute(InstructionSet[] instructionSets,ExpressLoader loader,IExpressContext context,
+		  List errorList,FuncitonCacheManager aFunctionCacheMananger,boolean isTrace) throws Exception{
+	 return  InstructionSet.execute(instructionSets,loader,context, errorList, aFunctionCacheMananger, isTrace);
+  }
 
   /**
    * Çå³ý»º´æ
    */
   public void clearExpressCache(){
-	  this.expressParseResultCache.clear();
+	  this.expressInstructionSetCache.clear();
   }
   
   /**

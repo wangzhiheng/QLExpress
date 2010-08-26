@@ -7,8 +7,6 @@ public class FunctionCacheTest {
 	@org.junit.Test
 	public void testFunctionCallCache() throws Exception {
 		String express = " cache isVIP(\"qh\") ;  cache isVIP(\"xuannan\"); cache isVIP(\"qh\") ;"
-				+ " cache new com.ql.util.express.test.BeanExample(\"张三\").unionName(\"李四\") ;"
-				+ "cache new com.ql.util.express.test.BeanExample(\"张三\").unionName(\"李四\") ;"
 				+ " cache example.unionName(\"李四\") ;"
 				+ " return cache example.unionName(\"李四\") ;";
 		IfTest runner = new IfTest();
