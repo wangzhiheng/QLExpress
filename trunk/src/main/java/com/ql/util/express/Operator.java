@@ -840,5 +840,22 @@ class OperatorIf extends OperatorBase {
 			return null;			
 		}
 	}
+}
+
+class OperatorFor extends OperatorBase {
+	public OperatorFor(String aName) {
+		this.name = aName;
+	}
+
+	public OperatorFor(String aAliasName, String aName, String aErrorInfo) {
+		this.name = aName;
+		this.aliasName = aAliasName;
+		this.errorInfo = aErrorInfo;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public  OperateData executeInner(InstructionSetContext parent, OperateData[] list) throws Exception {
+		throw new Exception("cache 是通过特殊指令来实现的，不能支持此方法");
+	}
 
 }
