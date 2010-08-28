@@ -80,6 +80,7 @@ final class OperatorManager {
 		this.addOperatorInner("或者", 10, 0, 2, new OperatorOr("或者"));
 		this.addOperatorInner("=", 12, 1, 2, new OperatorEvaluate("="));
 		this.addOperatorInner(",", 15, 0, -1, new OperatorNullOp(","));
+		this.addOperatorInner("for", 20, 0, 2, new OperatorFor("for"));
 		this.addOperatorInner("if", 20, 0, -1, new OperatorIf("if"));
 		this.addOperatorInner("then", 20, 0, -1, new OperatorNullOp("if"));
 		this.addOperatorInner("else", 20, 0, -1, new OperatorNullOp("if"));
