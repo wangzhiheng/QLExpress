@@ -380,6 +380,23 @@ public class ExpressRunner
     return list.toArray();
   }
   
+  public int matchNode(Object[] list,int startIndex,String opName){
+	  Stack<Object> stack = new Stack<Object>();
+	  if(opName.equalsIgnoreCase("(")){
+		  for(int i = startIndex + 1 ; i < list.length;i++){
+			  if(list[i] instanceof ExpressItem &&  ((ExpressItem)list[i]).name.equals("(")){
+				  stack.add(list[i]);
+			  }else if(list[i] instanceof ExpressItem &&  ((ExpressItem)list[i]).name.equals(")")){
+				  if(stack.size() >0){
+					  stack.pop();
+				  }else{
+					  return i;
+				  }
+			  }
+		  }
+	  }	  
+	  return -1;
+  }
   /**
    * 通过"{","}",";"把程序拆分开
    * @param list
@@ -392,18 +409,18 @@ public class ExpressRunner
 	  nodeStack.push(new ExpressTreeNodeRoot("ROOT"));
 	  stackList.push(new ArrayList<Object>());
 	  for(int i=0;i< list.length;i++){
-		  if(list[i] instanceof ExpressItem &&  ((ExpressItem)list[i]).name.equals(";")){//生成一个新的语句
+		  if(list[i] instanceof ExpressItem &&  ((ExpressItem)list[i]).name.equalsIgnoreCase(";")){//生成一个新的语句
 			  stackList.peek().add(list[i]);
 			  for(ExpressTreeNode item:getCResultOne(stackList.peek().toArray())){
 			      nodeStack.peek().addChild(item);
 			  }
 			  stackList.peek().clear();
-		  }else if(list[i] instanceof ExpressItem &&  ((ExpressItem)list[i]).name.equals("{")){//生成一个新的语句
+		  }else if(list[i] instanceof ExpressItem &&  ((ExpressItem)list[i]).name.equalsIgnoreCase("{")){//生成一个新的语句
 			  nodeStack.push(new ExpressTreeNodeRoot("{}"));
 			  stackList.push(new ArrayList<Object>());
-		  }else if(list[i] instanceof ExpressItem &&  ((ExpressItem)list[i]).name.equals("}")){//生成一个新的语句
+		  }else if(list[i] instanceof ExpressItem &&  ((ExpressItem)list[i]).name.equalsIgnoreCase("}")){//生成一个新的语句
 			  //若果 } 前面没有 ;则也作为一个完成的语句处理
-			  if(false == (list[i - 1] instanceof ExpressItem == true &&  ((ExpressItem)list[i - 1]).name.equals(";")))
+			  if(false == (list[i - 1] instanceof ExpressItem == true &&  ((ExpressItem)list[i - 1]).name.equalsIgnoreCase(";")))
 			  {   stackList.peek().add(new ExpressItem(";"));
 			      for(ExpressTreeNode item:getCResultOne(stackList.peek().toArray())){
 			          nodeStack.peek().addChild(item);
@@ -413,7 +430,14 @@ public class ExpressRunner
 			  stackList.peek().clear();
 			  stackList.pop();
 			  stackList.peek().add(nodeStack.pop());
-		  }else{
+		  }else if(list[i] instanceof ExpressItem &&  ((ExpressItem)list[i]).name.equalsIgnoreCase("for")){
+			  if(list[i + 1] instanceof ExpressItem &&  ((ExpressItem)list[i + 1]).name.equalsIgnoreCase("(")){
+				  ((ExpressItem)list[i + 1]).name = "{";
+				  int finishPoint = matchNode(list,i + 1,"(");
+				  ((ExpressItem)list[finishPoint]).name = "}";
+			  }
+			  stackList.peek().add(list[i]);
+	      }else{
 			  stackList.peek().add(list[i]);
 		  }
 	  }
