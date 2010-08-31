@@ -516,11 +516,14 @@ public class ExpressRunner
 						if (sop.size() > 1 || sdata.size() > 1) {
 							throw new Exception("表达式设置错误，请检查函数名称是否匹配");
 						}
-						ExpressTreeNode tmpResultNode = (ExpressTreeNode) sdata.pop();
-						if (tmpResultNode instanceof MyPlace) {
-							tmpResultNode = ((MyPlace) tmpResultNode).op;
+						if (sdata.size() > 0) {//在break，continue的情况下没有数据
+							ExpressTreeNode tmpResultNode = (ExpressTreeNode) sdata
+									.pop();
+							if (tmpResultNode instanceof MyPlace) {
+								tmpResultNode = ((MyPlace) tmpResultNode).op;
+							}
+							result.add(tmpResultNode);
 						}
-						result.add(tmpResultNode);
 						return result.toArray(new ExpressTreeNode[0]);
             case(1) :
                sop.pop();//抛出堆栈顶的操作符号
@@ -673,10 +676,14 @@ public class ExpressRunner
   }
   protected InstructionSet createInstructionSet(ExpressTreeNodeRoot root)throws Exception {
 		InstructionSet result = new InstructionSet();
-  	    createInstructionSetPrivate(result,root,true);
+		Stack<ForRelBreakContinue> forStack = new Stack<ForRelBreakContinue>();
+  	    createInstructionSetPrivate(result,forStack,root,true);
+  	    if(forStack .size() > 0){
+  	    	throw new Exception("For处理错误");
+  	    }
 		return result;
 	}
-	protected boolean createInstructionSetPrivate(InstructionSet result,ExpressTreeNode node,boolean isRoot)throws Exception {
+	protected boolean createInstructionSetPrivate(InstructionSet result,Stack<ForRelBreakContinue> forStack,ExpressTreeNode node,boolean isRoot)throws Exception {
 		boolean returnVal = false;
 		if(node instanceof OperateDataAttr){
 			FunctionInstructionSet functionSet = result.getMacroDefine(((OperateDataAttr) node).getName());
@@ -694,18 +701,30 @@ public class ExpressRunner
 			  throw new Exception("表达式设置错误");
 		  }
 		}else if(node instanceof ExpressItem && ((ExpressItem)node).name.equalsIgnoreCase("for")){			  	
-			  createInstructionSetForLoop(result,(ExpressItem)node);
+			  createInstructionSetForLoop(result,forStack,(ExpressItem)node);
 		}else if(node instanceof ExpressItem && ((ExpressItem)node).name.equalsIgnoreCase("cache")){			  	
 			result.insertInstruction(result.getCurrentPoint()+1, new InstructionCachFuncitonCall());
 		}else if(node instanceof ExpressItem && ((ExpressItem)node).name.equalsIgnoreCase("macro")){
 			createInstructionSetForMacro(result,(ExpressItem)node);
+		}else if(node instanceof ExpressItem && ((ExpressItem)node).name.equalsIgnoreCase("break")){
+			InstructionGoTo breakInstruction = new InstructionGoTo(result.getCurrentPoint()+1);		
+			breakInstruction.name = "break";
+			forStack.peek().breakList.add(breakInstruction);
+			result.insertInstruction(result.getCurrentPoint()+1, breakInstruction);
+		}else if(node instanceof ExpressItem && ((ExpressItem)node).name.equalsIgnoreCase("continue")){
+			InstructionGoTo continueInstruction = new InstructionGoTo(result.getCurrentPoint()+1);		
+			continueInstruction.name = "continue";
+			forStack.peek().continueList.add(continueInstruction);
+			
+			result.insertInstruction(result.getCurrentPoint()+1, continueInstruction);
+
 		}else if(node instanceof ExpressItem && ((ExpressItem)node).name.equalsIgnoreCase("call")){
 			for(ExpressTreeNode tmpNode :node.getChildren()){
-				createInstructionSetPrivate(result,tmpNode,false);					
+				createInstructionSetPrivate(result,forStack,tmpNode,false);					
 			}
 			result.insertInstruction(result.getCurrentPoint()+1, new InstructionCallFunction());
 		}else if(node instanceof ExpressItem && ((ExpressItem)node).name.equalsIgnoreCase("if")){
-			returnVal = createInstructionSetForIf(result,(ExpressItem)node);			
+			returnVal = createInstructionSetForIf(result,forStack,(ExpressItem)node);			
 		}else if(node instanceof ExpressTreeNodeRoot){
 			int tmpPoint = result.getCurrentPoint()+1;
 			boolean hasDef = false;
@@ -713,7 +732,7 @@ public class ExpressRunner
 				if(result.getCurrentPoint() >=0 && ( result.getInstruction(result.getCurrentPoint()) instanceof InstructionClearDataStack == false)){
 				   result.insertInstruction(result.getCurrentPoint()+1, new InstructionClearDataStack());
 				}
-				boolean tmpHas =   createInstructionSetPrivate(result,tmpNode,false);
+				boolean tmpHas =   createInstructionSetPrivate(result,forStack,tmpNode,false);
 				hasDef = hasDef || tmpHas;
 			}
 			if(hasDef == true && isRoot == false){
@@ -728,7 +747,7 @@ public class ExpressRunner
 			int [] finishPoint = new int[children.length];
 			for(int i =0;i < children.length;i++){
 				ExpressTreeNode tmpNode = children[i];
-				boolean tmpHas =  createInstructionSetPrivate(result,tmpNode,false);
+				boolean tmpHas =  createInstructionSetPrivate(result,forStack,tmpNode,false);
 				returnVal = returnVal || tmpHas;
 				finishPoint[i] = result.getCurrentPoint();
 			}
@@ -771,7 +790,7 @@ public class ExpressRunner
 	 * @param node
 	 * @throws Exception
 	 */
-	protected boolean createInstructionSetForIf(InstructionSet result,ExpressItem node)throws Exception {
+	protected boolean createInstructionSetForIf(InstructionSet result,Stack<ForRelBreakContinue>  forStack,ExpressItem node)throws Exception {
     	ExpressTreeNode[] children = node.getChildren();
     	if(children.length < 2){
     		throw new Exception("if 操作符至少需要2个操作数 " );
@@ -786,32 +805,33 @@ public class ExpressRunner
     		throw new Exception("if 操作符最多只有3个操作数 " );
     	}
 		int [] finishPoint = new int[children.length];
-   		boolean r1 = createInstructionSetPrivate(result,children[0],false);//condition	
+   		boolean r1 = createInstructionSetPrivate(result,forStack,children[0],false);//condition	
 		finishPoint[0] = result.getCurrentPoint();
-		boolean r2 = createInstructionSetPrivate(result,children[1],false);//true		
+		boolean r2 = createInstructionSetPrivate(result,forStack,children[1],false);//true		
 		result.insertInstruction(finishPoint[0]+1,new InstructionGoToWithCondition(false,result.getCurrentPoint() - finishPoint[0] + 2,true));
 		finishPoint[1] = result.getCurrentPoint();
-		boolean r3 = createInstructionSetPrivate(result,children[2],false);//false
+		boolean r3 = createInstructionSetPrivate(result,forStack,children[2],false);//false
 		result.insertInstruction(finishPoint[1]+1,new InstructionGoTo(result.getCurrentPoint() - finishPoint[1] + 1));  		
         return r1 || r2 || r3;
 	}
-	protected boolean createInstructionSetForLoop(InstructionSet result,ExpressItem node)throws Exception {
+	protected boolean createInstructionSetForLoop(InstructionSet result,Stack<ForRelBreakContinue> forStack,ExpressItem node)throws Exception {
     	if(node.getChildren().length < 2){
     		throw new Exception("if 操作符至少需要2个操作数 " );
     	}else if(node.getChildren().length > 2){
     		throw new Exception("if 操作符最多只有2个操作数 " );
     	}
-    	if(node.getChildren()[0].getChildren().length > 3){
+    	if(node.getChildren()[0].getChildren()!= null && node.getChildren()[0].getChildren().length > 3){
     		throw new Exception("循环语句的设置不合适:" + node.getChildren()[0]);	
     	}
     	//生成作用域开始指令
 	    result.insertInstruction(result.getCurrentPoint()+1, new InstructionOpenNewArea());			
-
+	    forStack.push(new ForRelBreakContinue(node));
+	    
     	//生成条件语句部分指令
     	ExpressTreeNode conditionNode = node.getChildren()[0];
     	int nodePoint = 0;
-    	if (conditionNode.getChildren().length == 3){//变量定义，判断，自增都存在
-    		createInstructionSetPrivate(result,conditionNode.getChildren()[0],false);
+    	if (conditionNode.getChildren() != null && conditionNode.getChildren().length == 3){//变量定义，判断，自增都存在
+    		createInstructionSetPrivate(result,forStack,conditionNode.getChildren()[0],false);
     		nodePoint = nodePoint + 1;
     	}
     	//循环的开始的位置
@@ -819,10 +839,12 @@ public class ExpressRunner
     	
     	//有条件语句
     	InstructionGoToWithCondition conditionInstruction=null;
-    	if(conditionNode.getChildren().length == 1
+    	if(conditionNode.getChildren() != null 
+    		&& (conditionNode.getChildren().length == 1
     			|| conditionNode.getChildren().length == 2 
-    			|| conditionNode.getChildren().length == 3){    		
-    		createInstructionSetPrivate(result,conditionNode.getChildren()[nodePoint],false);
+    			|| conditionNode.getChildren().length == 3)
+    		)	{    		
+    		createInstructionSetPrivate(result,forStack,conditionNode.getChildren()[nodePoint],false);
     		//跳转的位置需要根据后续的指令情况决定    		
     		conditionInstruction = new InstructionGoToWithCondition(false,-1,true);
     		result.insertInstruction(result.getCurrentPoint()+1,conditionInstruction);   
@@ -830,18 +852,32 @@ public class ExpressRunner
     	}
     	int conditionPoint = result.getCurrentPoint();
     	//生成循环体的代码
-    	createInstructionSetPrivate(result,node.getChildren()[1],false);
+    	createInstructionSetPrivate(result,forStack,node.getChildren()[1],false);
     	
+    	int selfAddPoint = result.getCurrentPoint()+1;
     	//生成自增代码指令
-    	if(conditionNode.getChildren().length == 2 || conditionNode.getChildren().length == 3){
-    		createInstructionSetPrivate(result,conditionNode.getChildren()[nodePoint],false);
+    	if(conditionNode.getChildren()!= null &&(
+    			conditionNode.getChildren().length == 2 || conditionNode.getChildren().length == 3
+    			)){
+    		createInstructionSetPrivate(result,forStack,conditionNode.getChildren()[nodePoint],false);
     	}
     	//增加一个无条件跳转
-    	System.out.println(loopStartPoint + ": "+ conditionPoint +":"+ result.getCurrentPoint());
-    	result.insertInstruction(result.getCurrentPoint()+1,new InstructionGoTo(loopStartPoint - (result.getCurrentPoint() + 1))); 
+    	InstructionGoTo reStartGoto = new InstructionGoTo(loopStartPoint - (result.getCurrentPoint() + 1));
+    	result.insertInstruction(result.getCurrentPoint()+1,reStartGoto); 
     	
     	//修改条件判断的跳转位置
-    	conditionInstruction.offset = result.getCurrentPoint() - conditionPoint + 1;
+    	if(conditionInstruction != null){
+    	   conditionInstruction.offset = result.getCurrentPoint() - conditionPoint + 1;
+    	}
+    	
+    	//修改Break和Continue指令的跳转位置,循环出堆
+    	ForRelBreakContinue rel =  forStack.pop();
+    	for(InstructionGoTo item:rel.breakList){
+    		item.offset = result.getCurrentPoint() -  item.offset ;
+    	}
+    	for(InstructionGoTo item:rel.continueList){
+    		item.offset = selfAddPoint -  item.offset - 1;
+    	}    	
     	
     	//生成作用域结束指令
 	    result.insertInstruction(result.getCurrentPoint()+1, new InstructionCloseNewArea());
@@ -1304,4 +1340,13 @@ public class ExpressRunner
  		}
  		return null;
  	}
+ }
+ 
+ class ForRelBreakContinue{
+	 ExpressItem node;
+	 List<InstructionGoTo> breakList = new ArrayList<InstructionGoTo>();
+	 List<InstructionGoTo> continueList = new ArrayList<InstructionGoTo>();
+	 public ForRelBreakContinue(ExpressItem aNode){
+		 node = aNode;
+	 }
  }

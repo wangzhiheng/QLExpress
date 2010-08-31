@@ -15,7 +15,7 @@ public class DefineTest {
 	public void testDefExpressInner() throws Exception{
 		String express = "定义变量 int qh = 1 + 1";
 		DefaultContext<String, Object>  context = new DefaultContext<String, Object>();
-		IfTest runner = new IfTest();	
+		ExpressRunner runner = new ExpressRunner();	
 		runner.addOperatorWithAlias("定义变量", "def", null);
 		context.put("qh",100);
 		Object r = runner.execute(express, null, false, context);
@@ -27,7 +27,7 @@ public class DefineTest {
 	public void testDefUserContext() throws Exception{
 		String express = "qh = 1 + 1";
 		DefaultContext<String, Object>  context = new DefaultContext<String, Object>();
-		IfTest runner = new IfTest();
+		ExpressRunner runner = new ExpressRunner();
 		context.put("qh",100);
 		Object r = runner.execute(express, null, false, context);
 		Assert.assertTrue("表达式变量作用域错误", r.toString().equalsIgnoreCase("2"));
@@ -38,7 +38,7 @@ public class DefineTest {
 		String express = " 定义别名 qh example.child ; "
 				+ "{定义别名 qh example.child.a;" + " qh =qh + \"-ssss\";" + "};"
 				+ " qh.a = qh.a +\"-qh\";" + " return example.child.a";
-		IfTest runner = new IfTest();
+		ExpressRunner runner = new ExpressRunner();
 		runner.addOperatorWithAlias("定义别名", "alias", null);
 		DefaultContext<String, Object> context = new DefaultContext<String, Object>();
 		context.put("example", new BeanExample());
@@ -52,7 +52,7 @@ public class DefineTest {
 	@org.junit.Test
 	public void testMacro() throws Exception{
 		String express ="定义宏  惩罚   {cache bean.unionName(name)}; 惩罚; return  惩罚";
-		IfTest runner = new IfTest();
+		ExpressRunner runner = new ExpressRunner();
 		runner.addOperatorWithAlias("定义宏", "macro", null);
 		DefaultContext<String, Object>  context = new DefaultContext<String, Object>();		
 		context.put("bean", new BeanExample("qhlhl2010@gmail.com"));
@@ -68,7 +68,7 @@ public class DefineTest {
 		String express =" example.child.a = \"ssssssss\";" +
 				" map.name =\"ffff\";" +
 				"return map.name;";
-		IfTest runner = new IfTest();
+		ExpressRunner runner = new ExpressRunner();
 		DefaultContext<String, Object>  context = new DefaultContext<String, Object>();
 		context.put("example", new BeanExample("张三"));
 		context.put("map",new HashMap());
@@ -81,7 +81,7 @@ public class DefineTest {
 	}	
 	@org.junit.Test
 	public void test批量执行指令() throws Exception{
-		IfTest runner = new IfTest();
+		ExpressRunner runner = new ExpressRunner();
 		runner.addOperatorWithAlias("定义宏", "macro", null);
 		DefaultContext<String, Object>  context = new DefaultContext<String, Object>();		
 		context.put("bean", new BeanExample("qhlhl2010@gmail.com"));

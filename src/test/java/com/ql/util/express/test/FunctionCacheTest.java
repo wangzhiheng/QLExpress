@@ -1,6 +1,7 @@
 package com.ql.util.express.test;
 
 import com.ql.util.express.DefaultContext;
+import com.ql.util.express.ExpressRunner;
 import com.ql.util.express.FuncitonCacheManager;
 
 public class FunctionCacheTest {
@@ -9,7 +10,7 @@ public class FunctionCacheTest {
 		String express = " cache isVIP(\"qh\") ;  cache isVIP(\"xuannan\"); cache isVIP(\"qh\") ;"
 				+ " cache example.unionName(\"李四\") ;"
 				+ " return cache example.unionName(\"李四\") ;";
-		IfTest runner = new IfTest();
+		ExpressRunner runner = new ExpressRunner();
 		DefaultContext<String, Object> context = new DefaultContext<String, Object>();
 		context.put("example", new BeanExample("张三"));
 		runner.addFunctionOfClassMethod("isVIP", BeanExample.class.getName(),
