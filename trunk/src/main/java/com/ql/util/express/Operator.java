@@ -731,6 +731,34 @@ class OperatorCall extends OperatorBase{
 		throw new Exception("return 是通过特殊指令来实现的，不能支持此方法");
 	}	
 }
+
+class OperatorBreak extends OperatorBase{
+	public OperatorBreak(String name) {
+		this.name = name;
+	}
+	public OperatorBreak(String aAliasName, String aName, String aErrorInfo) {
+		this.name = aName;
+		this.aliasName = aAliasName;
+		this.errorInfo = aErrorInfo;
+	}
+	public OperateData executeInner(InstructionSetContext parent, OperateData[] list) throws Exception {
+		throw new Exception("OperatorBreak 是通过特殊指令来实现的，不能支持此方法");
+	}	
+}
+class OperatorContinue extends OperatorBase{
+	public OperatorContinue(String name) {
+		this.name = name;
+	}
+	public OperatorContinue(String aAliasName, String aName, String aErrorInfo) {
+		this.name = aName;
+		this.aliasName = aAliasName;
+		this.errorInfo = aErrorInfo;
+	}
+	public OperateData executeInner(InstructionSetContext parent, OperateData[] list) throws Exception {
+		throw new Exception("OperatorContinue 是通过特殊指令来实现的，不能支持此方法");
+	}	
+}
+
 class OperatorMinMax extends Operator {
 	public OperatorMinMax(String name) {
 		this.name = name;

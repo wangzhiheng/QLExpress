@@ -549,7 +549,7 @@ class InstructionGoTo extends Instruction{
 	 * 跳转指令的偏移量
 	 */
     int offset;
-    boolean condition;
+    String name;
     public InstructionGoTo(int aOffset){
     	this.offset = aOffset;
     }
@@ -566,7 +566,7 @@ class InstructionGoTo extends Instruction{
 	  if(this.offset >=0){
 		  result = result +"+";
 	  }
-	  result = result + this.offset;
+	  result = result + this.offset + " " + this.name;
 	  return result;
 	}
 }

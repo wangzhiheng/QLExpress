@@ -3,6 +3,7 @@ package com.ql.util.express.test;
 import org.junit.Assert;
 
 import com.ql.util.express.DefaultContext;
+import com.ql.util.express.ExpressRunner;
 
 public class VarAreaTest {
 	@org.junit.Test
@@ -16,7 +17,7 @@ public class VarAreaTest {
 				" qh = qh + 100;" +
 				"}; " +
 				"qh = qh + 1;";
-		IfTest runner = new IfTest();
+		ExpressRunner runner = new ExpressRunner();
 		DefaultContext<String, Object>  context = new DefaultContext<String, Object>();
 		runner.addOperatorWithAlias("如果", "if",null);
 		runner.addOperatorWithAlias("则", "then",null);
@@ -38,7 +39,7 @@ public class VarAreaTest {
 				" qh = qh + 100;" +
 				"}; " +
 				"qh = qh + 1;";
-		IfTest runner = new IfTest();
+		ExpressRunner runner = new ExpressRunner();
 		DefaultContext<String, Object>  context = new DefaultContext<String, Object>();
 		runner.addOperatorWithAlias("如果", "if",null);
 		runner.addOperatorWithAlias("则", "then",null);
