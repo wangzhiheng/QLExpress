@@ -339,7 +339,7 @@ class InstructionLoadAttr extends Instruction{
 			if(environment.isTrace()){
 				log.debug(this +":" + environment.getContext().get(this.attrName));						
 			}
-		    environment.push((OperateDataAttr)environment.getContext().getSymbol(this.attrName));
+		    environment.push((OperateDataAttr)o);
 		    environment.programPointAddOne();
 		}
 	}
