@@ -21,15 +21,14 @@ public class IfTest {
 		for (int i = 1; i <= 10; i = i + 1) {
 			if (i > 5) {
 				break;
-			}
+			};
 			for (int j = 0; j < 10; j = j + 1) {
 				if (j > 5) {
 					break;
 				}
-				;
 				qh = qh + j;
-			}
-		}
+			};
+		};
 		
 		return qh;
 	}
@@ -55,7 +54,7 @@ public class IfTest {
 		DefaultContext<String, Object>  context = new DefaultContext<String, Object>();		
 		context.put("bean", new BeanExample("qhlhl2010@gmail.com"));
 		context.put("name","xuannn");		
-		int count = 10000;
+		int count = 10;
 		Object r = null;
 		s = System.currentTimeMillis();
 		r = runner.execute(expressString, null, true, context,null,false);
