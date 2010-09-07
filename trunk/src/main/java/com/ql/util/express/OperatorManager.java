@@ -34,10 +34,11 @@ final class OperatorManager {
 	 
 	 	this.addOperatorInner("cache", 0, 0, 0,  new OperatorAlias("cache"));
 		this.addOperatorInner("def", 0, 0, 2,  new OperatorDef("def"));
-		this.addOperatorInner("new", 0, 0, -1, null);
-		this.addOperatorInner("method", 0, 0, -1,true, null);
+		this.addOperatorInner("new", 0, 0, 2, null);
+		this.addOperatorInner("method", 0, 0, 2,true, null);
 		this.addOperatorInner("field", 0, 0, 1, null);
-		this.addOperatorInner("f", 0, 0, -1, null);
+		this.addOperatorInner("f", 0, 0, 1, null);
+		this.addOperatorInner("selffunction", 0, 0, 1, null);
 		this.addOperatorInner(".", 0, 0, -1, null);
 		this.addOperatorInner("(", 0, 0, -1, new OperatorNullOp("("));
 		this.addOperatorInner(")", 0, 0, -1, new OperatorNullOp(")"));
@@ -50,7 +51,7 @@ final class OperatorManager {
 		this.addOperatorInner("++", 1, 0, 1, null);
 		this.addOperatorInner("--", 1, 0, 1, null);
 		this.addOperatorInner("~", 1, 0, 1, null);
-		this.addOperatorInner("in", 0, 0, -1, true,new OperatorIn("in"));
+		this.addOperatorInner("in", 0, 0, 2, true,new OperatorIn("in"));
 		this.addOperatorInner("cast", 0, 0, 2, new OperatorCast("cast"));
 		this.addOperatorInner("!", 1, 0, 1, new OperatorNot("!"));
 		this.addOperatorInner("not", 1, 0, 1, new OperatorNot("not"));
@@ -79,7 +80,6 @@ final class OperatorManager {
 		this.addOperatorInner("or", 10, 0, 2, new OperatorOr("or"));
 		this.addOperatorInner("或者", 10, 0, 2, new OperatorOr("或者"));
 		this.addOperatorInner("=", 12, 1, 2, new OperatorEvaluate("="));
-		this.addOperatorInner(",", 15, 0, -1, new OperatorNullOp(","));
 		this.addOperatorInner("for", 20, 0, 2, new OperatorFor("for"));
 		this.addOperatorInner("if", 20, 0, -1, new OperatorIf("if"));
 		this.addOperatorInner("then", 20, 0, -1, new OperatorNullOp("if"));
@@ -93,7 +93,9 @@ final class OperatorManager {
 		//return 的操作数量是根据堆栈的实际情况来看的，999是一个特殊标志
 		this.addOperatorInner("return", 26, 0, 999, new OperatorReturn("return"));
 	 	this.addOperatorInner("macro", 30, 0, 2,  new OperatorMacro("macro"));
+	 	this.addOperatorInner("function", 30, 0, 3,  new OperatorFunction("function"));
 
+		this.addOperatorInner(",", 99, 0, -1, new OperatorNullOp(","));
 		
 		this.addOperatorInner(";", 100, 0, -1, new OperatorNullOp(";"));
 		
@@ -300,9 +302,11 @@ final class OperatorManager {
     	  result = 4; 
       }else if(op1.equalsIgnoreCase("if") &&  op2.equalsIgnoreCase("else")){
     	  result = 5; 
-      }else if(op1.equals("{")&&(op2.equals("}")))
+      }else if(op1.equals("{")&&(op2.equals("}"))){
           result =  6;
-      else if (op1.equals("{")) //(比所有的操作符级别低
+      }else if(op1.equals(";")&&(op2.equals(","))){
+          result =  7;
+      }else if (op1.equals("{")) //(比所有的操作符级别低
           result = 0;
       else if (op2.equals("{")) //(比所有的操作符级别低
           result = 0;
@@ -346,7 +350,7 @@ final class OperatorManager {
    }
      public int getDataMember(String name){
        if (isFunction(name))
-          return -1;
+          return 1;
        OpStr op = (OpStr)opStrList.get(name);
        return op.OpDataMember;
      }

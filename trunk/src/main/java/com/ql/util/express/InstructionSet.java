@@ -22,11 +22,17 @@ class CallResult{
 @SuppressWarnings("unchecked")
 public class InstructionSet {
   private int maxStackSize  = -1;
+  /**
+   * 指令
+   */
   private List<Instruction> list = new ArrayList<Instruction>();
   /**
    * 函数和宏定义
    */
   private Map<String,FunctionInstructionSet> functionDefine = new HashMap<String,FunctionInstructionSet>();
+  
+  private Map<String,OperateDataLocalVar> localVarDefine = new HashMap<String,OperateDataLocalVar>();
+  private List<OperateDataLocalVar> parameterList = new ArrayList<OperateDataLocalVar>();
   
   /**
    * 批量执行指令集合，指令集间可以共享 变量和函数
@@ -40,11 +46,22 @@ public class InstructionSet {
    * @throws Exception
    */
   protected static Object execute(InstructionSet[] sets,ExpressLoader loader,
-	IExpressContext aContext, List errorList,
-	FuncitonCacheManager aFunctionCacheMananger, boolean isTrace)
-	throws Exception {
+			IExpressContext aContext, List errorList,
+			FuncitonCacheManager aFunctionCacheMananger, boolean isTrace)
+			throws Exception {
 	  InstructionSetContext context = new InstructionSetContext<String, Object>(
-				aContext,loader, null, aFunctionCacheMananger);;
+				aContext,loader, null, aFunctionCacheMananger);
+	  Object result = execute(sets,context,errorList,isTrace);
+		if (aFunctionCacheMananger == null) {
+			// 如果是指令集自身创建的缓存，则清除
+			context.clearFuncitonCacheManager();
+		}
+     return result;
+  }
+
+  protected static Object execute(InstructionSet[] sets,
+    InstructionSetContext context, List errorList,boolean isTrace)
+	throws Exception {
 	  RunEnvironment environmen = null;
 	  Object result =null;
 	  for(int i=0;i< sets.length;i++){
@@ -58,10 +75,6 @@ public class InstructionSet {
 			break;
 		}		
 	  }	
-		if (aFunctionCacheMananger == null) {
-			// 如果是指令集自身创建的缓存，则清除
-			context.clearFuncitonCacheManager();
-		}
 	  return result;
 
   }
@@ -79,7 +92,6 @@ public class InstructionSet {
 		for(FunctionInstructionSet item : this.functionDefine.values()){
 			context.addSymbol(item.name, item.instructionSet);
 		}
-		
 		while (environmen.getProgramPoint() < this.list.size()) {
 			if (environmen.isExit() == true) {
 				break;
@@ -108,7 +120,24 @@ public class InstructionSet {
 	  return this.functionDefine.get(macroName);
   }
   
-  /**
+  
+	public OperateDataLocalVar getLocalVarDefine(String varName) {
+		return localVarDefine.get(varName);
+	}
+
+	public void addLocalVarDefine(String varName,
+			OperateDataLocalVar localVarDefine) {
+		this.localVarDefine.put(varName, localVarDefine);
+	}
+	
+	public OperateDataLocalVar[] getParameters() {
+		return this.parameterList.toArray(new OperateDataLocalVar[0]);
+	}
+
+	public void addParameter(OperateDataLocalVar localVar) {
+		this.parameterList.add(localVar);
+	}	
+/**
    * 添加操作数入栈指令
    * @param operateData
    * @param stackSize
@@ -152,10 +181,14 @@ public class InstructionSet {
 	  StringBuffer buffer = new StringBuffer();
 	  //输出宏定义
 	  for(FunctionInstructionSet set : this.functionDefine.values()){
-		  buffer.append("macro ：" + set.name).append("\n");
+		  buffer.append(set.type + ":" + set.name).append("\n");
 		  buffer.append(set.instructionSet);
 	  }	  
-	  buffer.append("指令集： 最大数据长度:" + (this.maxStackSize)).append("\n");
+	  //参数
+	  for(OperateDataLocalVar var : this.parameterList){
+		  buffer.append("参数 ：" + var.name).append(" ").append(var.type).append("\n");
+	  }	
+	  buffer.append("指令集：\n");
 	  for(int i=0;i<list.size();i++){
 		  buffer.append(i + 1).append(":").append(list.get(i)).append("\n");
 	  }
@@ -337,7 +370,7 @@ class InstructionLoadAttr extends Instruction{
 			new InstructionCallMacro(this.attrName).execute(environment, errorList);
 		}else{
 			if(environment.isTrace()){
-				log.debug(this +":" + environment.getContext().get(this.attrName));						
+				log.debug(this +":" + ((OperateDataAttr)o).getObject(environment.getContext()));						
 			}
 		    environment.push((OperateDataAttr)o);
 		    environment.programPointAddOne();
@@ -411,6 +444,54 @@ class InstructionCallFunction extends Instruction{
 	  return "call function " ;	
 	}
 }
+
+class InstructionCallSelfDefineFunction extends Instruction{
+	String functionName;
+	int opDataNumber;
+	public InstructionCallSelfDefineFunction(String name,int aOpDataNumber){
+	  this.functionName = name;
+	  this.opDataNumber =aOpDataNumber;
+	}
+	@SuppressWarnings("unchecked")
+	public void execute(RunEnvironment environment,List errorList)throws Exception{
+		OperateData[] parameters = environment.popArray(environment.getContext(),this.opDataNumber);		
+		if(environment.isTrace()){
+			String str = this.functionName + "(";
+			for(int i=0;i<parameters.length;i++){
+				if(i > 0){
+					str = str + ",";
+				}
+				if(parameters[i] instanceof OperateDataAttr){
+					str = str + parameters[i] + ":" + parameters[i].getObject(environment.getContext());
+				}else{
+				   str = str + parameters[i];
+				}
+			}
+			str = str + ")";
+			log.debug(str);
+		}
+		
+		InstructionSet functionSet = (InstructionSet)environment.getContext().getSymbol(functionName);		
+		InstructionSetContext context = new InstructionSetContext<String, Object>(
+			environment.getContext(),environment.getContext().getExpressLoader(), null,
+			environment.getContext().getFunctionCachManagerNoCreate());
+		OperateDataLocalVar[] vars = functionSet.getParameters();
+		for(int i=0;i<vars.length;i++){
+			//注意此处必须new 一个新的对象，否则就会在多次调用的时候导致数据冲突
+			OperateDataLocalVar var = new OperateDataLocalVar(vars[i].name,vars[i].type);
+			context.addSymbol(var.name, var);
+			var.setObject(context, parameters[i].getObject(environment.getContext()));
+		}
+		Object result =InstructionSet.execute(new InstructionSet[]{(InstructionSet)functionSet},
+				context,errorList,environment.isTrace());
+		environment.push(new OperateData(result,null));		
+		environment.programPointAddOne();
+	}
+	public String toString(){
+	  return "call selfDefineFunction " ;	
+	}
+}
+
 class InstructionCallMacro extends Instruction{
 	String name;
 	InstructionCallMacro(String aName){
@@ -418,7 +499,6 @@ class InstructionCallMacro extends Instruction{
     }
 	@SuppressWarnings("unchecked")
 	public void execute(RunEnvironment environment,List errorList)throws Exception{
-		//目前的模式，不需要执行任何操作
 		if(environment.isTrace()){
 			log.debug(this);
 		}
