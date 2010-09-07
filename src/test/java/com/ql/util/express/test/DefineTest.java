@@ -3,6 +3,7 @@ package com.ql.util.express.test;
 import java.util.HashMap;
 
 import org.junit.Assert;
+import org.junit.Test;
 
 import com.ql.util.express.DefaultContext;
 import com.ql.util.express.ExpressLoader;
@@ -61,6 +62,22 @@ public class DefineTest {
 		Assert.assertTrue("别名宏 错误", r.toString().equalsIgnoreCase("qhlhl2010@gmail.com-xuannn"));
 		System.out.println(r);
 	}	
+	@Test
+	public void test_自定义函数() throws Exception{		
+		String express ="定义函数  递归(int a){" +
+				" if(a == 1)then{ " +
+				"   return 1;" +
+				"  }else{ " +
+				"     return 递归(a - 1) *  a;" +
+				"  } " +
+				"}; " +
+				"递归(10);";
+		ExpressRunner runner = new ExpressRunner();
+		runner.addOperatorWithAlias("定义函数", "function",null);
+		DefaultContext<String, Object>  context = new DefaultContext<String, Object>();		
+		Object r = runner.execute(express, null, false, context,null,true);
+		Assert.assertTrue("自定义函数 错误", r.toString().equals("3628800"));
+	}	
 	@org.junit.Test
 	public void testProperty() throws Exception{
 		//String express =" cache isVIP(\"qh\") ;  cache isVIP(\"xuannan\") cache isVIP(\"qh\") ;";
@@ -118,5 +135,40 @@ public class DefineTest {
 		
 		Assert.assertTrue("别名实现 错误", r.toString().equalsIgnoreCase("500"));
 	
+	}	
+	@org.junit.Test
+	public  void test_循环() throws Exception{
+		long s = System.currentTimeMillis();
+		String expressString ="qh = 0; 循环(int i = 1;  i<=10;i = i + 1){ if(i > 5) then{ 终止;}; " +
+				"循环(def int j=0;j<10;j= j+1){  " +
+				"    if(j > 5)then{" +
+				"       终止;" +
+				"    }; " +
+				"    qh = qh + j;" +
+				//"   打印(i +\":\" + j+ \":\" +qh);"+
+				" };  " +
+				"};" +
+				"return qh;";
+		ExpressRunner runner = new ExpressRunner();		
+		runner.addOperatorWithAlias("循环", "for",null);
+		runner.addOperatorWithAlias("继续", "continue",null);
+		runner.addOperatorWithAlias("终止", "break",null);
+		runner.addFunctionOfServiceMethod("打印", System.out, "println", new String[]{Object.class.getName()}, null);
+		DefaultContext<String, Object>  context = new DefaultContext<String, Object>();		
+		context.put("bean", new BeanExample("qhlhl2010@gmail.com"));
+		context.put("name","xuannn");		
+		int count = 1;
+		Object r = null;
+		s = System.currentTimeMillis();
+		r = runner.execute(expressString, null, true, context,null,false);
+
+		System.out.println("编译耗时：" + (System.currentTimeMillis() - s));
+		
+		for(int i=0;i<count;i++){
+			r = runner.execute(expressString, null, true, context,null,false);
+			Assert.assertTrue("循环处理错误", r.toString().equals("75"));
+		}
+		System.out.println("执行耗时：" + (System.currentTimeMillis() - s));		
+		System.out.println(context);	
 	}	
 }

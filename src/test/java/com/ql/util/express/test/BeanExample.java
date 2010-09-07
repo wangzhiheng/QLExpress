@@ -34,4 +34,7 @@ public class BeanExample {
 		System.out.println(" execute isVIP("+ name+ ") .....");
 		return false;
 	}
+	public static boolean isVIPFalse() {		
+		return false;
+	}
 }

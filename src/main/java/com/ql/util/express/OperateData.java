@@ -214,11 +214,11 @@ class OperateDataAlias extends OperateDataAttr {
 	}
 }
 @SuppressWarnings("unchecked")
-class OperatorClass extends OperateData {
+class OperateClass extends OperateData {
 	private String name;
 	private Class m_class;
 
-	public OperatorClass(String name, Class aClass) {
+	public OperateClass(String name, Class aClass) {
 		super(null,null);
 		this.name = name;
 		this.m_class = aClass;
@@ -228,7 +228,9 @@ class OperatorClass extends OperateData {
 		return "Class:" + name;
 		// return name;
 	}
-
+    public Class getVarClass(){
+    	return this.m_class;
+    }
 	public Object getObjectInner(InstructionSetContext parent) {
 		return m_class;
 	}
@@ -271,6 +273,9 @@ class MyPlace implements ExpressTreeNode{
 	public void addChild(ExpressTreeNode child){
 		this.op.addChild(child);
 	}
+	public int getChildCount(){
+		return this.op.getChildCount();
+	}
 }
 
 interface ExpressTreeNode{
@@ -281,6 +286,7 @@ interface ExpressTreeNode{
     public int getMaxStackSize();
 	public void setMaxStackSize(int maxStackSize);
 	public void addChild(ExpressTreeNode child);
+	public int getChildCount();
 }
 
 class ExpressTreeNodeRoot extends ExpressTreeNodeImple{
@@ -310,14 +316,16 @@ class ExpressTreeNodeImple implements ExpressTreeNode{
 	}
 	public ExpressTreeNode[] getChildren() {
 		if(this.children == null){
-			return null;
+			return new ExpressTreeNode[0];
 		}
 		return (ExpressTreeNode[])children.toArray(new ExpressTreeNode[0]);
 	}
 	public void setChildren(ExpressTreeNode[] aChildren) {
 		if(this.children == null){
 			this.children = new ArrayList<ExpressTreeNode>();
-		}
+		}else{
+			this.children.clear();
+		}		
 		if(aChildren != null){
 			for(ExpressTreeNode node : aChildren){
 				this.children.add(node);
@@ -330,6 +338,12 @@ class ExpressTreeNodeImple implements ExpressTreeNode{
 			this.children = new ArrayList<ExpressTreeNode>();
 		}
 		this.children.add(child);
+	}
+	public int getChildCount(){
+		if(this.children == null){
+			return 0;
+		}
+		return this.children.size();
 	}
     public int getMaxStackSize() {
 		return maxStackSize;

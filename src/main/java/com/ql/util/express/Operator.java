@@ -297,7 +297,20 @@ class OperatorMacro extends OperatorBase {
 		return result;
 	}
 }
-
+class OperatorFunction extends OperatorBase {
+	public OperatorFunction(String aName) {
+		this.name = aName;
+	}
+	public OperatorFunction(String aAliasName, String aName, String aErrorInfo) {
+		this.name = aName;
+		this.aliasName = aAliasName;
+		this.errorInfo = aErrorInfo;
+	}
+	@SuppressWarnings("unchecked")
+	public OperateData executeInner(InstructionSetContext context, OperateData[] list) throws Exception {
+		throw new Exception("还没有实现");
+	}
+}
 class OperatorCache extends OperatorBase {
 	public OperatorCache(String aName) {
 		this.name = aName;
@@ -334,7 +347,7 @@ class OperatorMethod extends OperatorBase {
 				objs[i] = tmpObj;
 			}
 			Method m = null;
-			if (list[0] instanceof OperatorClass) {// 调用静态方法
+			if (list[0] instanceof OperateClass) {// 调用静态方法
 				m = ExpressUtil.findMethod((Class) obj, this.methodName,
 						types, true, true);
 			} else {
@@ -355,7 +368,7 @@ class OperatorMethod extends OperatorBase {
 				throw new Exception(s.toString());
 			}
 
-			if (list[0] instanceof OperatorClass) {// 调用静态方法
+			if (list[0] instanceof OperateClass) {// 调用静态方法
 				tmpObj = m.invoke(null, objs);
 			} else {
 				tmpObj = m.invoke(obj, objs);

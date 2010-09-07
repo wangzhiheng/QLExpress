@@ -1,72 +1,47 @@
 package com.ql.util.express.test;
 
+import org.junit.Assert;
+import org.junit.Test;
+
 import com.ql.util.express.DefaultContext;
 import com.ql.util.express.ExpressRunner;
 
 public class IfTest {
-//18658122779
-	public static void main(String[] args) throws Exception {
-	   new IfTest().testDemo();
 
-		long s = System.currentTimeMillis();
-		int count = 10000;
-		for(int i=0;i<count;i++){
-			 f();
-		}
-		System.out.println("执行耗时：" + (System.currentTimeMillis() - s));
-		
-	}
-	public static int f(){
-		int qh = 0;
-		for (int i = 1; i <= 10; i = i + 1) {
-			if (i > 5) {
-				break;
-			};
-			for (int j = 0; j < 10; j = j + 1) {
-				if (j > 5) {
-					break;
-				}
-				qh = qh + j;
-			};
-		};
-		
-		return qh;
-	}
-	@org.junit.Test
-	public  void testDemo() throws Exception{
-		long s = System.currentTimeMillis();
-		String expressString ="qh = 0; 循环(def int i = 1;  i<=10;i = i + 1){ if(i > 5) then{ 终止;}; " +
-				"循环(def int j=0;j<10;j= j+1){  " +
-				"    if(j > 5)then{" +
-				"       终止;" +
-				"    }; " +
-				"    qh = qh + j;" +
-				//"   打印(i +\":\" + j+ \":\" +qh);"+
-				" };  " +
-				"};" +
-				"return qh;";
-		System.out.println(expressString);
-		ExpressRunner runner = new ExpressRunner();		
-		runner.addOperatorWithAlias("循环", "for",null);
-		runner.addOperatorWithAlias("继续", "continue",null);
-		runner.addOperatorWithAlias("终止", "break",null);
-		runner.addFunctionOfServiceMethod("打印", System.out, "println", new String[]{Object.class.getName()}, null);
+	
+	@Test
+	public void testMacro() throws Exception{		
+		//String express ="a = 1.0 ; return (int)a + 1";
+		String express =" int a = 1 ; return a + 1";
+		ExpressRunner runner = new ExpressRunner();
+		DefaultContext<String, Object>  context = new DefaultContext<String, Object>();	
+		Object r = runner.execute(express, null, false, context,null,true);
+		System.out.println(r);
+		System.out.println(context);		
+	}	
+	@Test
+	public void test_自定义函数() throws Exception{		
+		String express ="定义函数  递归(int a,int b){" +
+				" if(a == 1)then{ " +
+				"   return 1;" +
+				"  }else{ " +
+				"     return 递归(a - 1,b) *  a;" +
+				"  } " +
+				"}; " +
+				"递归(10,10);";
+		ExpressRunner runner = new ExpressRunner();
+
+		runner.addOperatorWithAlias("定义函数", "function",null);
 		DefaultContext<String, Object>  context = new DefaultContext<String, Object>();		
-		context.put("bean", new BeanExample("qhlhl2010@gmail.com"));
-		context.put("name","xuannn");		
-		int count = 10;
-		Object r = null;
-		s = System.currentTimeMillis();
-		r = runner.execute(expressString, null, true, context,null,false);
-
-		System.out.println("编译耗时：" + (System.currentTimeMillis() - s));
-		
-		for(int i=0;i<count;i++){
-			r = runner.execute(expressString, null, true, context,null,false);
-			//System.out.println(i + ":" + r);
+		Object r = runner.execute(express, null, true, context,null,true);
+		long start = System.currentTimeMillis();
+		int num = 100;
+		for(int i = 0;i< num;i++){
+		   runner.execute(express, null, true,null);
 		}
-		System.out.println("执行耗时：" + (System.currentTimeMillis() - s));
+		System.out.println("执行" + num +"次\""+ express +"\" 耗时："
+				+ (System.currentTimeMillis() - start));
 		
-		System.out.println(context);	
-	}
+		Assert.assertTrue("自定义函数 错误", r.toString().equals("3628800"));
+	}	
 }

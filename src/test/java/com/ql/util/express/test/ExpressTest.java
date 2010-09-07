@@ -24,6 +24,7 @@ public class ExpressTest {
 		ExpressRunner runner = new ExpressRunner();
 		String express = "10 * 10 + 1 + 2 * 3 + 5 * 2";
 		int num = 100000;
+		runner.execute(express, null, true,null);
 		long start = System.currentTimeMillis();
 		for(int i = 0;i< num;i++){
 		   runner.execute(express, null, true,null);
