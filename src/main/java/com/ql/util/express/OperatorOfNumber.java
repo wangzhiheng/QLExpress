@@ -8,17 +8,34 @@ import java.math.BigDecimal;
  *
  */
 public class OperatorOfNumber {
-	public static final class Add {
 	
+	public static void main(String[] args) throws Exception{
+		Object o1 = new Integer(1000);
+		Object o2 = new Long(2);
+		Object o;
+		o = OperatorOfNumber.Add.execute(o1,o2);
+		System.out.println(o.getClass() + ":" + o);
+		o = OperatorOfNumber.Subtract.execute(o1,o2);
+		System.out.println(o.getClass() + ":" + o);
+		o = OperatorOfNumber.Multiply.execute(o1,o2);
+		System.out.println(o.getClass() + ":" + o);
+		o = OperatorOfNumber.Divide.execute(o1,o2);
+		System.out.println(o.getClass() + ":" + o);
+		o = OperatorOfNumber.Modulo.execute(o1,o2);
+		System.out.println(o.getClass() + ":" + o);
+	}
+	
+    public static int getSeq(Class aClass){
+    	if(aClass.equals(Byte.class)) return 1;
+    	if(aClass.equals(Short.class)) return 2;
+    	if(aClass.equals(Integer.class)) return 3;
+    	if(aClass.equals(Long.class)) return 4;
+    	if(aClass.equals(Float.class)) return 5;
+    	if(aClass.equals(Double.class)) return 6;
+         return -1;
+    }
+	public static final class Add {
 		public static Object execute(Object op1, Object op2) throws Exception {
-			
-			Object result = null;
-			boolean flag1;
-			boolean flag2;
-			boolean flag3;
-			boolean flag4;
-			boolean flag5;
-			boolean flag = flag1 = flag2 = flag3 = flag4 = flag5 = false;
 			if(op1 == null){
 				op1 = "null";
 			}
@@ -28,505 +45,115 @@ public class OperatorOfNumber {
 			if (op1 instanceof String || op2 instanceof String) {				
 				return op1.toString() + op2.toString();
 			}
-
-			if (op1 instanceof String)
-				flag = true;
-			else if (op1 instanceof Long)
-				flag2 = true;
-			else if (op1 instanceof Integer)
-				flag2 = true;
-			else if (op1 instanceof Double)
-				flag4 = true;
-			if (op2 instanceof String)
-				flag1 = true;
-			else if (op2 instanceof Long)
-				flag3 = true;
-			else if (op2 instanceof Integer)
-				flag3 = true;
-			else if (op2 instanceof Double)
-				flag5 = true;
-			if (flag)
-				result = (String) op1 + op2;
-			else if (flag2 && (flag3 || flag1)) {
-				long l = 0L;
-				try {
-					if (flag2) {
-						if (op1 instanceof Long)
-							l = ((Long) op1).longValue();
-						else
-							l = ((Integer) op1).longValue();
-					} else {
-						l = Long.parseLong((String) op1);
-					}
-					if (flag3) {
-						if (op2 instanceof Long)
-							l += ((Long) op2).longValue();
-						else
-							l += ((Integer) op2).longValue();
-					} else {
-						l += Long.parseLong((String) op2);
-					}
-				} catch (NumberFormatException e) {
-					throw new Exception("NumberFormatException ： "
-							+ e.getMessage());
-				}
-				result = Long.valueOf(l);
-			} else if (flag4 && (flag3 || flag5 || flag1) || flag5 && flag2) {
-				double d = 0.0D;
-				try {
-					BigDecimal decimal = new BigDecimal(op1.toString());
-					decimal = decimal.add(new BigDecimal(op2.toString()));
-					d = decimal.doubleValue();
-				} catch (NumberFormatException e) {
-					throw new Exception("NumberFormatException ： "
-							+ e.getMessage());
-				}
-				result = new Double(d);
-			} else {
-				throw new Exception("数据类型处理错误");
+			if(op1 instanceof Number == false){
+				throw new Exception("数据类型错误:" + op1.getClass().getName() + "不能执行 \"+\"操作");
 			}
-			return result;
+			if(op2 instanceof Number == false){
+				throw new Exception("数据类型错误:" + op2.getClass().getName() + "不能执行 \"+\"操作");
+			}
+			int type1 = getSeq(op1.getClass());
+			int type2 = getSeq(op2.getClass());
+			int type = type1 >  type2 ? type1:type2;
+			if(type == 1) return ((Number)op1).byteValue() + ((Number)op2).byteValue();
+			if(type == 2) return ((Number)op1).shortValue() + ((Number)op2).shortValue();
+			if(type == 3) return ((Number)op1).intValue() + ((Number)op2).intValue();
+			if(type == 4) return ((Number)op1).longValue() + ((Number)op2).longValue();
+			if(type == 5) return ((Number)op1).floatValue() + ((Number)op2).floatValue();
+			if(type == 6) return ((Number)op1).doubleValue() + ((Number)op2).doubleValue();
+			throw new Exception("不支持的对象执行了\"+\"操作");
 		}
 	}
 
 	public static final class Subtract{
 	 public  static  Object execute(Object op1,Object op2) throws Exception{
-	        Object result = null;
-	        boolean flag1;
-	        boolean flag2;
-	        boolean flag3;
-	        boolean flag4;
-	        boolean flag5;
-	        boolean flag = flag1 = flag2 = flag3 = flag4 = flag5 = false;
-	        if(op1 instanceof String)
-	            flag = true;
-	        else
-	        if(op1 instanceof Long)
-	            flag2 = true;
-	        else
-	        if(op1 instanceof Integer)
-	            flag2 = true;
-	        else
-	        if(op1 instanceof Double)
-	            flag4 = true;
-	        if(op2 instanceof String)
-	            flag1 = true;
-	        else
-	        if(op2 instanceof Long)
-	            flag3 = true;
-	        else
-	        if(op2 instanceof Integer)
-	            flag3 = true;
-	        else
-	        if(op2 instanceof Double)
-	            flag5 = true;
-	        if(flag2 && (flag3 || flag1) || flag3 && flag)
-	        {
-	            long l = 0L;
-	            try
-	            {
-	                if(flag2)
-	                {
-	                    if(op1 instanceof Integer)
-	                        l = ((Integer)op1).longValue();
-	                    else
-	                        l = ((Long)op1).longValue();
-	                } else
-	                {
-	                    l = Long.parseLong((String)op1);
-	                }
-	                if(flag3)
-	                {
-	                    if(op2 instanceof Integer)
-	                        l -= ((Integer)op2).longValue();
-	                    else
-	                        l -= ((Long)op2).longValue();
-	                } else
-	                {
-	                    l -= Long.parseLong((String)op2);
-	                }
-	            }catch(NumberFormatException e) {
-	              throw new Exception("NumberFormatException ： " + e.getMessage());
-	           }
-	            result = Long.valueOf(l);
-	        } else
-	        if(flag4 && (flag3 || flag5 || flag1) || flag5 && (flag2 || flag))
-	        {
-	            double d = 0.0D;
-	            try
-	            {
-	                if(flag4)
-	                    d = ((Double)op1).doubleValue();
-	                else
-	                if(flag2)
-	                {
-	                    if(op1 instanceof Integer)
-	                        d = ((Integer)op1).doubleValue();
-	                    else
-	                        d = ((Long)op1).doubleValue();
-	                } else
-	                {
-	                    d = Double.parseDouble((String)op1);
-	                }
-	                if(flag5)
-	                    d -= ((Double)op2).doubleValue();
-	                else
-	                if(flag3)
-	                {
-	                    if(op2 instanceof Integer)
-	                        d -= ((Integer)op2).doubleValue();
-	                    else
-	                        d -= ((Long)op2).doubleValue();
-	                } else
-	                {
-	                    d -= Double.parseDouble((String)op2);
-	                }
-	            }catch(NumberFormatException e) {
-	              throw new Exception("NumberFormatException ： " + e.getMessage());
-	           }
-	            result = new Double(d);
-	        } else
-	        {
-	        	throw new Exception("数据类型处理错误");
-	        }
-	        return result;
+			if(op1 instanceof Number == false){
+				throw new Exception("数据类型错误:" + op1.getClass().getName() + "不能执行 \"-\"操作");
+			}
+			if(op2 instanceof Number == false){
+				throw new Exception("数据类型错误:" + op2.getClass().getName() + "不能执行 \"-\"操作");
+			}
+			int type1 = getSeq(op1.getClass());
+			int type2 = getSeq(op2.getClass());
+			int type = type1 >  type2 ? type1:type2;
+			if(type == 1) return ((Number)op1).byteValue() - ((Number)op2).byteValue();
+			if(type == 2) return ((Number)op1).shortValue() - ((Number)op2).shortValue();
+			if(type == 3) return ((Number)op1).intValue() - ((Number)op2).intValue();
+			if(type == 4) return ((Number)op1).longValue() - ((Number)op2).longValue();
+			if(type == 5) return ((Number)op1).floatValue() - ((Number)op2).floatValue();
+			if(type == 6) return ((Number)op1).doubleValue() - ((Number)op2).doubleValue();
+			throw new Exception("不支持的对象执行了\"-\"操作");
 	    }
-
 	}
 
 	public static final class Multiply{
 
 	    public static Object execute(Object op1,Object op2) throws Exception {
-	        Object result = null;
-	        boolean flag1;
-	        boolean flag2;
-	        boolean flag3;
-	        boolean flag4;
-	        boolean flag5;
-	        boolean flag = flag1 = flag2 = flag3 = flag4 = flag5 = false;
-
-	        if(op1 instanceof String)
-	            flag = true;
-	        else
-	        if(op1 instanceof Long)
-	            flag2 = true;
-	        else
-	        if(op1 instanceof Integer)
-	            flag2 = true;
-	        else
-	        if(op1 instanceof Double)
-	            flag4 = true;
-	        if(op2 instanceof String)
-	            flag1 = true;
-	        else
-	        if(op2 instanceof Long)
-	            flag3 = true;
-	        else
-	        if(op2 instanceof Integer)
-	            flag3 = true;
-	        else
-	        if(op2 instanceof Double)
-	            flag5 = true;
-	        if(flag2 && (flag3 || flag1) || flag3 && flag)
-	        {
-	            long l = 0L;
-	            try
-	            {
-	                if(flag2)
-	                {
-	                    if(op1 instanceof Long)
-	                        l = ((Long)op1).longValue();
-	                    else
-	                        l = ((Integer)op1).longValue();
-	                } else
-	                {
-	                    l = Long.parseLong((String)op1);
-	                }
-	                if(flag3)
-	                {
-	                    if(op2 instanceof Long)
-	                        l *= ((Long)op2).longValue();
-	                    else
-	                        l *= ((Integer)op2).longValue();
-	                } else
-	                {
-	                    l *= Long.parseLong((String)op2);
-	                }
-	            }catch(NumberFormatException e) {
-	              throw new Exception("NumberFormatException ： " + e.getMessage());
-	           }
-	            result = Long.valueOf(l);
-	        } else
-	        if(flag4 && (flag3 || flag5 || flag1) || flag5 && (flag2 || flag))
-	        {
-	            double d = 0.0D;
-	            try
-	            {
-	                if(flag4)
-	                    d = ((Double)op1).doubleValue();
-	                else
-	                if(flag2)
-	                {
-	                    if(op1 instanceof Long)
-	                        d = ((Long)op1).doubleValue();
-	                    else
-	                        d = ((Integer)op1).doubleValue();
-	                } else
-	                {
-	                    d = Double.parseDouble((String)op1);
-	                }
-	                if(flag5)
-	                    d *= ((Double)op2).doubleValue();
-	                else
-	                if(flag3)
-	                {
-	                    if(op2 instanceof Long)
-	                        d *= ((Long)op2).doubleValue();
-	                    else
-	                        d *= ((Integer)op2).doubleValue();
-	                } else
-	                {
-	                    d *= Double.parseDouble((String)op2);
-	                }
-	            }catch(NumberFormatException e) {
-	              throw new Exception("NumberFormatException ： " + e.getMessage());
-	           }
-	            result = new Double(d);
-	        } else
-	        {
-	        	throw new Exception("数据类型处理错误");
-	        }
-	        return result;
-	    }
-
-	    public String toString()
-	    {
-	        return "*";
+			if(op1 instanceof Number == false){
+				throw new Exception("数据类型错误:" + op1.getClass().getName() + "不能执行 \"*\"操作");
+			}
+			if(op2 instanceof Number == false){
+				throw new Exception("数据类型错误:" + op2.getClass().getName() + "不能执行 \"*\"操作");
+			}
+			int type1 = getSeq(op1.getClass());
+			int type2 = getSeq(op2.getClass());
+			int type = type1 >  type2 ? type1:type2;
+			if(type == 1) return ((Number)op1).byteValue() * ((Number)op2).byteValue();
+			if(type == 2) return ((Number)op1).shortValue() * ((Number)op2).shortValue();
+			if(type == 3) return ((Number)op1).intValue() * ((Number)op2).intValue();
+			if(type == 4) return ((Number)op1).longValue() * ((Number)op2).longValue();
+			if(type == 5) return ((Number)op1).floatValue() * ((Number)op2).floatValue();
+			if(type == 6) return ((Number)op1).doubleValue() * ((Number)op2).doubleValue();
+			throw new Exception("不支持的对象执行了\"*\"操作");
 	    }
 	}
 
  public static final class Divide
 	{
-
 	   public static Object execute(Object op1,Object op2) throws Exception{
-	        boolean flag1;
-	        boolean flag2;
-	        boolean flag3;
-	        boolean flag4;
-	        boolean flag5;
-	        boolean flag = flag1 = flag2 = flag3 = flag4 = flag5 = false;
-
-	        if(op1 instanceof String)
-	            flag = true;
-	        else
-	        if(op1 instanceof Long)
-	            flag2 = true;
-	        else
-	        if(op1 instanceof Integer)
-	            flag2 = true;
-	        else
-	        if(op1 instanceof Double)
-	            flag4 = true;
-	        if(op2 instanceof String)
-	            flag1 = true;
-	        else
-	        if(op2 instanceof Long)
-	            flag3 = true;
-	        else
-	        if(op2 instanceof Integer)
-	            flag3 = true;
-	        else
-	        if(op2 instanceof Double)
-	            flag5 = true;
-	        Object obj;
-	        if(flag2 && (flag3 || flag1) || flag3 && flag)
-	        {
-	            long l = 0L;
-	            try
-	            {
-	                if(flag2)
-	                {
-	                    if(op1 instanceof Long)
-	                        l = ((Long)op1).longValue();
-	                    else
-	                        l = ((Integer)op1).longValue();
-	                } else
-	                {
-	                    l = Long.parseLong((String)op1);
-	                }
-	                if(flag3)
-	                {
-	                    if(op2 instanceof Long)
-	                        l /= ((Long)op2).longValue();
-	                    else
-	                        l /= ((Integer)op2).longValue();
-	                } else
-	                {
-	                    l /= Long.parseLong((String)op2);
-	                }
-	            }
-	            catch(NumberFormatException e) {
-	                throw new Exception("NumberFormatException ： " + e.getMessage());
-	            }
-
-	            obj = Long.valueOf(l);
-	        } else
-	        if(flag4 && (flag3 || flag5 || flag1) || flag5 && (flag2 || flag))
-	        {
-	            double d = 0.0D;
-	            try
-	            {
-	                if(flag4)
-	                    d = ((Double)op1).doubleValue();
-	                else
-	                if(flag2)
-	                {
-	                    if(op1 instanceof Long)
-	                        d = ((Long)op1).doubleValue();
-	                    else
-	                        d = ((Integer)op1).doubleValue();
-	                } else
-	                {
-	                    d = Double.parseDouble((String)op1);
-	                }
-	                if(flag5)
-	                    d /= ((Double)op2).doubleValue();
-	                else
-	                if(flag3)
-	                {
-	                    if(op2 instanceof Long)
-	                        d /= ((Long)op2).doubleValue();
-	                    else
-	                        d /= ((Integer)op2).doubleValue();
-	                } else
-	                {
-	                    d /= Double.parseDouble((String)op2);
-	                }
-	            }
-	            catch(NumberFormatException e) {
-	               throw new Exception("NumberFormatException ： " + e.getMessage());
-	           }
-
-	            obj = new Double(d);
-	        } else
-	        {
-	            throw new Exception("数据类型处理错误");
-	        }
-	        return obj;
+		   if(op1 instanceof Number == false){
+				throw new Exception("数据类型错误:" + op1.getClass().getName() + "不能执行 \"/\"操作");
+			}
+			if(op2 instanceof Number == false){
+				throw new Exception("数据类型错误:" + op2.getClass().getName() + "不能执行 \"/\"操作");
+			}
+			int type1 = getSeq(op1.getClass());
+			int type2 = getSeq(op2.getClass());
+			int type = type1 >  type2 ? type1:type2;
+			if(type == 1) return ((Number)op1).byteValue() / ((Number)op2).byteValue();
+			if(type == 2) return ((Number)op1).shortValue() / ((Number)op2).shortValue();
+			if(type == 3) return ((Number)op1).intValue() / ((Number)op2).intValue();
+			if(type == 4) return ((Number)op1).longValue() / ((Number)op2).longValue();
+			if(type == 5) return ((Number)op1).floatValue() / ((Number)op2).floatValue();
+			if(type == 6) return ((Number)op1).doubleValue() / ((Number)op2).doubleValue();
+			throw new Exception("不支持的对象执行了\"/\"操作");
 	    }
 	}
 
  public static final class Modulo
  {
     public static Object execute(Object op1,Object op2) throws Exception{
-         Object result = null;
-         boolean flag1;
-         boolean flag2;
-         boolean flag3;
-         boolean flag4;
-         boolean flag5;
-         boolean flag = flag1 = flag2 = flag3 = flag4 = flag5 = false;
-
-         if(op1 instanceof String)
-             flag = true;
-         else
-         if(op1 instanceof Long)
-             flag2 = true;
-         else
-         if(op1 instanceof Integer)
-             flag2 = true;
-         else
-         if(op1 instanceof Double)
-             flag4 = true;
-         if(op2 instanceof String)
-             flag1 = true;
-         else
-         if(op2 instanceof Long)
-             flag3 = true;
-         else
-         if(op2 instanceof Integer)
-             flag3 = true;
-         else
-         if(op2 instanceof Double)
-             flag5 = true;
-         if(flag2 && (flag3 || flag1) || flag3 && flag)
-         {
-             long l = 0L;
-             try
-             {
-                 if(flag2)
-                 {
-                     if(op1 instanceof Long)
-                         l = ((Long)op1).longValue();
-                     else
-                         l = ((Integer)op1).longValue();
-                 } else
-                 {
-                     l = Long.parseLong((String)op1);
-                 }
-                 if(flag3)
-                 {
-                     if(op2 instanceof Long)
-                         l %= ((Long)op2).longValue();
-                     else
-                         l %= ((Integer)op2).longValue();
-                 } else
-                 {
-                     l %= Long.parseLong((String)op2);
-                 }
-             }catch(NumberFormatException e) {
-               throw new Exception("NumberFormatException ： " + e.getMessage());
-            }
-             result = Long.valueOf(l);
-         } else
-         if(flag4 && (flag3 || flag5 || flag1) || flag5 && (flag2 || flag))
-         {
-             double d = 0.0D;
-             try
-             {
-                 if(flag4)
-                     d = ((Double)op1).doubleValue();
-                 else
-                 if(flag2)
-                 {
-                     if(op1 instanceof Long)
-                         d = ((Long)op1).doubleValue();
-                     else
-                         d = ((Integer)op1).doubleValue();
-                 } else
-                 {
-                     d = Double.parseDouble((String)op1);
-                 }
-                 if(flag5)
-                     d %= ((Double)op2).doubleValue();
-                 else
-                 if(flag3)
-                 {
-                     if(op2 instanceof Long)
-                         d %= ((Long)op2).doubleValue();
-                     else
-                         d %= ((Integer)op2).doubleValue();
-                 } else
-                 {
-                     d %= Double.parseDouble((String)op2);
-                 }
-             } catch(NumberFormatException e) {
-             throw new Exception("NumberFormatException ： " + e.getMessage());
-            }
-             result = new Double(d);
-         } else
-         {
-         	throw new Exception("数据类型处理错误");
-         }
-         return result;
+		   if(op1 instanceof Number == false){
+				throw new Exception("数据类型错误:" + op1.getClass().getName() + "不能执行 \"%\"操作");
+			}
+			if(op2 instanceof Number == false){
+				throw new Exception("数据类型错误:" + op2.getClass().getName() + "不能执行 \"%\"操作");
+			}
+			int type1 = getSeq(op1.getClass());
+			int type2 = getSeq(op2.getClass());
+			int type = type1 >  type2 ? type1:type2;
+			if(type == 1) return ((Number)op1).byteValue() % ((Number)op2).byteValue();
+			if(type == 2) return ((Number)op1).shortValue() % ((Number)op2).shortValue();
+			if(type == 3) return ((Number)op1).intValue() % ((Number)op2).intValue();
+			if(type == 4) return ((Number)op1).longValue() % ((Number)op2).longValue();
+			if(type == 5) return ((Number)op1).floatValue() % ((Number)op2).floatValue();
+			if(type == 6) return ((Number)op1).doubleValue() % ((Number)op2).doubleValue();
+			throw new Exception("不支持的对象执行了\"%\"操作");
      }
  }
 
  public static final class Arith {
 
    private static final int DEF_DIV_SCALE = 10;
-
-  
    private Arith() {
    }
 
