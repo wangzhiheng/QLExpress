@@ -175,7 +175,7 @@ public class ExpressRunner
   private Map<String,InstructionSet> expressInstructionSetCache = new HashMap<String,InstructionSet>();
   
   protected OperatorManager m_operatorManager =  new OperatorManager();
-  protected ExpressImport m_import = new ExpressImport();
+  //protected ExpressImport m_import = new ExpressImport();
   protected Map m_cacheOracleParseString = new HashMap();
   public ExpressRunner(){ }
 
@@ -259,9 +259,29 @@ public class ExpressRunner
 
   protected Object[] getOpObjectList(String[] tmpList)  throws Exception
   {
-   
+      
+	ExpressImport  tmpImportPackage = new ExpressImport();  
     List  list = new ArrayList();
     int point=0;
+    
+    //先处理import，import必须放在文件的最开始，必须以；结束
+    boolean isImport = false;
+    StringBuffer importName = new StringBuffer();
+    while(point <tmpList.length ){
+      if(tmpList[point].equals("import") ==true){
+    	  isImport = true;
+    	  importName.setLength(0);
+      }else if(tmpList[point].equals(";") ==true) {
+    	  isImport = false;
+    	  tmpImportPackage.addPackage(importName.toString());
+      }else if(isImport == true){
+    	  importName.append(tmpList[point]);
+      }else{
+    	  break;
+      }
+      point = point + 1;
+    }
+    
     while(point <tmpList.length){
       String name = tmpList[point];
       if (name.equals("new") == true) {
@@ -327,7 +347,7 @@ public class ExpressRunner
         String tmpStr="";
         while (j < tmpList.length) {
           tmpStr = tmpStr + tmpList[j];
-          tmpClass = this.m_import.getClass(tmpStr);
+          tmpClass = tmpImportPackage.getClass(tmpStr);
           if (tmpClass != null) {
             point = j + 1;
             isClass = true;
@@ -1306,9 +1326,7 @@ public class ExpressRunner
     if(str.endsWith(";") == false ){
       str = str +";";
     }
-//    if(str.indexOf(';') == str.length() -1 && str.indexOf("return") < 0){
-//    	str =  "return " + str;
-//    }
+
     String tmpWord ="";
     String tmpOpStr ="";
     char c;
@@ -1369,16 +1387,6 @@ public class ExpressRunner
     String result[] = new String[list.size()];
     list.toArray(result);
     return result;
-  }
-
-  public void addPackage(String aPackageName){
-    this.m_import.addPackage(aPackageName);
-  }
-  public void removePackage(String aPackageName){
-    this.m_import.removePackage(aPackageName);
-  }
-  public void resetPackages(){
-    this.m_import.resetPackages();
   }
 
 }

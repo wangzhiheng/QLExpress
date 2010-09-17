@@ -94,13 +94,17 @@ class ExpressItemDef extends ExpressItem{
 @SuppressWarnings("unchecked")
 class ExpressImport {
 
-	protected List m_packages = new ArrayList();
+	protected List<String> m_packages = new ArrayList<String>();
 
 	public ExpressImport() {
 		this.resetPackages();
 	}
 
 	public void addPackage(String aPackageName) {
+		int point = aPackageName.indexOf(".*");
+        if(point >=0){
+			aPackageName = aPackageName.substring(0, point);
+		}
 		this.m_packages.add(aPackageName);
 	}
 
@@ -142,11 +146,16 @@ class ExpressImport {
 			return Boolean.TYPE;
 
 		for (int i = 0; i < m_packages.size(); i++) {
-			String tmp = (String) m_packages.get(i) + "." + name;
+			String tmp ="";
+			if(m_packages.get(i).endsWith("."+ name) == true){
+				tmp =  m_packages.get(i);
+			}else{
+				tmp =  m_packages.get(i) + "." + name;					
+			}
 			try {
 				result = Class.forName(tmp);
 			} catch (ClassNotFoundException ex) {
-				//
+				//不做任何操作
 			}
 			if (result != null) {
 				return result;
