@@ -17,7 +17,7 @@ public class ImportTest {
 				"return new BigInteger(\"1000\");";
 		ExpressRunner runner = new ExpressRunner();
 		DefaultContext<String, Object>  context = new DefaultContext<String, Object>();	
-		Object r = runner.execute(express, null, false, context,null,true);
+		Object r = runner.execute(express,context, null, false,false);
 		Assert.assertTrue("import  µœ÷¥ÌŒÛ",r.toString().equals("1000"));
 		System.out.println(r);
 		System.out.println(context);		

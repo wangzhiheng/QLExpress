@@ -80,7 +80,7 @@ public class RunExample implements ApplicationContextAware, Runnable {
 					String s = expressTest[point][0];
 					// 批量处理的时候可以先预处理，会加快执行效率
 					List errorList = new ArrayList();
-					 Object result =runner.execute(s,errorList,true,expressContext);
+					 Object result = runner.execute(s,expressContext, null, false,false);
 					if (expressTest[point][1].equalsIgnoreCase("null")
 							&& result != null
 							|| result != null

@@ -22,7 +22,7 @@ public class VarAreaTest {
 		runner.addOperatorWithAlias("如果", "if",null);
 		runner.addOperatorWithAlias("则", "then",null);
 		runner.addOperatorWithAlias("否则", "else",null);
-		Object r = runner.execute(express, null, false, context,null,true);
+		Object r = runner.execute(express,context, null, false,false);
 		System.out.println(r);
 		System.out.println(context);
 		Assert.assertTrue("变量定义作用域错误", context.get("qh").toString().equals("104"));
@@ -44,7 +44,7 @@ public class VarAreaTest {
 		runner.addOperatorWithAlias("如果", "if",null);
 		runner.addOperatorWithAlias("则", "then",null);
 		runner.addOperatorWithAlias("否则", "else",null);
-		Object r = runner.execute(express, null, false, context,null,true);
+		Object r = runner.execute(express,context, null, false,false);
 		System.out.println(r);
 		System.out.println(context);
 		Assert.assertTrue("变量定义作用域错误", context.get("qh").toString().equals("2"));
