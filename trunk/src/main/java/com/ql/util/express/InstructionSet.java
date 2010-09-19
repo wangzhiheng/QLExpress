@@ -124,6 +124,9 @@ public class InstructionSet {
   public FunctionInstructionSet getMacroDefine(String macroName){
 	  return this.functionDefine.get(macroName);
   }
+  public FunctionInstructionSet[] getFunctionInstructionSets(){
+	  return this.functionDefine.values().toArray(new FunctionInstructionSet[0]);
+  }
   
   
 	public OperateDataLocalVar getLocalVarDefine(String varName) {
