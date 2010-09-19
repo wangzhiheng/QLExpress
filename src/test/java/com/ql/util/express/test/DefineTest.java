@@ -120,9 +120,10 @@ public class DefineTest {
 		ExpressRunner runner = new ExpressRunner();
 		runner.addOperatorWithAlias("定义宏", "macro", null);
 		ExpressLoader loader = new ExpressLoader(runner);
-		loader.parseInstructionSet("定义", "def int qh = 100;",true);
-		loader.parseInstructionSet("累加", " qh = qh + 100;",true);
-		loader.parseInstructionSet("执行", "call \"累加\"; call \"累加\";",true);
+		loader.parseInstructionSet("定义", "def int qh = 100;");
+		loader.parseInstructionSet("累加", "qh = qh + 100;");
+		loader.parseInstructionSet("执行", "call \"累加\"; call \"累加\";");
+		loader.parseInstructionSet("返回", "return qh;");
 		DefaultContext<String, Object>  context = new DefaultContext<String, Object>();		
 		context.put("bean", new BeanExample("qhlhl2010@gmail.com"));
 		context.put("name","xuannn");
@@ -130,9 +131,11 @@ public class DefineTest {
 		Object r = runner.execute(new InstructionSet[]{
 				loader.getInstructionSet("定义"),
 				loader.getInstructionSet("执行"),
-				loader.getInstructionSet("执行")
+				loader.getInstructionSet("执行"),
+				loader.getInstructionSet("返回")				
 		}, loader, context, null, null, true);
 		
+		System.out.println(r);
 		Assert.assertTrue("别名实现 错误", r.toString().equalsIgnoreCase("500"));
 	
 	}	
