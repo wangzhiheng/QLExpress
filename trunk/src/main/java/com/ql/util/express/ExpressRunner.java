@@ -20,6 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 
+
 /**
  * 表达式计算的主类
  * 
@@ -172,11 +173,18 @@ public class ExpressRunner
 {
 
   private static final Log log = LogFactory.getLog(ExpressRunner.class);
+  private boolean isTrace = false;
   private Map<String,InstructionSet> expressInstructionSetCache = new HashMap<String,InstructionSet>();
   
   protected OperatorManager m_operatorManager =  new OperatorManager();
   protected Map m_cacheOracleParseString = new HashMap();
-  public ExpressRunner(){ }
+
+	public ExpressRunner() {
+	}
+
+	public ExpressRunner(boolean aIsTrace) {
+		this.isTrace = aIsTrace;
+	}
 
   /**
 	 * 为已经存在的操作符定义别名，主要用于定义不同的错误信息输出。例如  addOperatorWithAlias("属于","in","用户不在列表中")
@@ -485,11 +493,11 @@ public class ExpressRunner
 		  }
 	  }
 	  ExpressTreeNodeRoot result = nodeStack.pop();
-	  if(log.isDebugEnabled()){
+	  if(this.isTrace && log.isDebugEnabled()){
 	     this.printTreeNode(result, 1);
 	  }
 	  result = (ExpressTreeNodeRoot)dealExpressTreeNodeRoot(result);
-	  if(log.isDebugEnabled()){
+	  if(this.isTrace && log.isDebugEnabled()){
 		     log.debug("----------处理后-------------");
 		     this.printTreeNode(result, 1);
 		  }
@@ -1125,63 +1133,52 @@ public class ExpressRunner
   protected ExpressTreeNodeRoot parseCResult(String condition)throws Exception{
 
 		String[] tmpList = parse(condition);
-	    if(log.isDebugEnabled()){
+	    if(this.isTrace && log.isDebugEnabled()){
 	    	log.debug("执行的表达式：" + condition);	    	
 	    	log.debug("单词分解结果:" + getPrintInfo(tmpList,","));
 	    }
 	    Object[] tmpObjectList = getOpObjectList(tmpList);
-	    if(log.isDebugEnabled()){
+	    if(this.isTrace && log.isDebugEnabled()){
 	    	log.debug("语法分解结果:" + getPrintInfo(tmpObjectList,","));
 	    }
 	    ExpressTreeNodeRoot result = getCResult(tmpObjectList);
-//	    if(log.isDebugEnabled()){
-//	    	log.debug("后缀表达式:" + getPrintInfo(result,","));
-//	    }
 	    return result;
 }
   public InstructionSet parseInstructionSet(String condition)throws Exception{
 	  InstructionSet result = createInstructionSet(this.parseCResult(condition));
-	  if(log.isDebugEnabled()){
+	  if(this.isTrace && log.isDebugEnabled()){
 	    	log.debug("生成的指令集:\n" + result);
 	    }
 	  return result;
 	  
   }
   
-  public Object execute(String expressString,List errorList,boolean isCache,IExpressContext context) throws Exception{
-	  return execute(expressString,errorList,isCache,context,null,false);
-  }
-
-  public Object execute(String expressString,List errorList,boolean isCache,IExpressContext context,FuncitonCacheManager aFunctionCacheMananger,boolean isTrace) throws Exception{
-	 return  this.execute(new String[]{expressString}, errorList, isCache, context, aFunctionCacheMananger, isTrace);
-  }
-  public Object execute(String[] expressString,List errorList,boolean isCache,IExpressContext context,FuncitonCacheManager aFunctionCacheMananger,boolean isTrace) throws Exception{
-		InstructionSet[] parseResult = new InstructionSet[expressString.length];
-		for (int i = 0; i < parseResult.length; i++) {
-			if (isCache == true) {
-				parseResult[i] = expressInstructionSetCache.get(expressString[i]);
-				if (parseResult[i] == null) {
-					synchronized (expressInstructionSetCache) {
-						parseResult[i] = expressInstructionSetCache
-								.get(expressString[i]);
-						if (parseResult[i] == null) {
-							parseResult[i] = this
-									.parseInstructionSet(expressString[i]);
-							expressInstructionSetCache.put(expressString[i],
-									parseResult[i]);
-							// System.out.println(parseResult);
-						}
+	public Object execute(String expressString,IExpressContext context,List errorList,
+			boolean isCache,boolean isTrace) throws Exception {
+		InstructionSet parseResult = null;
+		if (isCache == true) {
+			parseResult = expressInstructionSetCache.get(expressString);
+			if (parseResult == null) {
+				synchronized (expressInstructionSetCache) {
+					parseResult = expressInstructionSetCache.get(expressString);
+					if (parseResult == null) {
+						parseResult = this.parseInstructionSet(expressString);
+						expressInstructionSetCache.put(expressString,
+								parseResult);
 					}
 				}
-			} else {
-				parseResult[i] = this.parseInstructionSet(expressString[i]);
 			}
+		} else {
+			parseResult = this.parseInstructionSet(expressString);
 		}
-	  return this.execute(parseResult,null,context, errorList, aFunctionCacheMananger, isTrace);
- } 
+		return this.execute(new InstructionSet[] { parseResult }, null,
+				context, errorList, null, isTrace, false,null);
+	}
+
   public Object execute(InstructionSet[] instructionSets,ExpressLoader loader,IExpressContext context,
-		  List errorList,FuncitonCacheManager aFunctionCacheMananger,boolean isTrace) throws Exception{
-	 return  InstructionSet.execute(instructionSets,loader,context, errorList, aFunctionCacheMananger, isTrace);
+		  List errorList,FuncitonCacheManager aFunctionCacheMananger,boolean isTrace,boolean isCatchException,
+			Log aLog) throws Exception{
+	 return  InstructionSet.execute(instructionSets,loader,context, errorList, aFunctionCacheMananger, isTrace,isCatchException,aLog);
   }
 
   /**

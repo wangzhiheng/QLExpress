@@ -47,11 +47,12 @@ public class InstructionSet {
    */
   protected static Object execute(InstructionSet[] sets,ExpressLoader loader,
 			IExpressContext aContext, List errorList,
-			FuncitonCacheManager aFunctionCacheMananger, boolean isTrace)
+			FuncitonCacheManager aFunctionCacheMananger, boolean isTrace,boolean isCatchException,
+			Log aLog)
 			throws Exception {
 	  InstructionSetContext context = new InstructionSetContext<String, Object>(
 				aContext,loader, null, aFunctionCacheMananger);
-	  Object result = execute(sets,context,errorList,isTrace);
+	  Object result = execute(sets,context,errorList,isTrace,isCatchException,aLog);
 		if (aFunctionCacheMananger == null) {
 			// 如果是指令集自身创建的缓存，则清除
 			context.clearFuncitonCacheManager();
@@ -59,25 +60,34 @@ public class InstructionSet {
      return result;
   }
 
-  protected static Object execute(InstructionSet[] sets,
-    InstructionSetContext context, List errorList,boolean isTrace)
-	throws Exception {
-	  RunEnvironment environmen = null;
-	  Object result =null;
-	  for(int i=0;i< sets.length;i++){
-		 InstructionSet tmpSet = sets[i];
-		environmen = new RunEnvironment(tmpSet.maxStackSize, tmpSet,
-				(InstructionSetContext) context, isTrace);
-		context.setEnvironmen(environmen);
-		CallResult tempResult = tmpSet.excuteInner(environmen, context, errorList, i == sets.length - 1 );
-		if(tempResult.isExit == true){
-			result =  tempResult.returnValue;
-			break;
-		}		
-	  }	
-	  return result;
+	protected static Object execute(InstructionSet[] sets,
+			InstructionSetContext context, List errorList, boolean isTrace,boolean isCatchException,
+			Log aLog) throws Exception {
+		RunEnvironment environmen = null;
+		Object result = null;
+		for (int i = 0; i < sets.length; i++) {
+			InstructionSet tmpSet = sets[i];
+			environmen = new RunEnvironment(tmpSet.maxStackSize, tmpSet,
+					(InstructionSetContext) context, isTrace);
+			context.setEnvironmen(environmen);
+			try {
+				CallResult tempResult = tmpSet.excuteInner(environmen, context,
+						errorList, i == sets.length - 1, aLog);
+				if (tempResult.isExit == true) {
+					result = tempResult.returnValue;
+					break;
+				}
+			} catch (Exception e) {
+				if(isCatchException == true){
+				   aLog.error(e.getMessage(), e);
+				}else{
+					throw e;
+				}
+			}
+		}
+		return result;
 
-  }
+	}
   /**
    * 执行所有的操作指令
    * @param context
@@ -85,7 +95,7 @@ public class InstructionSet {
    * @return
    * @throws Exception
    */
-	public CallResult excuteInner(RunEnvironment environmen,InstructionSetContext context,List errorList,boolean isLast)
+	public CallResult excuteInner(RunEnvironment environmen,InstructionSetContext context,List errorList,boolean isLast,Log aLog)
 			throws Exception {
 		Instruction instruction;
 		//将函数export到上下文中
@@ -97,6 +107,7 @@ public class InstructionSet {
 				break;
 			}
 			instruction = this.list.get(environmen.getProgramPoint());
+			instruction.setLog(aLog);//设置log
 			instruction.execute(environmen, errorList);
 		}
 		if (environmen.isExit() == false && isLast == true) {// 是在执行完所有的指令后结束的代码
@@ -328,7 +339,12 @@ class RunEnvironment {
 }
 @SuppressWarnings("unchecked")
 abstract class Instruction{
-	protected static final Log log = LogFactory.getLog(Instruction.class);	
+	protected  Log log = LogFactory.getLog(Instruction.class);
+	public void setLog(Log aLog){
+		if(aLog != null){
+		   this.log = aLog;
+		}
+	}
 	public abstract void execute(RunEnvironment environment,List errorList)throws Exception;
 }
 /**
@@ -375,7 +391,9 @@ class InstructionLoadAttr extends Instruction{
 			if(environment.isTrace()){
 				log.debug("指令转换： LoadAttr -- >CallMacro ");						
 			}
-			new InstructionCallMacro(this.attrName).execute(environment, errorList);
+			InstructionCallMacro macro = new InstructionCallMacro(this.attrName);
+			macro.setLog(this.log);
+			macro.execute(environment, errorList);
 		}else{
 			if(environment.isTrace()){
 				log.debug(this +":" + ((OperateDataAttr)o).getObject(environment.getContext()));						
@@ -444,7 +462,7 @@ class InstructionCallFunction extends Instruction{
 		Object functionSet = environment.getContext().getSymbol(functionName);		
 		Object result =InstructionSet.execute(new InstructionSet[]{(InstructionSet)functionSet},environment.getContext().getExpressLoader(),
 				environment.getContext(), errorList, environment.getContext().getFunctionCachManagerNoCreate(),
-				environment.isTrace());
+				environment.isTrace(),false,this.log);
 		environment.push(new OperateData(result,null));		
 		environment.programPointAddOne();
 	}
@@ -491,7 +509,7 @@ class InstructionCallSelfDefineFunction extends Instruction{
 			var.setObject(context, parameters[i].getObject(environment.getContext()));
 		}
 		Object result =InstructionSet.execute(new InstructionSet[]{(InstructionSet)functionSet},
-				context,errorList,environment.isTrace());
+				context,errorList,environment.isTrace(),false,this.log);
 		environment.push(new OperateData(result,null));		
 		environment.programPointAddOne();
 	}
@@ -514,7 +532,7 @@ class InstructionCallMacro extends Instruction{
 		
 		Object result =InstructionSet.execute(new InstructionSet[]{(InstructionSet)functionSet},environment.getContext().getExpressLoader(),
 				environment.getContext(), errorList, environment.getContext().getFunctionCachManagerNoCreate(),
-				environment.isTrace());
+				environment.isTrace(),false,this.log);
 		environment.push(new OperateData(result,null));
 		
 		environment.programPointAddOne();
