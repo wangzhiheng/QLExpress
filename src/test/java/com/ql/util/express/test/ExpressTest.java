@@ -14,9 +14,9 @@ public class ExpressTest {
 	public void testDemo() throws Exception{
 		String express = "10 * 10 + 1 + 2 * 3 + 5 * 2";
 		ExpressRunner runner = new ExpressRunner();
-		Object result = runner.execute(express, null, false, null);
-		Assert.assertTrue("表达式计算", result.toString().equalsIgnoreCase("117"));
-		System.out.println("表达式计算：" + express + " = " + result);
+		Object r = runner.execute(express,null, null, false,false);
+		Assert.assertTrue("表达式计算", r.toString().equalsIgnoreCase("117"));
+		System.out.println("表达式计算：" + express + " = " + r);
 	}
 
 	@org.junit.Test
@@ -24,10 +24,10 @@ public class ExpressTest {
 		ExpressRunner runner = new ExpressRunner();
 		String express = "10 * 10 + 1 + 2 * 3 + 5 * 2";
 		int num = 100000;
-		runner.execute(express, null, true,null);
+		Object r = runner.execute(express,null, null, 	true,false);
 		long start = System.currentTimeMillis();
 		for(int i = 0;i< num;i++){
-		   runner.execute(express, null, true,null);
+			r = runner.execute(express,null, null, true,false);
 		}
 		System.out.println("执行" + num +"次\""+ express +"\" 耗时："
 				+ (System.currentTimeMillis() - start));
@@ -93,7 +93,7 @@ public class ExpressTest {
 		for (int point = 0; point < expressTest.length; point++) {
 			String expressStr = expressTest[point][0];
 			List errorList = new ArrayList();
-			 Object result =runner.execute(expressStr,errorList,true,expressContext,null,true);
+			Object result = runner.execute(expressStr,expressContext, null, false,true);
 			if (expressTest[point][1].equalsIgnoreCase("null")
 					&& result != null
 					|| result != null

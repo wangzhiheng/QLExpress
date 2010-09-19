@@ -16,8 +16,7 @@ public class FunctionCacheTest {
 		runner.addFunctionOfClassMethod("isVIP", BeanExample.class.getName(),
 				"isVIP", new String[] { "String" }, "$1不是VIP用户");
 		FuncitonCacheManager mananger = new FuncitonCacheManager();
-		Object r = runner
-				.execute(express, null, false, context, mananger, true);
+		Object r = runner.execute(express,context, null, false,false);
 		System.out.println(r);
 		System.out.println(context);
 		System.out.println(((BeanExample) context.get("example")).child.a);
