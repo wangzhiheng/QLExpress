@@ -175,7 +175,6 @@ public class ExpressRunner
   private Map<String,InstructionSet> expressInstructionSetCache = new HashMap<String,InstructionSet>();
   
   protected OperatorManager m_operatorManager =  new OperatorManager();
-  //protected ExpressImport m_import = new ExpressImport();
   protected Map m_cacheOracleParseString = new HashMap();
   public ExpressRunner(){ }
 
