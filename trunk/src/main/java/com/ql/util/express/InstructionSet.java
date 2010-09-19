@@ -21,6 +21,7 @@ class CallResult{
  */
 @SuppressWarnings("unchecked")
 public class InstructionSet {
+	private static final Log log = LogFactory.getLog(InstructionSet.class);
   private int maxStackSize  = -1;
   /**
    * ЦёБо
@@ -79,7 +80,11 @@ public class InstructionSet {
 				}
 			} catch (Exception e) {
 				if(isCatchException == true){
-				   aLog.error(e.getMessage(), e);
+					if (aLog != null){
+				       aLog.error(e.getMessage(), e);
+					}else{
+					   log.error(e.getMessage(),e);
+					}
 				}else{
 					throw e;
 				}
