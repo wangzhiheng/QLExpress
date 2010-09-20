@@ -380,7 +380,8 @@ public class ExpressRunner
             list.add(new OperateClass(tmpStr,tmpClass));
             list.add(new ExpressItem("cast"));
             point = point + 1;//不在处理后一个“）”
-          }else if( (point <= 1 ||  point >1 && this.m_operatorManager.getRealName(tmpList[point - 2]).equals("def") == false)
+          }else if( (point <= 1 ||  point >1 && this.m_operatorManager.getRealName(tmpList[point - 2]).equalsIgnoreCase("def") == false
+        		  && this.m_operatorManager.getRealName(tmpList[point - 2]).equalsIgnoreCase("exportDef") == false)
         		  && point < tmpList.length  && tmpList[point].equals("(") == false && 
         		  tmpList[point].equals(")") == false && tmpList[point].equals(".") == false ){//处理 int a
         	//处理 int a和def int a和 a=1; int b和new String( 三种情况
@@ -396,6 +397,10 @@ public class ExpressRunner
         	        ){
         		list.add(new OperateData(name,String.class));
         	}else if(list.size() >=1 && list.get(list.size() -1 ) instanceof ExpressItem
+           	         && this.m_operatorManager.getRealName(((ExpressItem)list.get(list.size() -1 )).name).equalsIgnoreCase("exportAlias")
+           	        ){
+           		list.add(new OperateData(name,String.class));
+        	}else if(list.size() >=1 && list.get(list.size() -1 ) instanceof ExpressItem
               	   &&  this.m_operatorManager.getRealName(((ExpressItem)list.get(list.size() -1 )).name).equalsIgnoreCase("macro")
               	   ){	
          		list.add(new OperateData(name,String.class));
@@ -407,7 +412,11 @@ public class ExpressRunner
              	   &&  this.m_operatorManager.getRealName(((ExpressItem)list.get(list.size() -2 )).name).equalsIgnoreCase("def")
              	   ){	
         		list.add(new OperateData(name,String.class));
-        	}else if(point + 1 < tmpList.length && tmpList[point + 1].equals("(")){
+         	}else if(list.size() >=2 && list.get(list.size() -2 ) instanceof ExpressItem
+              	   &&  this.m_operatorManager.getRealName(((ExpressItem)list.get(list.size() -2 )).name).equalsIgnoreCase("exportdef")
+              	   ){	
+         		list.add(new OperateData(name,String.class));
+         	}else if(point + 1 < tmpList.length && tmpList[point + 1].equals("(")){
         		list.add(new ExpressItemSelfDefineFunction(name));
             }else{
                 list.add(new OperateDataAttr(name));

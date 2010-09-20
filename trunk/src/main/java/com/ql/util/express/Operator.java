@@ -260,6 +260,26 @@ class OperatorDef extends OperatorBase {
 		return result;
 	}
 }
+
+class OperatorExportDef extends OperatorBase {
+	public OperatorExportDef(String aName) {
+		this.name = aName;
+	}
+	public OperatorExportDef(String aAliasName, String aName, String aErrorInfo) {
+		this.name = aName;
+		this.aliasName = aAliasName;
+		this.errorInfo = aErrorInfo;
+	}
+	@SuppressWarnings("unchecked")
+	public OperateData executeInner(InstructionSetContext context, OperateData[] list) throws Exception {
+		Class tmpClass = (Class) list[0].getObject(context);
+		String varName = (String)list[1].getObject(context);		
+		OperateDataLocalVar result = new OperateDataLocalVar(varName,tmpClass);
+		context.exportSymbol(varName, result);
+		return result;
+	}
+}
+
 class OperatorAlias extends OperatorBase {
 	public OperatorAlias(String aName) {
 		this.name = aName;
@@ -278,7 +298,24 @@ class OperatorAlias extends OperatorBase {
 		return result;
 	}
 }
-
+class OperatorExportAlias extends OperatorBase {
+	public OperatorExportAlias(String aName) {
+		this.name = aName;
+	}
+	public OperatorExportAlias(String aAliasName, String aName, String aErrorInfo) {
+		this.name = aName;
+		this.aliasName = aAliasName;
+		this.errorInfo = aErrorInfo;
+	}
+	@SuppressWarnings("unchecked")
+	public OperateData executeInner(InstructionSetContext context, OperateData[] list) throws Exception {
+		String varName = (String)list[0].getObjectInner(context);	
+		OperateDataAttr realAttr = (OperateDataAttr)list[1];
+		OperateDataAttr result = new OperateDataAlias(varName,realAttr);
+		context.exportSymbol(varName, result);
+		return result;
+	}
+}
 class OperatorMacro extends OperatorBase {
 	public OperatorMacro(String aName) {
 		this.name = aName;

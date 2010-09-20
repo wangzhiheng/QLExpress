@@ -34,6 +34,7 @@ final class OperatorManager {
 	 
 	 	this.addOperatorInner("cache", 0, 0, 0,  new OperatorAlias("cache"));
 		this.addOperatorInner("def", 0, 0, 2,  new OperatorDef("def"));
+		this.addOperatorInner("exportDef", 0, 0, 2,  new OperatorExportDef("exportDef"));
 		this.addOperatorInner("new", 0, 0, 2, null);
 		this.addOperatorInner("method", 0, 0, 2,true, null);
 		this.addOperatorInner("field", 0, 0, 1, null);
@@ -85,6 +86,7 @@ final class OperatorManager {
 		this.addOperatorInner("then", 20, 0, -1, new OperatorNullOp("if"));
 		this.addOperatorInner("else", 20, 0, -1, new OperatorNullOp("if"));
 		
+	 	this.addOperatorInner("exportAlias", 21, 0, 2,  new OperatorExportAlias("exportAlias"));
 	 	this.addOperatorInner("alias", 21, 0, 2,  new OperatorAlias("alias"));
 		this.addOperatorInner("call", 25, 0, 1, new OperatorCall("call"));
 		this.addOperatorInner("break", 25, 0, 0, new OperatorBreak("break"));
