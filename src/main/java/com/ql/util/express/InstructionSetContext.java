@@ -50,13 +50,23 @@ class InstructionSetContext<K,V> extends HashMap<K,V> implements IExpressContext
 	public void setEnvironmen(RunEnvironment environmen) {
 		this.environmen = environmen;
 	}
-	public void addSymbol(String varName,Object aliasNameObject){
+	public void exportSymbol(String varName,Object aliasNameObject) throws Exception{
+		if( this.parent != null && this.parent instanceof InstructionSetContext){
+			((InstructionSetContext)this.parent).exportSymbol(varName, aliasNameObject);
+		}else{
+		    this.addSymbol(varName, aliasNameObject);
+		}
+	}
+	public void addSymbol(String varName,Object aliasNameObject) throws Exception{
 		if(this.symbolTable == null){
 			this.symbolTable = new HashMap<String,Object>();
 		}
+		if(this.symbolTable.containsKey(varName)){
+			throw new Exception("变量" + varName + "已经存在，不能重复定义，也不能再从函数内部 exprot ");
+		}
 		this.symbolTable.put(varName,aliasNameObject);
 	}
-	public Object getSymbol(String varName){
+	public Object getSymbol(String varName) throws Exception{
 		Object result = null;
 		if(this.symbolTable != null){
 			result = this.symbolTable.get(varName);
