@@ -1162,8 +1162,12 @@ public class ExpressRunner
 	  
   }
   
+	public Object execute(String expressString, IExpressContext context,
+			List errorList, boolean isCache, boolean isTrace) throws Exception {
+		return this.execute(expressString, context, errorList, isCache, isTrace, null);
+	}
 	public Object execute(String expressString,IExpressContext context,List errorList,
-			boolean isCache,boolean isTrace) throws Exception {
+			boolean isCache,boolean isTrace,Log aLog) throws Exception {
 		InstructionSet parseResult = null;
 		if (isCache == true) {
 			parseResult = expressInstructionSetCache.get(expressString);
@@ -1181,9 +1185,8 @@ public class ExpressRunner
 			parseResult = this.parseInstructionSet(expressString);
 		}
 		return this.execute(new InstructionSet[] { parseResult }, null,
-				context, errorList, null, isTrace, false,null);
+				context, errorList, null, isTrace, false,aLog);
 	}
-
   public Object execute(InstructionSet[] instructionSets,ExpressLoader loader,IExpressContext context,
 		  List errorList,FuncitonCacheManager aFunctionCacheMananger,boolean isTrace,boolean isCatchException,
 			Log aLog) throws Exception{
