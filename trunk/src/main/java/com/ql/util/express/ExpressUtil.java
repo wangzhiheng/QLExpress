@@ -1,13 +1,12 @@
 package com.ql.util.express;
 
-import java.util.Vector;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -154,7 +153,7 @@ public class ExpressUtil {
 				constructorList.add(constructors[i]);
 			}
 		}
-        
+
 		int match = findMostSpecificSignature(types, (Class[][]) listClass
 				.toArray(new Class[0][]));
 		return match == -1 ? null : constructorList.get(match);
@@ -234,7 +233,8 @@ public class ExpressUtil {
 		try {
 			String baseName = "";
 			if (baseClass.isPrimitive() == false) {
-				return loadClass(arrayString.toString() + "L" + baseClass.getName() + ";");
+				return loadClass(arrayString.toString() + "L"
+						+ baseClass.getName() + ";");
 			} else {
 				if (baseClass.equals(boolean.class)) {
 					baseName = "Z";
@@ -347,12 +347,12 @@ public class ExpressUtil {
 
 	public static Object getProperty(Object bean, String name) {
 		try {
-	        if(bean instanceof Class){
-				Field f = ((Class)bean).getDeclaredField(name);
+			if (bean instanceof Class) {
+				Field f = ((Class) bean).getDeclaredField(name);
 				return f.get(null);
-	        }else{
-			   return PropertyUtils.getProperty(bean, name);
-	        }
+			} else {
+				return PropertyUtils.getProperty(bean, name);
+			}
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -360,14 +360,14 @@ public class ExpressUtil {
 
 	public static void setProperty(Object bean, String name, Object value) {
 		try {
-			if(bean instanceof Class){
-				Field f = ((Class)bean).getDeclaredField(name);
+			if (bean instanceof Class) {
+				Field f = ((Class) bean).getDeclaredField(name);
 				f.set(null, value);
-	        }else{
-			   PropertyUtils.setProperty(bean, name, value);
-	        }
+			} else {
+				PropertyUtils.setProperty(bean, name, value);
+			}
 		} catch (Exception e) {
-			throw new RuntimeException(e);
+			throw new RuntimeException("不能访问" + bean + "的property:" + name,e);
 		}
 	}
 
@@ -375,9 +375,10 @@ public class ExpressUtil {
 		try {
 			return PropertyUtils.getPropertyType(bean, name);
 		} catch (Exception e) {
-			throw new RuntimeException(e);
+			throw new RuntimeException("不能访问" + bean + "的property:" + name, e);
 		}
 	}
+
 	public static void main(String[] args) throws Exception {
 		System.out.println(replaceString("$1强化$2实施$2", new String[] { "qq",
 				"ff" }));

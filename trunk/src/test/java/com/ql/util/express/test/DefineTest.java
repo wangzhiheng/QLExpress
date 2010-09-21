@@ -17,13 +17,13 @@ import com.ql.util.express.InstructionSet;
 public class DefineTest {
 	@org.junit.Test
 	public void testDefExpressInner() throws Exception{
-		String express = "定义变量 int qh = 1 + 1";
+		String express = "定义变量 int qh = 1";
 		DefaultContext<String, Object>  context = new DefaultContext<String, Object>();
 		ExpressRunner runner = new ExpressRunner();	
 		runner.addOperatorWithAlias("定义变量", "def", null);
 		context.put("qh",100);
 		Object r = runner.execute(express,context, null, false,false);
-		Assert.assertTrue("表达式变量作用域错误", r.toString().equalsIgnoreCase("2"));
+		Assert.assertTrue("表达式变量作用域错误", r.toString().equalsIgnoreCase("1"));
 		Assert.assertTrue("表达式变量作用域错误", context.get("qh").toString().equalsIgnoreCase("100"));
 	}		
 	

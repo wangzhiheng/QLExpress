@@ -5,8 +5,8 @@
   <groupId>com.taobao.util</groupId>
   <artifactId>taobao-express</artifactId>
   <packaging>jar</packaging>
-  <version>1.0.1</version>
-  <name>ql-express</name>
+  <version>1.3-SNAPSHOT</version>
+  <name>taobao-express</name>
   <dependencies>
       <dependency>
   <groupId>commons-beanutils</groupId>
