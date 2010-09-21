@@ -117,6 +117,7 @@ public class InstructionSet {
 		}
 		if (environmen.isExit() == false && isLast == true) {// 是在执行完所有的指令后结束的代码
 			if (environmen.getDataStackSize() > 0) {
+
 				OperateData tmpObject = environmen.pop();
 				if (tmpObject == null) {
 					environmen.quitExpress(null);

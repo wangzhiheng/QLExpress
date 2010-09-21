@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @SuppressWarnings("serial")
-class InstructionSetContext<K,V> extends HashMap<K,V> implements IExpressContext<K,V> {
+public class InstructionSetContext<K,V> extends HashMap<K,V> implements IExpressContext<K,V> {
 	 private FuncitonCacheManager functionCachManager;
 	 private RunEnvironment environmen;
 	/**

@@ -8,6 +8,7 @@ import org.springframework.context.ApplicationContextAware;
 
 import com.ql.util.express.ExpressRunner;
 import com.ql.util.express.IExpressContext;
+import com.ql.util.express.Operator;
 
 public class RunExample implements ApplicationContextAware, Runnable {
 	private ApplicationContext applicationContext;
@@ -25,6 +26,7 @@ public class RunExample implements ApplicationContextAware, Runnable {
 	}
     public static void initialRunner(ExpressRunner runner) throws Exception{
 		runner.addOperator("love", new LoveOperator("love"));
+		runner.addOperator("equalIn", new EqualIn());
 		runner.addOperatorWithAlias("属于", "in", "用户$1不在允许的范围");
 		runner.addOperatorWithAlias("myand", "and", "用户$1不在允许的范围");
 		runner.addFunction("累加", new GroupOperator("累加"));
@@ -68,7 +70,8 @@ public class RunExample implements ApplicationContextAware, Runnable {
 						{ "true myand false", "false" },
 						{ "'a' love 'b' love 'c' love 'd'", "d{c{b{a}b}c}d" },
 						{ " 10 * 10 + 1 + 2 * 3 + 5 * 2", "117" },
-						{" 1!=1 and 2==2 and 1 == 2","false"}
+						{" 1!=1 and 2==2 and 1 == 2","false"},
+						{" 80 > \"300\"","true"}
 						};
 				IExpressContext expressContext = new ExpressContextExample(	this.applicationContext);
 				expressContext.put("a", j);
@@ -99,5 +102,18 @@ public class RunExample implements ApplicationContextAware, Runnable {
 		System.out.println(Thread.currentThread() + "耗时："
 				+ (System.currentTimeMillis() - start));
 	}
-
+	
+	
 }
+class EqualIn extends Operator{
+
+	@Override
+	public Object executeInner(Object[] list) throws Exception {
+		for (int i = 0 ; i < list.length ; i ++){
+			System.out.println(list[i]);
+		}
+		return Boolean.TRUE;
+	}
+	
+}
+
