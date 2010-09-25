@@ -33,6 +33,7 @@ class ExpressItem extends ExpressTreeNodeImple {
 class ExpressItemNew extends ExpressItem{
   public ExpressItemNew(){
     super("new");
+    this.opDataNumber = 2;
   }
 }
 
@@ -59,6 +60,15 @@ class ExpressItemMethod extends ExpressItem{
   }
 }
 
+class ExpressItemArray extends ExpressItem{
+	  public ExpressItemArray(String name){
+	    super(name);
+	  }
+	  public String toString()
+	  {
+	    return "Operator:" + name;
+	  }
+	}
 class ExpressItemSelfDefineFunction extends ExpressItem{
 	   protected String functionName;
 	   public ExpressItemSelfDefineFunction(String aFunctionName){

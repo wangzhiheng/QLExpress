@@ -14,12 +14,17 @@ public class ExportDefine {
 	@Test
 	public void testABC() throws Exception {
 		String express = 
-				"function initial(){exportAlias qh example.child ; exportDef int abc = 100;}; " +
+				"function initial(){" +
+				"   exportAlias qh example.child ; exportDef int abc = 100;" +
+				"}; " +
 				"initial();" +
-				" abc = abc + 10000;" +
+				"abc = abc + 10000;" +
 				"System.out.println(abc);" +
-				"{alias qh example.child.a;" + " qh =qh + \"-ssss\";" + "};" +
-						" qh.a = qh.a +\"-qh\";" + " return example.child.a ";
+				"{" +
+				"   alias qh example.child.a;" 
+				+ " qh =qh + \"-ssss\";" 
+				+ "};" 
+				+" qh.a = qh.a +\"-qh\";" + " return example.child.a ";
 		ExpressRunner runner = new ExpressRunner(true);
 		DefaultContext<String, Object> context = new DefaultContext<String, Object>();
 		context.put("example", new BeanExample());

@@ -10,6 +10,7 @@
 
 package com.ql.util.express;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -198,6 +199,20 @@ class OperatorNew extends OperatorBase {
 
 	public OperateData executeInner(InstructionSetContext parent, OperateData[] list) throws Exception {
 		Class obj = (Class) list[0].getObject(parent);
+		if (obj.isArray()) {
+			Class tmpClass = obj;
+			int dim = 0;
+			while (tmpClass.isArray()) {
+				tmpClass = tmpClass.getComponentType();
+				dim = dim + 1;
+			}
+			int[] dimLength = new int[dim];
+			for (int index = 0; index < dim; index++) {
+				dimLength[index] = ((Number) (list[index + 1].getObject(parent)))
+						.intValue();
+			}
+			return new OperateData(Array.newInstance(tmpClass, dimLength), obj);
+		}
 		Class[] types = new Class[list.length - 1];
 		Object[] objs = new Object[list.length - 1];
 		Object tmpObj;
@@ -240,7 +255,29 @@ class OperatorCast extends OperatorBase {
 		return result;
 	}
 }
-
+class OperatorArray extends OperatorBase {
+	public OperatorArray(String aName) {
+		this.name = aName;
+	}
+	public OperatorArray(String aAliasName, String aName, String aErrorInfo) {
+		this.name = aName;
+		this.aliasName = aAliasName;
+		this.errorInfo = aErrorInfo;
+	}
+	@SuppressWarnings("unchecked")
+	public OperateData executeInner(InstructionSetContext context, OperateData[] list) throws Exception {
+		if(list[0] == null || list[0].getObject(context) == null){
+			throw new Exception("对象为null,不能执行数组相关操作");
+		}
+		Object tmpObject = list[0].getObject(context);
+	    if( tmpObject.getClass().isArray() == false){
+			throw new Exception("对象:"+ tmpObject.getClass() +"不是数组,不能执行相关操作" );
+		}
+	    int index = ((Number)list[1].getObject(context)).intValue();		
+	    OperateData result  = new OperateDataArrayItem((OperateDataAttr)list[0],index);
+		return result;
+	}
+}
 class OperatorDef extends OperatorBase {
 	public OperatorDef(String aName) {
 		this.name = aName;

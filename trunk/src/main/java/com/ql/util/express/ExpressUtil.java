@@ -312,6 +312,46 @@ public class ExpressUtil {
 		}
 	}
 
+	public static String getClassName(Class className) {
+		String name = className.getName();
+		return getClassName(name);
+	}
+
+	private static String getClassName(String name) {
+		String arrays = "";
+		if (name.indexOf("[") >= 0) {
+			int point = 0;
+			while (name.charAt(point) == '[') {
+				arrays = arrays + "[]";
+				++point;
+			}
+			if (name.charAt(point) == 'L') {
+				name = name.substring(point + 1, name.length() - 1);
+			} else if (name.charAt(point) == 'Z') {
+				name = "boolean";
+			} else if (name.charAt(point) == 'B') {
+				name = "byte";
+			} else if (name.charAt(point) == 'C') {
+				name = "char";
+			} else if (name.charAt(point) == 'D') {
+				name = "double";
+			} else if (name.charAt(point) == 'F') {
+				name = "float";
+			} else if (name.charAt(point) == 'I') {
+				name = "int";
+			} else if (name.charAt(point) == 'J') {
+				name = "long";
+			} else if (name.charAt(point) == 'S') {
+				name = "short";
+			}
+		}
+		int index = name.lastIndexOf('.');
+		if (index > 0 && name.substring(0, index).equals("java.lang") == true) {
+			name = name.substring(index + 1);
+		}
+		name = name + arrays;
+		return name;
+	}
 	public static Class loadClass(String name) throws ClassNotFoundException {
 		return Class.forName(name);
 	}
