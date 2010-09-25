@@ -1,5 +1,6 @@
 package com.ql.util.express;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -112,7 +113,33 @@ class OperateDataAttr extends OperateData {
 		}
 	}
 }
+class OperateDataArrayItem extends OperateDataAttr {
+	OperateDataAttr arrayObject;
+	int index;
+	public OperateDataArrayItem(OperateDataAttr aArrayObject,int aIndex) {
+		super("array[" + aArrayObject.name +"," + aIndex +"]",null);
+		this.arrayObject = aArrayObject;
+		this.index = aIndex;
+	}
+	public Class getType(InstructionSetContext context) throws Exception {
+		  return this.arrayObject.getObject(context).getClass();
+	}
+	public Object getObjectInner(InstructionSetContext context){
+		try {
+			return Array.get(this.arrayObject.getObject(context),this.index);
+		} catch (Exception e) {
+			 throw new RuntimeException(e);
+		}
+	}
 
+	public void setObject(InstructionSetContext context, Object value) {
+		try {
+		 Array.set(this.arrayObject.getObject(context), this.index, value);
+		} catch (Exception e) {
+			 throw new RuntimeException(e);
+		}
+	}
+}
 @SuppressWarnings("unchecked")
 class OperateDataField extends OperateDataAttr {
 	Object fieldObject;
@@ -217,7 +244,6 @@ class OperateDataAlias extends OperateDataAttr {
 class OperateClass extends OperateData {
 	private String name;
 	private Class m_class;
-
 	public OperateClass(String name, Class aClass) {
 		super(null,null);
 		this.name = name;
@@ -230,6 +256,10 @@ class OperateClass extends OperateData {
 	}
     public Class getVarClass(){
     	return this.m_class;
+    }
+    public void reset(String aName,Class newClass){
+    	this.name = aName;
+    	this.m_class = newClass;
     }
 	public Object getObjectInner(InstructionSetContext parent) {
 		return m_class;

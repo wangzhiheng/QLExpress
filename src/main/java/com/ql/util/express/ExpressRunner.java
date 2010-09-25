@@ -368,6 +368,24 @@ public class ExpressRunner
             break;
           }
         }
+        if(isClass == true){
+        	//处理数组问题
+        	String arrayStr ="";
+        	int tmpPoint = point ;
+			while (tmpPoint < tmpList.length) {
+				if (tmpList[tmpPoint].equals("[")&& tmpList[tmpPoint + 1].equals("]")) {
+				  arrayStr = arrayStr + "[]";
+				  tmpPoint = tmpPoint + 2;
+				} else {
+					break;
+				}
+			}
+			if(arrayStr.length() >0){
+				tmpStr = tmpStr+ arrayStr;
+				tmpClass = ExpressUtil.getJavaClass(tmpStr);
+				point = tmpPoint;
+			}
+        }
 
         if(isClass == true){
           //处理造型操作(Integer);
@@ -380,8 +398,12 @@ public class ExpressRunner
             list.add(new OperateClass(tmpStr,tmpClass));
             list.add(new ExpressItem("cast"));
             point = point + 1;//不在处理后一个“）”
-          }else if( (point <= 1 ||  point >1 && this.m_operatorManager.getRealName(tmpList[point - 2]).equalsIgnoreCase("def") == false
-        		  && this.m_operatorManager.getRealName(tmpList[point - 2]).equalsIgnoreCase("exportDef") == false)
+          }else if( ( list.size() ==0
+        		     || (list.get(list.size() -1)  instanceof ExpressItem == false)
+        		     ||    this.m_operatorManager.getRealName(((ExpressItem)list.get(list.size() -1)).name).equalsIgnoreCase("def") == false
+        		        && this.m_operatorManager.getRealName(((ExpressItem)list.get(list.size() -1)).name).equalsIgnoreCase("new") == false
+        		        && this.m_operatorManager.getRealName(((ExpressItem)list.get(list.size() -1)).name).equalsIgnoreCase("exportDef") == false
+                    )
         		  && point < tmpList.length  && tmpList[point].equals("(") == false && 
         		  tmpList[point].equals(")") == false && tmpList[point].equals(".") == false ){//处理 int a
         	//处理 int a和def int a和 a=1; int b和new String( 三种情况
@@ -391,7 +413,7 @@ public class ExpressRunner
             list.add(new OperateClass(tmpStr,tmpClass));
           }
         }else{
-        	//讲 def，alias 后面的第一个参数当作字符串处理
+        	//将 def，alias 后面的第一个参数当作字符串处理
         	if(list.size() >=1 && list.get(list.size() -1 ) instanceof ExpressItem
         	         && this.m_operatorManager.getRealName(((ExpressItem)list.get(list.size() -1 )).name).equalsIgnoreCase("alias")
         	        ){
@@ -427,6 +449,8 @@ public class ExpressRunner
     }
     return list.toArray();
   }
+  
+  
   
   public int matchNode(Object[] list,int startIndex,String opName){
 	  Stack<Object> stack = new Stack<Object>();
@@ -478,6 +502,34 @@ public class ExpressRunner
 		      }
 			  //处理 }
 			  stackList.peek().clear();
+			  stackList.pop();
+			  stackList.peek().add(nodeStack.pop());
+		  }else if(list[i] instanceof ExpressItem &&  ((ExpressItem)list[i]).name.equalsIgnoreCase("[")){//生成一个新的语句
+			  List tmpList = stackList.peek();
+			  int arrarDim = 0;
+			  for(int index = tmpList.size() -1;index >=0;index--){
+				  if(tmpList.get(index) instanceof OperateClass ){
+					  String className =ExpressUtil.getClassName(((OperateClass)tmpList.get(index)).getVarClass());
+					  Class arrayClass = ExpressUtil.getJavaClass(className +"[]");
+					  ((OperateClass)tmpList.get(index)).reset(className +"[]",arrayClass);
+				  }else if(tmpList.get(index) instanceof ExpressTreeNodeRoot  && 
+						  ((ExpressTreeNodeRoot)tmpList.get(index)).name.equals("[]")){
+					  arrarDim = arrarDim + 1;
+				  }else if(tmpList.get(index) instanceof  ExpressItemNew){
+					  ((ExpressItemNew)tmpList.get(index)).opDataNumber = ((ExpressItemNew)tmpList.get(index)).opDataNumber + arrarDim ;
+					  break;
+				  }else{
+					  stackList.peek().add(new ExpressItemArray("array"));
+					  break;
+				  }
+			  }
+			  nodeStack.push(new ExpressTreeNodeRoot("[]"));
+			  stackList.push(new ArrayList<Object>());			  
+		  }else if(list[i] instanceof ExpressItem &&  ((ExpressItem)list[i]).name.equalsIgnoreCase("]")){//	
+			  for(Object item:stackList.peek().toArray()){
+				  nodeStack.peek().addChild((ExpressTreeNode)item);
+			  }
+			  stackList.peek().clear();			  
 			  stackList.pop();
 			  stackList.peek().add(nodeStack.pop());
 		  }else if(list[i] instanceof ExpressItem &&  ((ExpressItem)list[i]).name.equalsIgnoreCase("(")){//生成一个新的语句
