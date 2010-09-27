@@ -8,5 +8,9 @@ function sub(int a,int b){
 
 macro ¿€º” {qh = qh + 100;};
 
-macro initial {qh =100};
+macro initial {
+    exportDef int qh;
+    exportAlias a qh;    
+    a = 0;
+};
 

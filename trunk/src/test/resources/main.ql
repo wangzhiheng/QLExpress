@@ -1,11 +1,10 @@
-
-alias a qh;
-
 initial;
 작속;
 작속;
 작속;
 
-a = a + 1000000;
+if(true)then {1==1} else{ 3==3} ;
 
-return add(3,4) + sub(10,9);
+a = a + 1000000;
+System.out.println(a);
+return add(a,4) + sub(a,9);

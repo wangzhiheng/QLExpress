@@ -4,7 +4,9 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * 表达式装载器
@@ -59,12 +61,18 @@ public class ExpressLoader {
 		}
 		synchronized (expressInstructionSetCache) {
 			parseResult = this.runner.parseInstructionSet(expressString);
+			parseResult.setName(expressName);
+			parseResult.setGlobeName(expressName);
 			// 需要将函数和宏定义都提取出来
 			for (FunctionInstructionSet item : parseResult
 					.getFunctionInstructionSets()) {
 				this.addInstructionSet(item.name, item.instructionSet);
+				item.instructionSet.setName(item.name);
+				item.instructionSet.setGlobeName(expressName+ "." + item.name);
 			}
-			this.addInstructionSet(expressName, parseResult);
+			if(parseResult.hasMain()){
+			   this.addInstructionSet(expressName, parseResult);
+			}
 		}
 		return parseResult;
 	}
@@ -75,5 +83,16 @@ public class ExpressLoader {
 		synchronized (expressInstructionSetCache) {
 			return expressInstructionSetCache.get(expressName);
 		}
+	}
+	public ExportItem[] getExportInfo(){
+		Map<String,ExportItem> result = new TreeMap<String,ExportItem>();
+		for(InstructionSet item:expressInstructionSetCache.values()){
+			for(ExportItem var:item.getExportDef()){
+				var.setGlobeName(item.getGlobeName() + "." + var.name);
+				result.put(var.getGlobeName(),var);
+			}
+			result.put(item.getGlobeName(),new ExportItem(item.getGlobeName(), item.getName(),item.getType(),item.toResource()));
+		}
+		return (ExportItem[])result.values().toArray(new ExportItem[0]);
 	}
 }
