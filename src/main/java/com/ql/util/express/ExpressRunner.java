@@ -478,23 +478,23 @@ public class ExpressRunner
   protected ExpressTreeNodeRoot getCResult(Object[] list) throws Exception{
 	  Stack<List<Object>> stackList = new Stack<List<Object>> ();
 	  Stack<ExpressTreeNodeRoot> nodeStack = new Stack<ExpressTreeNodeRoot> ();
-	  nodeStack.push(new ExpressTreeNodeRoot("ROOT"));
+	  nodeStack.push(new ExpressTreeNodeRoot("ROOT","main{\n","}\n",true));
 	  stackList.push(new ArrayList<Object>());
 	  for(int i=0;i< list.length;i++){
 		  if(list[i] instanceof ExpressItem &&  ((ExpressItem)list[i]).name.equalsIgnoreCase(";")){//生成一个新的语句
-			    ExpressTreeNode temp = new ExpressTreeNodeRoot(";");
+			    ExpressTreeNode temp = new ExpressTreeNodeRoot(";","",";\n",false);
 			    nodeStack.peek().addChild(temp);
 			  for(Object item:stackList.peek().toArray()){
 				  temp.addChild((ExpressTreeNode)item);
 			  }
 			  stackList.peek().clear();
 		  }else if(list[i] instanceof ExpressItem &&  ((ExpressItem)list[i]).name.equalsIgnoreCase("{")){//生成一个新的语句
-			  nodeStack.push(new ExpressTreeNodeRoot("{}"));
+			  nodeStack.push(new ExpressTreeNodeRoot("{}","{\n","}\n",true));
 			  stackList.push(new ArrayList<Object>());
 		  }else if(list[i] instanceof ExpressItem &&  ((ExpressItem)list[i]).name.equalsIgnoreCase("}")){//生成一个新的语句
 			  //若果 } 前面没有 ;则也作为一个完成的语句处理
 			  if(false == (list[i - 1] instanceof ExpressItem == true &&  ((ExpressItem)list[i - 1]).name.equalsIgnoreCase(";")))
-			  {   ExpressTreeNode temp = new ExpressTreeNodeRoot(";");
+			  {   ExpressTreeNode temp = new ExpressTreeNodeRoot(";","",";\n",false);
 			      nodeStack.peek().addChild(temp);
 			      for(Object item:stackList.peek().toArray()){
 			    	  temp.addChild((ExpressTreeNode)item);
@@ -504,6 +504,19 @@ public class ExpressRunner
 			  stackList.peek().clear();
 			  stackList.pop();
 			  stackList.peek().add(nodeStack.pop());
+			  //对应{},如果前面不是if(true)then{}else{},则生成一个新的语句
+			  if(i + 1 < list.length ){
+				  List tmpList = stackList.peek();
+				  if((list[i+1] instanceof ExpressItem  == true )
+						&& (((ExpressItem)list[i+1]).name.equalsIgnoreCase(";")==false
+						  || ((ExpressItem)list[i+1]).name.equalsIgnoreCase("else")==false 
+						  ) ){
+					  //什么都不做
+				  }else{
+					  list[i] = new ExpressItem(";");
+					  i = i -1;
+				  }
+			  }
 		  }else if(list[i] instanceof ExpressItem &&  ((ExpressItem)list[i]).name.equalsIgnoreCase("[")){//生成一个新的语句
 			  List tmpList = stackList.peek();
 			  int arrarDim = 0;
@@ -523,7 +536,7 @@ public class ExpressRunner
 					  break;
 				  }
 			  }
-			  nodeStack.push(new ExpressTreeNodeRoot("[]"));
+			  nodeStack.push(new ExpressTreeNodeRoot("[]","[","]",false));
 			  stackList.push(new ArrayList<Object>());			  
 		  }else if(list[i] instanceof ExpressItem &&  ((ExpressItem)list[i]).name.equalsIgnoreCase("]")){//	
 			  for(Object item:stackList.peek().toArray()){
@@ -533,7 +546,7 @@ public class ExpressRunner
 			  stackList.pop();
 			  stackList.peek().add(nodeStack.pop());
 		  }else if(list[i] instanceof ExpressItem &&  ((ExpressItem)list[i]).name.equalsIgnoreCase("(")){//生成一个新的语句
-			  nodeStack.push(new ExpressTreeNodeRoot("()"));
+			  nodeStack.push(new ExpressTreeNodeRoot("()","","",false));
 			  stackList.push(new ArrayList<Object>());
 		  }else if(list[i] instanceof ExpressItem &&  ((ExpressItem)list[i]).name.equalsIgnoreCase(")")){//			  
 			  for(Object item:stackList.peek().toArray()){
@@ -723,176 +736,9 @@ public class ExpressRunner
 	throw new Exception("没有能够进行正确的解析表达式");
     
   }
-  protected ExpressTreeNodeRoot getCResultBackup(Object[] list) throws Exception{
-	  Stack<List<Object>> stackList = new Stack<List<Object>> ();
-	  Stack<ExpressTreeNodeRoot> nodeStack = new Stack<ExpressTreeNodeRoot> ();
-	  nodeStack.push(new ExpressTreeNodeRoot("ROOT"));
-	  stackList.push(new ArrayList<Object>());
-	  for(int i=0;i< list.length;i++){
-		  if(list[i] instanceof ExpressItem &&  ((ExpressItem)list[i]).name.equalsIgnoreCase(";")){//生成一个新的语句
-			  stackList.peek().add(list[i]);
-			  for(ExpressTreeNode item:getCResultOne(stackList.peek().toArray())){
-			      nodeStack.peek().addChild(item);
-			  }
-			  stackList.peek().clear();
-		  }else if(list[i] instanceof ExpressItem &&  ((ExpressItem)list[i]).name.equalsIgnoreCase("{")){//生成一个新的语句
-			  nodeStack.push(new ExpressTreeNodeRoot("{}"));
-			  stackList.push(new ArrayList<Object>());
-		  }else if(list[i] instanceof ExpressItem &&  ((ExpressItem)list[i]).name.equalsIgnoreCase("}")){//生成一个新的语句
-			  //若果 } 前面没有 ;则也作为一个完成的语句处理
-			  if(false == (list[i - 1] instanceof ExpressItem == true &&  ((ExpressItem)list[i - 1]).name.equalsIgnoreCase(";")))
-			  {   stackList.peek().add(new ExpressItem(";"));
-			      for(ExpressTreeNode item:getCResultOne(stackList.peek().toArray())){
-			          nodeStack.peek().addChild(item);
-			      }
-		      }
-			  //处理 }
-			  stackList.peek().clear();
-			  stackList.pop();
-			  stackList.peek().add(nodeStack.pop());
-		  }else if(list[i] instanceof ExpressItem &&  ((ExpressItem)list[i]).name.equalsIgnoreCase("for")){
-			  if(list[i + 1] instanceof ExpressItem &&  ((ExpressItem)list[i + 1]).name.equalsIgnoreCase("(")){
-				  ((ExpressItem)list[i + 1]).name = "{";
-				  int finishPoint = matchNode(list,i + 1,"(");
-				  ((ExpressItem)list[finishPoint]).name = "}";
-			  }
-			  stackList.peek().add(list[i]);
-	      }else{
-			  stackList.peek().add(list[i]);
-		  }
-	  }
-	  ExpressTreeNodeRoot result = nodeStack.pop();
-	  if(log.isDebugEnabled()){
-	     this.printTreeNode(result, 1);
-	  }
-	  return result;
-  }   
-  protected ExpressTreeNode[] getCResultOneBackkup(Object[] list) throws Exception
-  {
-	try{
-    if (list == null){
-      throw new Exception("表达式不能为空");
-    }  
-    List<ExpressTreeNode> result = new ArrayList<ExpressTreeNode>();
-    Stack sop = new Stack();
-    Stack sdata = new Stack();
-    Stack sOpDataNumber = new Stack();
-    sop.push(new ExpressItem(";"));
-    int i =0;
-    while (i < list.length)
-    {
-      if(list[i] instanceof ExpressTreeNodeRoot){
-    	  sdata.push(list[i]);
-    	  i++;
-      }else if (list[i] instanceof OperateData){  
-    	 ((OperateData)list[i]).setMaxStackSize(sdata.size());
-         sdata.push(list[i]);
-         i++;
-      }
-      else if (list[i] instanceof ExpressItem)
-      {
-         ExpressItem op1 = (ExpressItem)sop.peek();
-         ExpressItem op2 = (ExpressItem)list[i] ;
-         int op  =m_operatorManager.compareOp(op1.name,op2.name);
-         if (op2.name.equals("(")){
-            sOpDataNumber.push(Integer.valueOf(1));            	
-         }   
 
-         switch(op)
-         {  case (0):
-                    sop.push(list[i]);
-                    i++;
-                    break;
-            case (6):// { 与 } 相遇
-            	sop.pop();
-            	i++;
-            	break;
-            case (2):// ( 与 ) 相遇
-                     sop.pop();
-                     if(this.isNAddOneParameterCount( (ExpressItem)sop.peek())){
-                       ((ExpressItem) sop.peek()).opDataNumber = 1 + ( (Integer)sOpDataNumber.pop()).intValue();
-                     }else{
-                       ((ExpressItem) sop.peek()).opDataNumber = ( (Integer)sOpDataNumber.pop()).intValue();
-                     }
-                     if (list[i - 1] instanceof ExpressItem && ((ExpressItem)list[i - 1]).name.equals("(") == true) {
-                       ((ExpressItem) sop.peek()).opDataNumber = ((ExpressItem) sop.peek()).opDataNumber - 1;
-                     }
-                     i++;
-                     break;
-            case(4):// if 与 then
-            	op1.opDataNumber = 2;
-                i++;
-            	break;
-            case(5):// if 与 then 
-            	if(list[i -1] instanceof ExpressItem &&  ((ExpressItem)list[i -1]).name.equalsIgnoreCase("then") == true){
-            		 //在if () then else 的情况下 增加一个 void 操作数，方便后续的错误判断
-            	   sdata.push(new OperateData(null,void.class));            	     
-            	}
-            	op1.opDataNumber = 3;
-                i++;
-            	break;
-            case (3):
-						if (sop.size() > 1 || sdata.size() > 1) {
-							throw new Exception("表达式设置错误，请检查函数名称是否匹配");
-						}
-						if (sdata.size() > 0) {//在break，continue的情况下没有数据
-							ExpressTreeNode tmpResultNode = (ExpressTreeNode) sdata
-									.pop();
-							if (tmpResultNode instanceof MyPlace) {
-								tmpResultNode = ((MyPlace) tmpResultNode).op;
-							}
-							result.add(tmpResultNode);
-						}
-						return result.toArray(new ExpressTreeNode[0]);
-            case(1) :
-               sop.pop();//抛出堆栈顶的操作符号
-               if (op1.name.equals(",")){
-                   int TmpInt = ((Integer)sOpDataNumber.pop()).intValue();
-                   TmpInt = TmpInt + 1;
-                   sOpDataNumber.push(Integer.valueOf(TmpInt));
-               }else{
-                   // 为了判断表达式的语法是否正确，需要对操作数栈进行处理，不支持(2,3,4)执行结果为4的形式
-                   int opDataNumber =m_operatorManager.getDataMember(op1.name);
-                   if (opDataNumber <0){
-                     opDataNumber = op1.opDataNumber;
-                   } 
-                   if(op1.name.equalsIgnoreCase("return") == true ){
-                	   opDataNumber = sdata.size(); 
-                	   if(opDataNumber > 1){
-                		   opDataNumber = 1; 
-                	   }
-                   }
-                   op1.opDataNumber = opDataNumber;
-                   op1.setMaxStackSize(sdata.size());
-                   List<ExpressTreeNode> tmpList = new ArrayList<ExpressTreeNode>();         
-                   for(int point =0;point < opDataNumber;point++){
-                  	 //确定操作符号的操作数
-                  	 ExpressTreeNode tmpNode = (ExpressTreeNode)sdata.pop();
-                  	 if(tmpNode instanceof MyPlace){
-                  		 tmpNode = ((MyPlace)tmpNode).op;
-                  	 }
-                  	 tmpNode.setParent(op1);
-                     tmpList.add(0,tmpNode);
-                   }
-                   op1.setChildren(tmpList.toArray(new ExpressTreeNode[0]));
-                   if(op1.getChildren().length <=0 ){
-                	   result.add(op1);
-                   }else{
-                      sdata.push(new MyPlace(op1));
-                   }
-               }
-               break;
-         }
-      }
-    }
-	  }catch(Exception e){
-		  throw new Exception("表达式语法分析错误：[" + e.getMessage() +"] 请检查：[" + getPrintInfo2(list," ")+"]",e);
-	  }
-	throw new Exception("没有能够进行正确的解析表达式");
-    
-  }
-  protected InstructionSet createInstructionSet(ExpressTreeNodeRoot root)throws Exception {
-		InstructionSet result = new InstructionSet();
+  protected InstructionSet createInstructionSet(ExpressTreeNodeRoot root,String type)throws Exception {
+		InstructionSet result = new InstructionSet(type);
 		createInstructionSet(root,result);
 		return result;
 	}
@@ -985,6 +831,7 @@ public class ExpressRunner
 				returnVal = returnVal || tmpHas;
 				finishPoint[i] = result.getCurrentPoint();
 			}
+			
 			if(op instanceof OperatorReturn){
 				result.insertInstruction(result.getCurrentPoint()+1,new InstructionReturn());	
 			}else{	
@@ -995,6 +842,11 @@ public class ExpressRunner
 					result.insertInstruction(finishPoint[0]+1,new InstructionGoToWithCondition(true,result.getCurrentPoint() - finishPoint[0] + 1,false));
 				}else if(op instanceof OperatorDef || op instanceof OperatorAlias){
 					returnVal = true;
+				}else if(op instanceof OperatorExportDef){
+					//添加对外的变量声明
+					result.addExportDef(new ExportItem(children[1].toString(),ExportItem.TYPE_DEF,ExpressUtil.getClassName(((OperateClass)children[0]).getVarClass())));
+				}else if(op instanceof OperatorExportAlias ){
+					result.addExportDef(new ExportItem(children[0].toString(),ExportItem.TYPE_ALIAS,children[1].toResource()));
 				}
 			}
 		}else{
@@ -1011,9 +863,9 @@ public class ExpressRunner
 	 */
 	protected boolean createInstructionSetForMacro(InstructionSet result,ExpressItem node)throws Exception {
 		String macroName =(String)((OperateData)node.getChildren()[0]).dataObject;
-		ExpressTreeNodeRoot macroRoot = new ExpressTreeNodeRoot("macro-" + macroName);
+		ExpressTreeNodeRoot macroRoot = new ExpressTreeNodeRoot("macro-" + macroName,"macro " + macroName +"{\n","}\n",true);
 		macroRoot.addChild(node.getChildren()[1]);
-		InstructionSet macroInstructionSet = this.createInstructionSet(macroRoot);
+		InstructionSet macroInstructionSet = this.createInstructionSet(macroRoot,InstructionSet.TYPE_MARCO);
 		result.addMacroDefine(macroName, new FunctionInstructionSet(macroName,"macro",macroInstructionSet));
 		return false;
 	}
@@ -1053,7 +905,7 @@ public class ExpressRunner
     	if(children.length != 3){
     		throw new Exception("funciton 操作符需要3个操作数 " );
     	}
-    	InstructionSet functionSet = new InstructionSet();
+    	InstructionSet functionSet = new InstructionSet(InstructionSet.TYPE_FUNCTION);
     	for(ExpressTreeNode item : children[1].getChildren()){
     		ExpressItem expressItem = (ExpressItem)item;
     		if(expressItem.name.equals("def") == false){
@@ -1066,7 +918,7 @@ public class ExpressRunner
     	}
     	
 		String functionName =(String)((OperateData)node.getChildren()[0]).dataObject;
-		ExpressTreeNodeRoot macroRoot = new ExpressTreeNodeRoot("function-" + functionName);
+		ExpressTreeNodeRoot macroRoot = new ExpressTreeNodeRoot("function-" + functionName,"function "+functionName +"(...){\n","}\n",true);
 		macroRoot.addChild(node.getChildren()[2]);
 		this.createInstructionSet(macroRoot,functionSet);
 		result.addMacroDefine(functionName, new FunctionInstructionSet(functionName,"function",functionSet));
@@ -1206,7 +1058,7 @@ public class ExpressRunner
 	    return result;
 }
   public InstructionSet parseInstructionSet(String condition)throws Exception{
-	  InstructionSet result = createInstructionSet(this.parseCResult(condition));
+	  InstructionSet result = createInstructionSet(this.parseCResult(condition),InstructionSet.TYPE_MAIN);
 	  if(this.isTrace && log.isDebugEnabled()){
 	    	log.debug("生成的指令集:\n" + result);
 	    }

@@ -49,7 +49,13 @@ public class OperateData extends ExpressTreeNodeImple {
 			return this.dataObject.toString();
 		}
 	}
-
+	public void toResource(StringBuilder builder,int level){
+		if(this.dataObject != null){
+			builder.append(this.dataObject.toString());
+		}else{
+			builder.append("null");
+		}
+	}
 }
 
 @SuppressWarnings("unchecked")
@@ -66,6 +72,9 @@ class OperateDataAttr extends OperateData {
     public String getName(){
     	return name;
     }
+    public void toResource(StringBuilder builder,int level){		
+			builder.append(this.name);
+	}
 	public String toString() {
 		try {
 			String str ="";
@@ -121,6 +130,9 @@ class OperateDataArrayItem extends OperateDataAttr {
 		this.arrayObject = aArrayObject;
 		this.index = aIndex;
 	}
+	public void toResource(StringBuilder builder,int level){		
+		builder.append(this.index);
+    }
 	public Class getType(InstructionSetContext context) throws Exception {
 		  return this.arrayObject.getObject(context).getClass();
 	}
@@ -249,7 +261,9 @@ class OperateClass extends OperateData {
 		this.name = name;
 		this.m_class = aClass;
 	}
-
+	public void toResource(StringBuilder builder,int level){		
+		builder.append(this.name);
+    }
 	public String toString() {
 		return "Class:" + name;
 		// return name;
@@ -306,6 +320,12 @@ class MyPlace implements ExpressTreeNode{
 	public int getChildCount(){
 		return this.op.getChildCount();
 	}
+	public void toResource(StringBuilder builder,int level){
+		throw new RuntimeException("不应该执行此方法");
+	}
+	public String toResource(){
+		throw new RuntimeException("不应该执行此方法");
+	}
 }
 
 interface ExpressTreeNode{
@@ -317,18 +337,11 @@ interface ExpressTreeNode{
 	public void setMaxStackSize(int maxStackSize);
 	public void addChild(ExpressTreeNode child);
 	public int getChildCount();
+	public void toResource(StringBuilder builder,int level);
+	public String toResource();
 }
 
-class ExpressTreeNodeRoot extends ExpressTreeNodeImple{
-	String name;
-	ExpressTreeNodeRoot(String aName){
-		this.name = aName;
-	}
-	public String toString(){
-		return "ExpressNode[" + this.name +"]";
-	}
-}
-class ExpressTreeNodeImple implements ExpressTreeNode{
+abstract class ExpressTreeNodeImple implements ExpressTreeNode{
 	private ExpressTreeNode parent;
 	private List<ExpressTreeNode> children=null;
 	/**
@@ -381,5 +394,42 @@ class ExpressTreeNodeImple implements ExpressTreeNode{
 	public void setMaxStackSize(int maxStackSize) {
 		this.maxStackSize = maxStackSize;
 	}
-	
+	public void toResourceOfChild(StringBuilder builder,int level) {
+		if (this.children != null) {
+			for (ExpressTreeNode child : this.children) {
+				child.toResource(builder,level);
+			}
+		}
+	}
+	public String toResource(){
+		StringBuilder builder = new StringBuilder();
+		this.toResource(builder,0);
+		return builder.toString();
+	}
+}
+class ExpressTreeNodeRoot extends ExpressTreeNodeImple{
+	String name;
+	String startTag;
+	String endTag;
+	boolean isAddLevel;
+	ExpressTreeNodeRoot(String aName,String aStartTag ,String aEndTag,boolean aIsAddLevel){
+		this.name = aName;
+		this.startTag = aStartTag;
+		this.endTag = aEndTag;
+		this.isAddLevel = aIsAddLevel;
+	}
+	public String toString(){
+		return "ExpressNode[" + this.name +"]";
+	}
+	public void toResource(StringBuilder builder,int level){
+		if(this.startTag != null){
+		  builder.append(this.startTag);
+		}
+		
+		this.toResourceOfChild(builder,level + (this.isAddLevel == true? 1:0));
+		
+		if(this.endTag!= null){
+			  builder.append(this.startTag);
+		}
+	}
 }

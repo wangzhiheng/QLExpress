@@ -22,6 +22,9 @@ class ExpressItem extends ExpressTreeNodeImple {
     this.aliasName = aAliasName;
     this.opDataNumber = 0;
   }
+  public void toResource(StringBuilder builder,int level){		
+		builder.append(this.aliasName);
+  }
   public String toString()
   {
 	   return this.aliasName;
@@ -42,6 +45,10 @@ class ExpressItemField extends ExpressItem{
   public ExpressItemField(String aName,String aFieldName){
     super(aName);
     this.fieldName = aFieldName;
+  }
+  public void toResource(StringBuilder builder,int level){
+	  this.toResourceOfChild(builder, level);
+	  builder.append(".").append(this.fieldName);
   }
   public String toString()
   {

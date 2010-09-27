@@ -9,10 +9,6 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-class CallResult{
-	Object returnValue;
-	boolean isExit;
-}
 
 /**
  * 表达式执行编译后形成的指令集合
@@ -21,8 +17,15 @@ class CallResult{
  */
 @SuppressWarnings("unchecked")
 public class InstructionSet {
+	public static String TYPE_MAIN ="main";
+	public static String TYPE_FUNCTION ="function";
+	public static String TYPE_MARCO ="marco";
+	
 	private static final Log log = LogFactory.getLog(InstructionSet.class);
-  private int maxStackSize  = -1;
+	private String type ="main";
+	private String name;
+	private String globeName;
+    private int maxStackSize  = -1;
   /**
    * 指令
    */
@@ -31,9 +34,14 @@ public class InstructionSet {
    * 函数和宏定义
    */
   private Map<String,FunctionInstructionSet> functionDefine = new HashMap<String,FunctionInstructionSet>();
-  
-  private Map<String,OperateDataLocalVar> localVarDefine = new HashMap<String,OperateDataLocalVar>();
+  private List<ExportItem> exportVar = new ArrayList<ExportItem>();
+  /**
+   * 函数参数定义
+   */
   private List<OperateDataLocalVar> parameterList = new ArrayList<OperateDataLocalVar>();
+  public InstructionSet(String aType){
+	  this.type = aType;
+  }
   
   /**
    * 批量执行指令集合，指令集间可以共享 变量和函数
@@ -144,16 +152,15 @@ public class InstructionSet {
   public FunctionInstructionSet[] getFunctionInstructionSets(){
 	  return this.functionDefine.values().toArray(new FunctionInstructionSet[0]);
   }
-  
-  
-	public OperateDataLocalVar getLocalVarDefine(String varName) {
-		return localVarDefine.get(varName);
-	}
+  public void addExportDef(ExportItem e){
+	  this.exportVar.add(e);
+  }
+  public List<ExportItem> getExportDef(){
+	  List<ExportItem> result = new ArrayList<ExportItem> ();
+	  result.addAll(this.exportVar);
+	  return result;
+  }
 
-	public void addLocalVarDefine(String varName,
-			OperateDataLocalVar localVarDefine) {
-		this.localVarDefine.put(varName, localVarDefine);
-	}
 	
 	public OperateDataLocalVar[] getParameters() {
 		return this.parameterList.toArray(new OperateDataLocalVar[0]);
@@ -201,7 +208,46 @@ public class InstructionSet {
   public int getCurrentPoint(){
 	  return this.list.size() - 1; 
   }
-  public String toString(){
+  
+  public String getName() {
+	return name;
+}
+
+public void setName(String name) {
+	this.name = name;
+}
+
+public String getGlobeName() {
+	return globeName;
+}
+
+public void setGlobeName(String globeName) {
+	this.globeName = globeName;
+}
+public boolean hasMain(){
+	return this.list.size() >0;
+}
+public String getType() {
+	return type;
+}
+public String toResource(){
+	String result ="";
+	if(this.parameterList.size() >0){
+		result = result +"(";
+	}
+	for(int i=0;i<this.parameterList.size();i++){
+		 OperateDataLocalVar var = this.parameterList.get(i);
+		 if(i > 0){
+			 result = result +",";
+		 }
+		result =result + var.type+ " "+var.name;
+	  }	
+	if(this.parameterList.size() >0){
+		result = result +")";
+	}
+	return result;
+}
+public String toString(){
 	  
 	  StringBuffer buffer = new StringBuffer();
 	  //输出宏定义
@@ -723,6 +769,10 @@ class InstructionOperator extends Instruction{
 		return result;
 	}
 }	
+class CallResult{
+	Object returnValue;
+	boolean isExit;
+}
 class FunctionInstructionSet{
 	String name;
 	String type;
