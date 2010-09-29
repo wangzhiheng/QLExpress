@@ -310,8 +310,10 @@ class OperatorExportDef extends OperatorBase {
 	public OperateData executeInner(InstructionSetContext context, OperateData[] list) throws Exception {
 		Class tmpClass = (Class) list[0].getObject(context);
 		String varName = (String)list[1].getObject(context);		
-		OperateDataLocalVar result = new OperateDataLocalVar(varName,tmpClass);
-		context.exportSymbol(varName, result);
+		//OperateDataLocalVar result = new OperateDataLocalVar(varName,tmpClass);
+		//context.exportSymbol(varName, result);
+		OperateDataAttr result = (OperateDataAttr)context.getSymbol(varName);
+		result.type = tmpClass;
 		return result;
 	}
 }
