@@ -433,8 +433,4 @@ final class OperatorManager {
         this.OpDataMember = aOpDataMember;
     	this.isNAddOneParameterCount = aIsNAddOneParameterCount;
     }
-    public OpStr(String name,int pri,int combine,int aOpDataMember)
-    {
-    	this(name,name,pri,combine,aOpDataMember,false);
-    }
   }
