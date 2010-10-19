@@ -21,8 +21,6 @@ public class OperatorOfNumber {
 		System.out.println(o.getClass() + ":" + o);
 		o = OperatorOfNumber.Divide.execute(o1,o2);
 		System.out.println(o.getClass() + ":" + o);
-		o = OperatorOfNumber.Remainder.execute(o1,o2);
-		System.out.println(o.getClass() + ":" + o);
 		o = OperatorOfNumber.Modulo.execute(o1,o2);
 		System.out.println(o.getClass() + ":" + o);
 		
@@ -132,25 +130,6 @@ public class OperatorOfNumber {
 	    }
 	}
 
- public static final class Remainder
- {
-    public static Object execute(Object op1,Object op2) throws Exception{
-		   if(op1 instanceof Number == false){
-				throw new Exception("数据类型错误:" + op1.getClass().getName() + "不能执行 \"%\"操作");
-			}
-			if(op2 instanceof Number == false){
-				throw new Exception("数据类型错误:" + op2.getClass().getName() + "不能执行 \"%\"操作");
-			}
-			int type1 = getSeq(op1.getClass());
-			int type2 = getSeq(op2.getClass());
-			int type = type1 >  type2 ? type1:type2;
-			if(type == 1) return ((Number)op1).byteValue() % ((Number)op2).byteValue();
-			if(type == 2) return ((Number)op1).shortValue() % ((Number)op2).shortValue();
-			if(type == 3) return ((Number)op1).intValue() % ((Number)op2).intValue();
-			if(type == 4) return ((Number)op1).longValue() % ((Number)op2).longValue();
-			throw new Exception("不支持的对象执行了\"%\"操作");
-     }
- }
  public static final class Modulo
  {
     public static Object execute(Object op1,Object op2) throws Exception{
@@ -163,10 +142,10 @@ public class OperatorOfNumber {
 			int type1 = getSeq(op1.getClass());
 			int type2 = getSeq(op2.getClass());
 			int type = type1 >  type2 ? type1:type2;
-			if(type == 1) return ((Number)op1).byteValue() / ((Number)op2).byteValue();
-			if(type == 2) return ((Number)op1).shortValue() / ((Number)op2).shortValue();
-			if(type == 3) return ((Number)op1).intValue() / ((Number)op2).intValue();
-			if(type == 4) return ((Number)op1).longValue() / ((Number)op2).longValue();
+			if(type == 1) return ((Number)op1).byteValue() % ((Number)op2).byteValue();
+			if(type == 2) return ((Number)op1).shortValue() % ((Number)op2).shortValue();
+			if(type == 3) return ((Number)op1).intValue() % ((Number)op2).intValue();
+			if(type == 4) return ((Number)op1).longValue() % ((Number)op2).longValue();
 			throw new Exception("不支持的对象执行了\"mod\"操作");
      }
  }

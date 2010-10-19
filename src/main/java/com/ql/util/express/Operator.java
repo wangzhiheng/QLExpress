@@ -590,7 +590,7 @@ class OperatorMultiDiv extends Operator {
 		else if (this.getName().equals("/"))
 			obj = OperatorOfNumber.Divide.execute(op1, op2);
 		else if (this.getName().equals("%"))
-			obj = OperatorOfNumber.Remainder.execute(op1, op2);
+			obj = OperatorOfNumber.Modulo.execute(op1, op2);
 		else if (this.getName().equals("mod"))
 			obj = OperatorOfNumber.Modulo.execute(op1, op2);
 
