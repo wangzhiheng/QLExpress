@@ -175,7 +175,7 @@ public class ExpressRunner
 
   private static final Log log = LogFactory.getLog(ExpressRunner.class);
   private boolean isTrace = false;
-  private volatile Map<String,InstructionSet> expressInstructionSetCache = new ConcurrentHashMap<String, InstructionSet>();
+  private Map<String,InstructionSet> expressInstructionSetCache = new ConcurrentHashMap<String, InstructionSet>();
   
   protected OperatorManager m_operatorManager =  new OperatorManager();
   protected Map m_cacheOracleParseString = new HashMap();

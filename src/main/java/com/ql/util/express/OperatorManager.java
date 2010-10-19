@@ -59,7 +59,8 @@ final class OperatorManager {
 		this.addOperatorInner("not", 1, 0, 1, new OperatorNot("not"));
 		this.addOperatorInner("*", 2, 0, 2, new OperatorMultiDiv("*"));
 		this.addOperatorInner("/", 2, 0, 2, new OperatorMultiDiv("/"));
-		this.addOperatorInner("%", 2, 0, 2, null);
+		this.addOperatorInner("%", 2, 0, 2, new OperatorMultiDiv("%"));
+		this.addOperatorInner("mod", 2, 0, 2, new OperatorMultiDiv("mod"));
 		this.addOperatorInner("like", 2, 0, 2, new OperatorLike("like"));
 		this.addOperatorInner("+", 3, 0, 2, new OperatorAddReduce("+"));
 		this.addOperatorInner("-", 3, 0, 2, new OperatorAddReduce("-"));

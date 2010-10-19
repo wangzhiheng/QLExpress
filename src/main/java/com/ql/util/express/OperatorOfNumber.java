@@ -11,7 +11,7 @@ public class OperatorOfNumber {
 	
 	public static void main(String[] args) throws Exception{
 		Object o1 = new Integer(1000);
-		Object o2 = new Long(2);
+		Object o2 = new Long(3);
 		Object o;
 		o = OperatorOfNumber.Add.execute(o1,o2);
 		System.out.println(o.getClass() + ":" + o);
@@ -21,8 +21,11 @@ public class OperatorOfNumber {
 		System.out.println(o.getClass() + ":" + o);
 		o = OperatorOfNumber.Divide.execute(o1,o2);
 		System.out.println(o.getClass() + ":" + o);
+		o = OperatorOfNumber.Remainder.execute(o1,o2);
+		System.out.println(o.getClass() + ":" + o);
 		o = OperatorOfNumber.Modulo.execute(o1,o2);
 		System.out.println(o.getClass() + ":" + o);
+		
 	}
 	
     public static int getSeq(Class aClass){
@@ -129,7 +132,7 @@ public class OperatorOfNumber {
 	    }
 	}
 
- public static final class Modulo
+ public static final class Remainder
  {
     public static Object execute(Object op1,Object op2) throws Exception{
 		   if(op1 instanceof Number == false){
@@ -145,12 +148,28 @@ public class OperatorOfNumber {
 			if(type == 2) return ((Number)op1).shortValue() % ((Number)op2).shortValue();
 			if(type == 3) return ((Number)op1).intValue() % ((Number)op2).intValue();
 			if(type == 4) return ((Number)op1).longValue() % ((Number)op2).longValue();
-			if(type == 5) return ((Number)op1).floatValue() % ((Number)op2).floatValue();
-			if(type == 6) return ((Number)op1).doubleValue() % ((Number)op2).doubleValue();
 			throw new Exception("不支持的对象执行了\"%\"操作");
      }
  }
-
+ public static final class Modulo
+ {
+    public static Object execute(Object op1,Object op2) throws Exception{
+		   if(op1 instanceof Number == false){
+				throw new Exception("数据类型错误:" + op1.getClass().getName() + "不能执行 \"mod\"操作");
+			}
+			if(op2 instanceof Number == false){
+				throw new Exception("数据类型错误:" + op2.getClass().getName() + "不能执行 \"mod\"操作");
+			}
+			int type1 = getSeq(op1.getClass());
+			int type2 = getSeq(op2.getClass());
+			int type = type1 >  type2 ? type1:type2;
+			if(type == 1) return ((Number)op1).byteValue() / ((Number)op2).byteValue();
+			if(type == 2) return ((Number)op1).shortValue() / ((Number)op2).shortValue();
+			if(type == 3) return ((Number)op1).intValue() / ((Number)op2).intValue();
+			if(type == 4) return ((Number)op1).longValue() / ((Number)op2).longValue();
+			throw new Exception("不支持的对象执行了\"mod\"操作");
+     }
+ }
  public static final class Arith {
 
    private static final int DEF_DIV_SCALE = 10;
