@@ -585,11 +585,13 @@ class OperatorMultiDiv extends Operator {
 	public Object executeInner(Object op1,
 			Object op2) throws Exception {
 		Object obj = null;
-		if (this.getName() == "*")
+		if (this.getName().equals("*"))
 			obj = OperatorOfNumber.Multiply.execute(op1, op2);
-		else if (this.getName() == "/")
+		else if (this.getName().equals("/"))
 			obj = OperatorOfNumber.Divide.execute(op1, op2);
-		else if (this.getName() == "%")
+		else if (this.getName().equals("%"))
+			obj = OperatorOfNumber.Remainder.execute(op1, op2);
+		else if (this.getName().equals("mod"))
 			obj = OperatorOfNumber.Modulo.execute(op1, op2);
 
 		return obj;
