@@ -66,6 +66,20 @@ public class InstructionSetContext<K,V> extends HashMap<K,V> implements IExpress
 		}
 		this.symbolTable.put(varName,aliasNameObject);
 	}
+	public Object findAliasOrDefSymbol(String varName)throws Exception{
+		Object result = null;
+		if(this.symbolTable != null){
+			result = this.symbolTable.get(varName);
+		}
+		if(result == null){
+			if( this.parent != null && this.parent instanceof InstructionSetContext){
+			    result = ((InstructionSetContext)this.parent).findAliasOrDefSymbol(varName);
+			}else{
+			    result = null;
+			}
+		}	
+		return result;		
+	}
 	public Object getSymbol(String varName) throws Exception{
 		Object result = null;
 		if(this.symbolTable != null){
