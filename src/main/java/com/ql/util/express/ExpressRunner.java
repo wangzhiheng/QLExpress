@@ -308,7 +308,8 @@ public class ExpressRunner
       	    && (point <tmpList.length -1) 
       	    && ( tmpList[point + 1].charAt(0) >='0'
       	    	   && tmpList[point + 1].charAt(0) <='9'
-      	    	  ||tmpList[point + 1].charAt(0)=='.')){ //对负数进行特殊处理
+      	    	  ||tmpList[point + 1].charAt(0)=='.')
+      	    && (point == 0 || this.m_operatorManager.isOperator(tmpList[point -1]) == true)	){ //对负数进行特殊处理
       		tmpList[point + 1] = '-' + tmpList[point + 1];
       		point = point + 1;
       		
