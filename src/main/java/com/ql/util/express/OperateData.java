@@ -157,13 +157,13 @@ class OperateDataArrayItem extends OperateDataAttr {
 @SuppressWarnings("unchecked")
 class OperateDataField extends OperateDataAttr {
 	Object fieldObject;
-	String fieldName;
+	String orgiFieldName;
 	
 	public OperateDataField(Object aFieldObject,String aFieldName) {
-		super(null,ExpressUtil.getPropertyType(aFieldObject, aFieldName));
+		super(null,null);
 		this.name = aFieldObject.getClass().getName() + "." + aFieldName;
 		this.fieldObject = aFieldObject;
-		this.fieldName =aFieldName;
+		this.orgiFieldName =aFieldName;
 	}
 	
     public String getName(){
@@ -177,17 +177,30 @@ class OperateDataField extends OperateDataAttr {
 		}
 	}
 
-
+    public String transferFieldName(InstructionSetContext context,String oldName){
+    	try{
+    	   OperateDataAttr o = (OperateDataAttr)context.findAliasOrDefSymbol(oldName);
+    	   if(o != null){
+    		  return (String)o.getObject(context);
+    	   }else{
+    	     return oldName;
+    	   }
+    	}catch(Exception e){
+    		throw new RuntimeException(e);
+    	}
+    }
 	public Object getObjectInner(InstructionSetContext context) {
-			return ExpressUtil.getProperty(this.fieldObject, this.fieldName);
+		//如果能找到aFieldName的定义,则再次运算
+
+		return ExpressUtil.getProperty(this.fieldObject,transferFieldName(context,this.orgiFieldName));
 	}
     
 	public Class getType(InstructionSetContext context) throws Exception {
 		  return  this.type;
 	}
 
-	public void setObject(InstructionSetContext parent, Object value) {
-		ExpressUtil.setProperty(fieldObject, fieldName, value);
+	public void setObject(InstructionSetContext context, Object value) {
+		ExpressUtil.setProperty(fieldObject, transferFieldName(context,this.orgiFieldName), value);
 	}
 }
 

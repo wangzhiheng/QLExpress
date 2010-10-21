@@ -6,6 +6,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -390,8 +391,11 @@ public class ExpressUtil {
 			if (bean instanceof Class) {
 				Field f = ((Class) bean).getDeclaredField(name);
 				return f.get(null);
-			} else {
-				return PropertyUtils.getProperty(bean, name);
+			}else if(bean instanceof Map ){
+				return ((Map)bean).get(name);
+		    }else {
+				Object obj = PropertyUtils.getProperty(bean, name);
+				return obj;
 			}
 		} catch (Exception e) {
 			throw new RuntimeException(e);
@@ -403,7 +407,9 @@ public class ExpressUtil {
 			if (bean instanceof Class) {
 				Field f = ((Class) bean).getDeclaredField(name);
 				f.set(null, value);
-			} else {
+			}else if(bean instanceof Map ){
+				((Map)bean).put(name, value);
+		    } else {
 				PropertyUtils.setProperty(bean, name, value);
 			}
 		} catch (Exception e) {
