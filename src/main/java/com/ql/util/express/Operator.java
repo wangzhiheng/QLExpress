@@ -161,13 +161,9 @@ class OperatorEvaluate extends OperatorBase {
 		return executeInner(parent, list[0], list[1]);
 	}
 
-	public OperateData executeInner(InstructionSetContext parent, OperateData op1,
-			OperateData op2) throws Exception {
-		if(op1 instanceof OperateDataAttr){
-		  ((OperateDataAttr)op1).setObject(parent, op2.getObject(parent));
-		}else{
-		  throw new Exception("只有属性才能在表达式设置值");	
-		}
+	public OperateData executeInner(InstructionSetContext parent,
+			OperateData op1, OperateData op2) throws Exception {
+		 op1.setObject(parent, op2.getObject(parent));
 		return op2;
 	}
 

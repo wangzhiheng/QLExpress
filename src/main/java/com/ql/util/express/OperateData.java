@@ -41,7 +41,9 @@ public class OperateData extends ExpressTreeNodeImple {
     protected Object getObjectInner(InstructionSetContext context){
     	return this.dataObject;
     }
-
+    public void setObject(InstructionSetContext parent, Object object) {
+		throw new RuntimeException("必须在子类中实现此方法");
+	}
 	public String toString() {
 		if( this.dataObject == null)
 			return this.type + ":null";

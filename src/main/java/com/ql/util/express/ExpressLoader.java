@@ -32,7 +32,6 @@ public class ExpressLoader {
 		while( ( tmpStr = reader.readLine()) != null){
 			builder.append(tmpStr);
 		}
-		System.out.println(builder.toString());
 		return builder.toString();
 	}
 
