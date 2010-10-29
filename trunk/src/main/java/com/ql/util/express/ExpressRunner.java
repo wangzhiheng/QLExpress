@@ -664,8 +664,11 @@ public class ExpressRunner
                 i++;
             	break;
             case (3):
-						if (sop.size() > 1 || sdata.size() > 1) {
-							throw new Exception("表达式设置错误，请检查函数名称是否匹配");
+						if (sop.size() > 1){
+							throw new Exception("表达式设置错误，请检查函数名称是否匹配,在操作符栈中还有未处理的操作符");
+						}
+						if( sdata.size() > 1) {
+							throw new Exception("表达式设置错误，请检查函数名称是否匹配,在操作数栈中多于一个操作数");
 						}
 						if (sdata.size() > 0) {//在break，continue的情况下没有数据
 							ExpressTreeNode tmpResultNode = (ExpressTreeNode) sdata
@@ -1040,7 +1043,11 @@ public class ExpressRunner
 	  	StringBuffer buffer = new StringBuffer();
 		for(int i=0;i<list.length;i++){
 			if(i > 0){buffer.append(splitOp);}
-			buffer.append(list[i]);
+			if(list[i] != null){
+			   buffer.append(list[i]+"[" + list[i].getClass().getName()  + "]");
+			}else{
+				buffer.append(list[i]+"[NULL]");
+			}
 		}
 		return buffer.toString();
 	  }
