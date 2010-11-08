@@ -60,7 +60,7 @@ public class InstructionSet {
 			Log aLog)
 			throws Exception {
 	  InstructionSetContext context = new InstructionSetContext<String, Object>(
-				aContext,loader, null, aFunctionCacheMananger);
+				aContext,loader, aFunctionCacheMananger);
 	  Object result = execute(sets,context,errorList,isTrace,isCatchException,aLog);
 		if (aFunctionCacheMananger == null) {
 			// 如果是指令集自身创建的缓存，则清除
@@ -78,7 +78,6 @@ public class InstructionSet {
 			InstructionSet tmpSet = sets[i];
 			environmen = new RunEnvironment(tmpSet.maxStackSize, tmpSet,
 					(InstructionSetContext) context, isTrace);
-			context.setEnvironmen(environmen);
 			try {
 				CallResult tempResult = tmpSet.excuteInner(environmen, context,
 						errorList, i == sets.length - 1, aLog);
@@ -491,7 +490,7 @@ class InstructionOpenNewArea extends Instruction{
 			log.debug(this);
 		}
 		environment.setContext(new InstructionSetContext<String, Object>(
-				environment.getContext(),environment.getContext().getExpressLoader(), environment, environment.getContext()
+				environment.getContext(),environment.getContext().getExpressLoader(), environment.getContext()
 						.getFunctionCachManagerNoCreate()));
 		environment.programPointAddOne();
 	}
@@ -551,7 +550,7 @@ class InstructionCallSelfDefineFunction extends Instruction{
 		
 		InstructionSet functionSet = (InstructionSet)environment.getContext().getSymbol(functionName);		
 		InstructionSetContext context = new InstructionSetContext<String, Object>(
-			environment.getContext(),environment.getContext().getExpressLoader(), null,
+			environment.getContext(),environment.getContext().getExpressLoader(),
 			environment.getContext().getFunctionCachManagerNoCreate());
 		OperateDataLocalVar[] vars = functionSet.getParameters();
 		for(int i=0;i<vars.length;i++){
