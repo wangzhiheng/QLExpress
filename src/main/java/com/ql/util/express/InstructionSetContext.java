@@ -6,7 +6,6 @@ import java.util.Map;
 @SuppressWarnings("serial")
 public class InstructionSetContext<K,V> extends HashMap<K,V> implements IExpressContext<K,V> {
 	 private FuncitonCacheManager functionCachManager;
-	 private RunEnvironment environmen;
 	/**
 	 * 函数调用开启标志，在Method执行完毕后清除
 	 */
@@ -20,9 +19,8 @@ public class InstructionSetContext<K,V> extends HashMap<K,V> implements IExpress
 	
 	private ExpressLoader expressLoader;
 		
-	public InstructionSetContext(IExpressContext<K,V> aParent,ExpressLoader aExpressLoader,RunEnvironment aEnvironmen ,FuncitonCacheManager aFunctionCachManager){
+	public InstructionSetContext(IExpressContext<K,V> aParent,ExpressLoader aExpressLoader, FuncitonCacheManager aFunctionCachManager){
 		parent = aParent;
-		this.environmen = aEnvironmen;
 		this.functionCachManager =  aFunctionCachManager;
 		this.expressLoader = aExpressLoader;
 	}
@@ -42,14 +40,6 @@ public class InstructionSetContext<K,V> extends HashMap<K,V> implements IExpress
 		return functionCachManager;
 	}
 
-	
-	public RunEnvironment getEnvironmen() {
-		return environmen;
-	}
-	
-	public void setEnvironmen(RunEnvironment environmen) {
-		this.environmen = environmen;
-	}
 	public void exportSymbol(String varName,Object aliasNameObject) throws Exception{
 		if( this.parent != null && this.parent instanceof InstructionSetContext){
 			((InstructionSetContext)this.parent).exportSymbol(varName, aliasNameObject);
