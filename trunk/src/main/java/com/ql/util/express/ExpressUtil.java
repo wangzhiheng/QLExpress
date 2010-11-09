@@ -386,15 +386,15 @@ public class ExpressUtil {
 		return sb.toString();
 	}
 
-	public static Object getProperty(Object bean, String name) {
+	public static Object getProperty(Object bean, Object name) {
 		try {
 			if (bean instanceof Class) {
-				Field f = ((Class) bean).getDeclaredField(name);
+				Field f = ((Class) bean).getDeclaredField(name.toString());
 				return f.get(null);
 			}else if(bean instanceof Map ){
 				return ((Map)bean).get(name);
 		    }else {
-				Object obj = PropertyUtils.getProperty(bean, name);
+				Object obj = PropertyUtils.getProperty(bean, name.toString());
 				return obj;
 			}
 		} catch (Exception e) {
@@ -402,15 +402,15 @@ public class ExpressUtil {
 		}
 	}
 
-	public static void setProperty(Object bean, String name, Object value) {
+	public static void setProperty(Object bean, Object name, Object value) {
 		try {
 			if (bean instanceof Class) {
-				Field f = ((Class) bean).getDeclaredField(name);
+				Field f = ((Class) bean).getDeclaredField(name.toString());
 				f.set(null, value);
 			}else if(bean instanceof Map ){
 				((Map)bean).put(name, value);
 		    } else {
-				PropertyUtils.setProperty(bean, name, value);
+				PropertyUtils.setProperty(bean, name.toString(), value);
 			}
 		} catch (Exception e) {
 			throw new RuntimeException("不能访问" + bean + "的property:" + name,e);

@@ -10,7 +10,7 @@ import com.ql.util.express.ExpressLoader;
 import com.ql.util.express.ExpressRunner;
 import com.ql.util.express.InstructionSet;
 /**
- * 分成配置范例
+ * 分成配置范例,通过动态属性来实现
  * @author xuannan
  *
  */
