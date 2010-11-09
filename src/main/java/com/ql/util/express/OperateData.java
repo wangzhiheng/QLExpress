@@ -177,11 +177,11 @@ class OperateDataField extends OperateDataAttr {
 		}
 	}
 
-    public String transferFieldName(InstructionSetContext context,String oldName){
+    public Object transferFieldName(InstructionSetContext context,String oldName){
     	try{
     	   OperateDataAttr o = (OperateDataAttr)context.findAliasOrDefSymbol(oldName);
     	   if(o != null){
-    		  return (String)o.getObject(context);
+    		  return o.getObject(context);
     	   }else{
     	     return oldName;
     	   }
