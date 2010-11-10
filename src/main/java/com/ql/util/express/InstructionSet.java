@@ -42,6 +42,12 @@ public class InstructionSet {
   public InstructionSet(String aType){
 	  this.type = aType;
   }
+  protected static Object executeOuter(InstructionSet[] sets,ExpressLoader loader,
+			IExpressContext aContext, List errorList,
+			FuncitonCacheManager aFunctionCacheMananger, boolean isTrace,boolean isCatchException,
+			Log aLog) throws Exception{
+	 return execute(sets, loader, aContext, errorList, aFunctionCacheMananger, isTrace, isCatchException,true, aLog);
+  }
   
   /**
    * 批量执行指令集合，指令集间可以共享 变量和函数
@@ -57,11 +63,11 @@ public class InstructionSet {
   protected static Object execute(InstructionSet[] sets,ExpressLoader loader,
 			IExpressContext aContext, List errorList,
 			FuncitonCacheManager aFunctionCacheMananger, boolean isTrace,boolean isCatchException,
-			Log aLog)
+			boolean isReturnLastData,Log aLog)
 			throws Exception {
 	  InstructionSetContext context = new InstructionSetContext<String, Object>(
 				aContext,loader, aFunctionCacheMananger);
-	  Object result = execute(sets,context,errorList,isTrace,isCatchException,aLog);
+	  Object result = execute(sets,context,errorList,isTrace,isCatchException,isReturnLastData,aLog);
 		if (aFunctionCacheMananger == null) {
 			// 如果是指令集自身创建的缓存，则清除
 			context.clearFuncitonCacheManager();
@@ -71,7 +77,7 @@ public class InstructionSet {
 
 	protected static Object execute(InstructionSet[] sets,
 			InstructionSetContext context, List errorList, boolean isTrace,boolean isCatchException,
-			Log aLog) throws Exception {
+			boolean isReturnLastData,Log aLog) throws Exception {
 		RunEnvironment environmen = null;
 		Object result = null;
 		for (int i = 0; i < sets.length; i++) {
@@ -80,7 +86,7 @@ public class InstructionSet {
 					(InstructionSetContext) context, isTrace);
 			try {
 				CallResult tempResult = tmpSet.excuteInner(environmen, context,
-						errorList, i == sets.length - 1, aLog);
+						errorList, i == sets.length - 1,isReturnLastData,aLog);
 				if (tempResult.isExit == true) {
 					result = tempResult.returnValue;
 					break;
@@ -100,14 +106,18 @@ public class InstructionSet {
 		return result;
 
 	}
-  /**
-   * 执行所有的操作指令
-   * @param context
-   * @param errorList
-   * @return
-   * @throws Exception
-   */
-	public CallResult excuteInner(RunEnvironment environmen,InstructionSetContext context,List errorList,boolean isLast,Log aLog)
+/**
+ * 
+ * @param environmen
+ * @param context
+ * @param errorList
+ * @param isLast
+ * @param isReturnLastData 是否最后的结果，主要是在执行宏定义的时候需要
+ * @param aLog
+ * @return
+ * @throws Exception
+ */
+	public CallResult excuteInner(RunEnvironment environmen,InstructionSetContext context,List errorList,boolean isLast,boolean isReturnLastData,Log aLog)
 			throws Exception {
 		Instruction instruction;
 		//将函数export到上下文中
@@ -129,7 +139,11 @@ public class InstructionSet {
 				if (tmpObject == null) {
 					environmen.quitExpress(null);
 				} else {
-					environmen.quitExpress(tmpObject.getObject(context));
+					if(isReturnLastData == true){
+						environmen.quitExpress(tmpObject.getObject(context));
+					}else{
+					    environmen.quitExpress(tmpObject);
+					}
 				}
 			}
 		}
@@ -513,7 +527,7 @@ class InstructionCallFunction extends Instruction{
 		Object functionSet = environment.getContext().getSymbol(functionName);		
 		Object result =InstructionSet.execute(new InstructionSet[]{(InstructionSet)functionSet},environment.getContext().getExpressLoader(),
 				environment.getContext(), errorList, environment.getContext().getFunctionCachManagerNoCreate(),
-				environment.isTrace(),false,this.log);
+				environment.isTrace(),false,true,this.log);
 		environment.push(new OperateData(result,null));		
 		environment.programPointAddOne();
 	}
@@ -560,7 +574,7 @@ class InstructionCallSelfDefineFunction extends Instruction{
 			var.setObject(context, parameters[i].getObject(environment.getContext()));
 		}
 		Object result =InstructionSet.execute(new InstructionSet[]{(InstructionSet)functionSet},
-				context,errorList,environment.isTrace(),false,this.log);
+				context,errorList,environment.isTrace(),false,true,this.log);
 		environment.push(new OperateData(result,null));		
 		environment.programPointAddOne();
 	}
@@ -583,8 +597,12 @@ class InstructionCallMacro extends Instruction{
 		
 		Object result =InstructionSet.execute(new InstructionSet[]{(InstructionSet)functionSet},environment.getContext().getExpressLoader(),
 				environment.getContext(), errorList, environment.getContext().getFunctionCachManagerNoCreate(),
-				environment.isTrace(),false,this.log);
-		environment.push(new OperateData(result,null));
+				environment.isTrace(),false,false,this.log);
+		if(result instanceof OperateData){
+			environment.push((OperateData)result);
+		}else{
+		   environment.push(new OperateData(result,null));
+		}
 		
 		environment.programPointAddOne();
 	}
