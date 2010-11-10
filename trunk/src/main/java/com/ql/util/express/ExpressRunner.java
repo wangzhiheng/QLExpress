@@ -1103,7 +1103,7 @@ public class ExpressRunner
   public Object execute(InstructionSet[] instructionSets,ExpressLoader loader,IExpressContext context,
 		  List errorList,FuncitonCacheManager aFunctionCacheMananger,boolean isTrace,boolean isCatchException,
 			Log aLog) throws Exception{
-	 return  InstructionSet.execute(instructionSets,loader,context, errorList, aFunctionCacheMananger, isTrace,isCatchException,aLog);
+	 return  InstructionSet.executeOuter(instructionSets,loader,context, errorList, aFunctionCacheMananger, isTrace,isCatchException,aLog);
   }
 
   /**
