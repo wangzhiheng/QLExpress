@@ -8,13 +8,27 @@ import java.lang.reflect.Modifier;
  * @author qhlhl2010@gmail.com
  *
  */
-@SuppressWarnings("unchecked")
 class SelfDefineClassFunctionOperator extends OperatorBase{
   String functionName;
   String[] parameterTypes;
-  Class[] parameterClasses ;
-  Class operClass;
+  Class<?>[] parameterClasses ;
+  Class<?> operClass;
   Method method;
+  
+  public SelfDefineClassFunctionOperator(String aOperName,String aClassName, String aFunctionName,
+          Class<?>[] aParameterClassTypes,String aErrorInfo) throws Exception {
+	    this.name = aOperName;
+	    this.errorInfo = aErrorInfo;
+	    this.functionName = aFunctionName;
+	    this.parameterClasses = aParameterClassTypes;
+	    this.parameterTypes = new String[aParameterClassTypes.length];
+	    for(int i=0;i<this.parameterClasses.length;i++){
+	      this.parameterTypes[i] = this.parameterClasses[i].getName();
+	    }
+	    operClass = ExpressUtil.getJavaClass(aClassName);
+	    method = operClass.getMethod(functionName,parameterClasses);	  
+  }
+
   public SelfDefineClassFunctionOperator(String aOperName,String aClassName, String aFunctionName,
                          String[] aParameterTypes,String aErrorInfo) throws Exception {
     this.name = aOperName;
@@ -57,13 +71,30 @@ class SelfDefineClassFunctionOperator extends OperatorBase{
  * @author qhlhl2010@gmail.com
  *
  */
-@SuppressWarnings("unchecked")
 class SelfDefineServiceFunctionOperator extends OperatorBase{
   Object serviceObject;
   String functionName;
   String[] parameterTypes;
-  Class[] parameterClasses ;
+  Class<?>[] parameterClasses ;
   Method method;
+  
+	public SelfDefineServiceFunctionOperator(String aOperName,
+			Object aServiceObject, String aFunctionName,
+			Class<?>[] aParameterClassTypes, String aErrorInfo) throws Exception {
+		this.name = aOperName;
+		this.errorInfo = aErrorInfo;
+		this.serviceObject = aServiceObject;
+		this.functionName = aFunctionName;
+		this.parameterClasses = aParameterClassTypes;
+		this.parameterTypes = new String[this.parameterClasses.length];
+		for (int i = 0; i < this.parameterClasses.length; i++) {
+			this.parameterTypes[i] = this.parameterClasses[i].getName();
+		}
+		Class<?> operClass = serviceObject.getClass();
+		method = operClass.getMethod(functionName, parameterClasses);
+
+	}
+  
   public SelfDefineServiceFunctionOperator(String aOperName,Object aServiceObject, String aFunctionName,
                          String[] aParameterTypes,String aErrorInfo) throws Exception {
     this.name = aOperName;
@@ -75,7 +106,7 @@ class SelfDefineServiceFunctionOperator extends OperatorBase{
     for(int i=0;i<this.parameterClasses.length;i++){
       this.parameterClasses[i] =ExpressUtil.getJavaClass(this.parameterTypes[i]);
     }
-    Class operClass = serviceObject.getClass();
+    Class<?> operClass = serviceObject.getClass();
     method = operClass.getMethod(functionName,parameterClasses);
    
   }

@@ -184,6 +184,25 @@ final class OperatorManager {
       }	  
       this.addFunction(name, new SelfDefineClassFunctionOperator(name,aClassName,aFunctionName,aParameterTypes, errorInfo));
     }
+     /**
+      * 添加一个类的函数定义，例如：Math.abs(double) 映射为表达式中的 "取绝对值(-5.0)"
+      * @param name 函数名称
+      * @param aClassName 类名称
+      * @param aFunctionName 类中的方法名称
+      * @param aParameterClassTypes 方法的参数类型Class
+      * @param errorInfo 如果函数执行的结果是false，需要输出的错误信息
+      * @throws Exception
+      */
+	public void addFunctionOfClassMethod(String name, String aClassName,
+			String aFunctionName, Class[] aParameterClassTypes, String errorInfo)
+			throws Exception {
+		if (errorInfo != null && errorInfo.trim().length() == 0) {
+			errorInfo = null;
+		}
+		this.addFunction(name, new SelfDefineClassFunctionOperator(name,
+				aClassName, aFunctionName, aParameterClassTypes, errorInfo));
+	}
+     
     /**
      * 用于将一个用户自己定义的对象(例如Spring对象)方法转换为一个表达式计算的函数
      * @param name
@@ -200,6 +219,16 @@ final class OperatorManager {
         }	 	
      this.addFunction(name, new SelfDefineServiceFunctionOperator(name,aServiceObject,aFunctionName,aParameterTypes,errorInfo));
     }
+
+	public void addFunctionOfServiceMethod(String name, Object aServiceObject,
+			String aFunctionName, Class<?>[] aParameterClassTypes, String errorInfo)
+			throws Exception {
+		if (errorInfo != null && errorInfo.trim().length() == 0) {
+			errorInfo = null;
+		}
+		this.addFunction(name, new SelfDefineServiceFunctionOperator(name,
+				aServiceObject, aFunctionName, aParameterClassTypes, errorInfo));
+	}
     
     protected void addOperatorInner(String name,int pri,int combine,int aOpDataMember,OperatorBase op){
    	 this.addOperatorInner(name, pri, combine, aOpDataMember, false, op);
