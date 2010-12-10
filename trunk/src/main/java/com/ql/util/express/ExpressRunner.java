@@ -178,7 +178,7 @@ public class ExpressRunner
   private Map<String,InstructionSet> expressInstructionSetCache = new ConcurrentHashMap<String, InstructionSet>();
   
   protected OperatorManager m_operatorManager =  new OperatorManager();
-  protected Map m_cacheOracleParseString = new HashMap();
+  protected Map<Object,Object> m_cacheOracleParseString = new HashMap<Object,Object>();
 
 	public ExpressRunner() {
 	}
@@ -250,6 +250,22 @@ public class ExpressRunner
                         String[] aParameterTypes,String errorInfo) throws Exception {
     	this.m_operatorManager.addFunctionOfClassMethod(name, aClassName, aFunctionName, aParameterTypes, errorInfo);
     }
+    
+    /**
+     * 添加一个类的函数定义，例如：Math.abs(double) 映射为表达式中的 "取绝对值(-5.0)"
+     * @param name 函数名称
+     * @param aClassName 类名称
+     * @param aFunctionName 类中的方法名称
+     * @param aParameterClassTypes 方法的参数类型名称
+     * @param errorInfo 如果函数执行的结果是false，需要输出的错误信息
+     * @throws Exception
+     */
+	public void addFunctionOfClassMethod(String name, String aClassName,
+			String aFunctionName, Class<?>[] aParameterClassTypes, String errorInfo)
+			throws Exception {
+		this.m_operatorManager.addFunctionOfClassMethod(name, aClassName,
+				aFunctionName, aParameterClassTypes, errorInfo);
+	}
     /**
      * 用于将一个用户自己定义的对象(例如Spring对象)方法转换为一个表达式计算的函数
      * @param name
@@ -263,13 +279,19 @@ public class ExpressRunner
                         String[] aParameterTypes,String errorInfo ) throws Exception {
     	this.m_operatorManager.addFunctionOfServiceMethod(name, aServiceObject, aFunctionName, aParameterTypes, errorInfo);
     }
- 
+
+	public void addFunctionOfServiceMethod(String name, Object aServiceObject,
+			String aFunctionName, Class<?>[] aParameterClassTypes, String errorInfo)
+			throws Exception {
+		this.m_operatorManager.addFunctionOfServiceMethod(name, aServiceObject,
+				aFunctionName, aParameterClassTypes, errorInfo);
+	}
 
   protected Object[] getOpObjectList(String[] tmpList)  throws Exception
   {
       
 	ExpressImport  tmpImportPackage = new ExpressImport();  
-    List  list = new ArrayList();
+    List<Object>  list = new ArrayList<Object>();
     int point=0;
     
     //先处理import，import必须放在文件的最开始，必须以；结束
