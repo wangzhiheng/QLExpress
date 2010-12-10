@@ -50,6 +50,8 @@ public class ExpressTest {
 				"isVIP", new String[] { "String" }, "$1不是VIP用户");
 		runner.addFunctionOfClassMethod("取绝对值", Math.class.getName(), "abs",
 				new String[] { "double" }, null);
+		runner.addFunctionOfClassMethod("取绝对值TWO", Math.class.getName(), "abs",
+				new Class[] { double.class }, null);
 		runner.addFunctionOfClassMethod("转换为大写", BeanExample.class.getName(),
 				"upper", new String[] { "String" }, null);		
 		runner.addFunctionOfClassMethod("testLong", BeanExample.class.getName(),
@@ -67,6 +69,7 @@ public class ExpressTest {
 						"张三-李四" }, 
 						{ "group(2,3,4)", "9" },
 						{ "取绝对值(-5.0)", "5.0" },
+						{ "取绝对值TWO(-10.0)", "10.0" },
 				{ "max(2,3,4,10)", "10" },
 				{ "max(3,2) + 转换为大写(\"abc\")", "3ABC" },
 				{ "c = 1000 + 2000", "3000" },
