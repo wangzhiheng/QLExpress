@@ -409,7 +409,7 @@ class OperatorMethod extends OperatorBase {
 			String msg = "对象为空，不能执行方法:";
 			throw new Exception(msg + this.methodName);
 		} else {
-			Class[] types = new Class[list.length - 1];
+			Class<?>[] types = new Class[list.length - 1];
 			Object[] objs = new Object[list.length - 1];
 			Object tmpObj;
 			for (int i = 0; i < types.length; i++) {
