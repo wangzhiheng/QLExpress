@@ -52,12 +52,6 @@ public class ExpressUtil {
 			{int.class,short.class},   {int.class,byte.class},
 			{short.class,byte.class},
 			//---------
-			{byte.class,Byte.class},{Byte.class,byte.class},
-			{short.class,Short.class},{Short.class,short.class},
-			{int.class,Integer.class},{Integer.class,int.class},
-			{long.class,Long.class},{Long.class,long.class},
-			{float.class,Float.class},{Float.class,float.class},
-			{double.class,Double.class},{Double.class,double.class},
 			{char.class,Character.class},{Character.class,char.class},
 			{boolean.class,Boolean.class},{Boolean.class,boolean.class}
 	};	
