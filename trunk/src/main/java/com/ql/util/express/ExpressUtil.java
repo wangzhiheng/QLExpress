@@ -44,6 +44,24 @@ public class ExpressUtil {
 	public static final String DT_char = "char";
 	public static final String DT_boolean = "boolean";
 
+	public static Class<?>[][] classMatchs =new Class[][]{
+			//原始数据类型
+			{double.class,float.class},{double.class,long.class},{double.class,int.class}, {double.class,short.class},{double.class,byte.class},
+			{float.class,long.class},  {float.class,int.class},  {float.class,short.class},{float.class,byte.class},
+			{long.class,int.class},    {long.class,short.class}, {long.class,byte.class},
+			{int.class,short.class},   {int.class,byte.class},
+			{short.class,byte.class},
+			//---------
+			{byte.class,Byte.class},{Byte.class,byte.class},
+			{short.class,Short.class},{Short.class,short.class},
+			{int.class,Integer.class},{Integer.class,int.class},
+			{long.class,Long.class},{Long.class,long.class},
+			{float.class,Float.class},{Float.class,float.class},
+			{double.class,Double.class},{Double.class,double.class},
+			{char.class,Character.class},{Character.class,char.class},
+			{boolean.class,Boolean.class},{Boolean.class,boolean.class}
+	};	
+	
 	public static Class getSimpleDataType(Class aClass) {
 		if (Integer.class.equals(aClass))
 			return Integer.TYPE;
@@ -64,7 +82,59 @@ public class ExpressUtil {
 		return aClass;
 	}
 
-	public static boolean isAssignable(Class lhsType, Class rhsType) {
+	public static boolean isAssignable(Class<?> lhsType, Class<?> rhsType) {
+		if (lhsType == rhsType)
+			return true;
+
+		if (lhsType == null)
+			return false;
+		if (rhsType == null)//null转换
+			return !lhsType.isPrimitive();
+		
+		if (lhsType.isAssignableFrom(rhsType) == true){
+			return true;
+		}
+		if (lhsType.isPrimitive() == false) {
+			if (lhsType == Byte.class)
+				lhsType = byte.class;
+			else if (lhsType == Short.class)
+				lhsType = short.class;
+			else if (lhsType == Integer.class)
+				lhsType = int.class;
+			else if (lhsType == Long.class)
+				lhsType = long.class;
+			else if (lhsType == Float.class)
+				lhsType = float.class;
+			else if (lhsType == Double.class)
+				lhsType = double.class;
+		}
+		if (rhsType.isPrimitive() == false) {
+			if (rhsType == Byte.class)
+				rhsType = byte.class;
+			else if (rhsType == Short.class)
+				rhsType = short.class;
+			else if (rhsType == Integer.class)
+				rhsType = int.class;
+			else if (rhsType == Long.class)
+				rhsType = long.class;
+			else if (rhsType == Float.class)
+				rhsType = float.class;
+			else if (rhsType == Double.class)
+				rhsType = double.class;
+		}
+		if (lhsType == rhsType)// 转换后需要在判断一下
+			return true;
+
+		for (int i = 0; i < classMatchs.length; i++) {
+			if (lhsType == classMatchs[i][0] && rhsType == classMatchs[i][1]) {
+				return true;
+			}
+		}
+		
+		return false;
+		
+	}
+	public static boolean isAssignableOld(Class<?> lhsType, Class<?> rhsType) {
 		if (lhsType == null)
 			return false;
 		if (rhsType == null)
@@ -429,5 +499,6 @@ public class ExpressUtil {
 		System.out.println(replaceString("$1强化$2实施$2", new String[] { "qq",
 				"ff" }));
 	}
-
+    
 }
+
