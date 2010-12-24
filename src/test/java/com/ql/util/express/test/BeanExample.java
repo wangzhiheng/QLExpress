@@ -18,10 +18,10 @@ public class BeanExample {
 		name = aName;
 	}
 	public String testLong(long i){		
-		return "toString:" + i;
+		return "toString-long:" + i;
 	}
 	public String testLong(int i){		
-		return "toString:" + i;
+		return "toString-int:" + i;
 	}
 	public String unionName(String otherName) {
 		System.out.println(" execute unionName("+ otherName+ ") .....");
