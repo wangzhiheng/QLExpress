@@ -1279,7 +1279,12 @@ public class ExpressRunner
     {
        c = str.charAt(i);
       if (c=='"' || c=='\''){
-        int index = str.indexOf(c,i + 1);
+        
+    	int index = str.indexOf(c,i + 1);
+    	//处理字符串中的”问题
+        while(index >0 && str.charAt(index - 1) =='\\'){
+        	index = str.indexOf(c,index + 1);
+        }
         if (index < 0)
         	throw new Exception("字符串没有关闭");
         //先将操作符填入队列，再填充操作数
