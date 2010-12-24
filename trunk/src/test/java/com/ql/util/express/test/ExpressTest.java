@@ -82,7 +82,7 @@ public class ExpressTest {
 				{" 1!=1 and isVIP(\"qhlhl2010@gmail.com\")","false"},
 				{" 1==1 or isVIP(\"qhlhl2010@gmail.com\") ","true"},
 				{ "abc == 1", "true" },
-				{ "testLong(abc)", "toString:1" }
+				{ "testLong(abc)", "toString-long:1" }
 				};
 		IExpressContext expressContext = new ExpressContextExample(null);
 		expressContext.put("b", new Integer(200));
