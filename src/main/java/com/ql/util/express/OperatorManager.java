@@ -398,39 +398,11 @@ final class OperatorManager {
      public  static int compareData(Object op1,Object op2) throws Exception{
       int compareResult = -1;
 
-      if(op1 instanceof String)
+      if(op1 instanceof String){
          compareResult = ((String)op1).compareTo(op2.toString());
-      else if(op1 instanceof Long){
-      	if(op2 instanceof Number){
-      		compareResult = ((Long)op1).compareTo(Long.valueOf(((Number)op2).longValue()));
-      	}
-      	else{
-      	  compareResult = ((Long)op1).compareTo(Long.valueOf(op2.toString()));
-      	}
-      }
-      else if(op1 instanceof Integer){
-      	if(op2 instanceof Number){
-      		compareResult = ((Integer)op1).compareTo(Integer.valueOf(((Number)op2).intValue()));
-      	}
-      	else{
-      	  compareResult = ((Integer)op1).compareTo(Integer.valueOf(op2.toString()));
-      	}
-      }
-      else if(op1 instanceof Double){
-      	if(op2 instanceof Number){
-      		compareResult = ((Double)op1).compareTo(Double.valueOf(((Number)op2).doubleValue()));
-      	}
-      	else{
-      	  compareResult = ((Double)op1).compareTo(Double.valueOf(op2.toString()));
-      	}
-      }
-      else if(op1 instanceof Float){
-      	if(op2 instanceof Number){
-      		compareResult = ((Float)op1).compareTo(new Float(((Number)op2).floatValue()));
-      	}
-      	else{
-      	  compareResult = ((Float)op1).compareTo(Float.valueOf(op2.toString()));
-      	}
+      }else if(op1 instanceof Number && op2 instanceof Number){
+    	  //Êý×Ö±È½Ï
+    	  compareResult =  OperatorOfNumber.compareNumber((Number)op1, (Number)op2);
       }
       else if ((op1 instanceof Boolean) && (op2 instanceof Boolean))
       {

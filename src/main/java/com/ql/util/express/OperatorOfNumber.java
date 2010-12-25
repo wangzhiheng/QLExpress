@@ -25,7 +25,55 @@ public class OperatorOfNumber {
 		System.out.println(o.getClass() + ":" + o);
 		
 	}
-	
+	public static int compareNumber(Number op1, Number op2){
+		int type1 = getSeq(op1.getClass());
+		int type2 = getSeq(op2.getClass());
+		int type = type1 >  type2 ? type1:type2;
+		if(type == 1)  {
+			byte o1 =	((Number)op1).byteValue();
+			byte o2 =  ((Number)op2).byteValue();
+			if(o1 == o2) return 0;
+			if(o1 < o2) return -1;
+			return 1;
+		}
+		if(type == 2) {
+			short o1 =	((Number)op1).shortValue();
+			short o2 =  ((Number)op2).shortValue();
+			if(o1 == o2) return 0;
+			if(o1 < o2) return -1;
+			return 1;
+		}
+		if(type == 3) {
+			int o1 =	((Number)op1).intValue();
+			int o2 =  ((Number)op2).intValue();
+			if(o1 == o2) return 0;
+			if(o1 < o2) return -1;
+			return 1;
+		}
+		if(type == 4) {
+			long o1 =	((Number)op1).longValue();
+			long o2 =  ((Number)op2).longValue();
+			if(o1 == o2) return 0;
+			if(o1 < o2) return -1;
+			return 1;
+		}
+		if(type == 5) {
+			float o1 =	((Number)op1).floatValue();
+			float o2 =  ((Number)op2).floatValue();
+			if(o1 == o2) return 0;
+			if(o1 < o2) return -1;
+			return 1;
+		}
+		if(type == 6){
+			double o1 =	((Number)op1).doubleValue();
+			double o2 =  ((Number)op2).doubleValue();
+			if(o1 == o2) return 0;
+			if(o1 < o2) return -1;
+			return 1;
+		}
+		throw new RuntimeException("±È½Ï²Ù×÷´íÎó:op1=" + op1.toString() +",op2=" + op2.toString());
+
+	}
     public static int getSeq(Class aClass){
     	if(aClass.equals(Byte.class)) return 1;
     	if(aClass.equals(Short.class)) return 2;
