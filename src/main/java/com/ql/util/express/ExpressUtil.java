@@ -489,10 +489,30 @@ public class ExpressUtil {
 		}
 	}
 
-	public static void main(String[] args) throws Exception {
-		System.out.println(replaceString("$1强化$2实施$2", new String[] { "qq",
-				"ff" }));
-	}
-    
+	  public static Object[] transferArray(Object[] values,Class<?>[] types){
+		  Object[] result = new Object[values.length];
+		  for(int i=0;i <result.length;i++){
+			  result[i] = transfer(values[i],types[i]);
+		  }
+		  return result;
+	  }
+	  public static Object transfer(Object value,Class<?> type){
+		     if (value == null) return null;
+		     if(value.getClass() == type || type.isAssignableFrom(value.getClass())){
+		    	 return value;
+		     }
+		     if(value instanceof Number && (type.isPrimitive() || Number.class.isAssignableFrom(type))){
+		    	 return OperatorOfNumber.transfer((Number)value, type);
+		     }
+		     return value;
+		   }    
+
+		public static void main(String[] args) throws Exception {
+			System.out.println(replaceString("$1强化$2实施$2", new String[] { "qq",
+					"ff" }));
+			System.out.println(Number.class.isAssignableFrom(Long.class));
+			Object obj = transfer(Double.valueOf(1d),Double.class);
+			System.out.println(obj +":" + obj.getClass());
+		}   
 }
 

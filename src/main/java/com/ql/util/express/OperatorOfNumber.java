@@ -25,6 +25,28 @@ public class OperatorOfNumber {
 		System.out.println(o.getClass() + ":" + o);
 		
 	}
+	/**
+	 * 进行数据类型转换
+	 * @param value
+	 * @param type
+	 * @return
+	 */
+	public static Object transfer(Number value,Class<?> type){
+		int type1 = getSeq(value.getClass());
+		int type2 = getSeq(type);
+		if(type1 == type2){
+			return value;
+		}
+		if(type1 < type2){
+			if(type2 == 1) return new Byte(value.byteValue()); 
+			if(type2 == 2) return new Short(value.shortValue()); 
+			if(type2 == 3) return new Integer(value.intValue()); 
+			if(type2 == 4) return new Long(value.longValue()); 
+			if(type2 == 5) return new Float(value.floatValue()); 
+			if(type2 == 6) return new Double(value.doubleValue()); 
+		}
+       throw new RuntimeException(value.getClass().getName() +" 不能转化为类型：" + type.getName());
+	}
 	public static int compareNumber(Number op1, Number op2){
 		int type1 = getSeq(op1.getClass());
 		int type2 = getSeq(op2.getClass());
@@ -75,12 +97,12 @@ public class OperatorOfNumber {
 
 	}
     public static int getSeq(Class aClass){
-    	if(aClass.equals(Byte.class)) return 1;
-    	if(aClass.equals(Short.class)) return 2;
-    	if(aClass.equals(Integer.class)) return 3;
-    	if(aClass.equals(Long.class)) return 4;
-    	if(aClass.equals(Float.class)) return 5;
-    	if(aClass.equals(Double.class)) return 6;
+    	if(aClass == Byte.class || aClass == byte.class) return 1;
+    	if(aClass == Short.class || aClass == byte.class) return 2;
+    	if(aClass == Integer.class || aClass == int.class) return 3;
+    	if(aClass == Long.class || aClass == long.class) return 4;
+    	if(aClass == Float.class || aClass == float.class) return 5;
+    	if(aClass == Double.class || aClass == double.class) return 6;
          return -1;
     }
 	public static final class Add {

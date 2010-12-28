@@ -350,6 +350,10 @@ public class ExpressRunner
                (name.charAt(0) == '.') || name.charAt(0)=='-') { //Êý×Ö       	
        if (name.endsWith("L") || name.endsWith("l")) {//long
          list.add(new OperateData(new Long(name.substring(0,name.length() - 1)), Long.TYPE));
+       }else if (name.endsWith("f") || name.endsWith("F")) {//long
+           list.add(new OperateData(new Float(name.substring(0,name.length() - 1)), Float.TYPE));
+       }else if (name.endsWith("d") || name.endsWith("D")) {//long
+             list.add(new OperateData(new Double(name.substring(0,name.length() - 1)), Double.TYPE));
        }else {
          boolean isFind = false;
          for (int i = 0; i < name.length(); i++){
