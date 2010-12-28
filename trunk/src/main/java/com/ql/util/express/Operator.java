@@ -440,9 +440,9 @@ class OperatorMethod extends OperatorBase {
 			}
 
 			if (list[0] instanceof OperateClass) {// 调用静态方法
-				tmpObj = m.invoke(null, objs);
+				tmpObj = m.invoke(null,ExpressUtil.transferArray(objs,m.getParameterTypes()));
 			} else {
-				tmpObj = m.invoke(obj, objs);
+				tmpObj = m.invoke(obj, ExpressUtil.transferArray(objs,m.getParameterTypes()));
 			}
 			return new OperateData(tmpObj, m.getReturnType());
 		}
