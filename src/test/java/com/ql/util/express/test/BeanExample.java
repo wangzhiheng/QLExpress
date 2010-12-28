@@ -17,10 +17,13 @@ public class BeanExample {
 	public BeanExample(String aName) {
 		name = aName;
 	}
+	public String testLongObject(Long i){		
+		return "toString-LongObject:" + i;
+	}
 	public String testLong(long i){		
 		return "toString-long:" + i;
 	}
-	public String testLong(int i){		
+	public String testInt(int i){		
 		return "toString-int:" + i;
 	}
 	public String unionName(String otherName) {
