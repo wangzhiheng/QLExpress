@@ -56,7 +56,7 @@ class SelfDefineClassFunctionOperator extends OperatorBase{
       if( Modifier.isStatic(this.method.getModifiers())){
          obj = this.method.invoke(null,parameres);
       }else{
-    	 obj = this.method.invoke(this.operClass.newInstance(),parameres);
+    	 obj = this.method.invoke(this.operClass.newInstance(),ExpressUtil.transferArray(parameres,parameterClasses));
       }
 
       if(obj != null){
@@ -121,7 +121,7 @@ class SelfDefineServiceFunctionOperator extends OperatorBase{
         parameres[i] = list[i].getObject(context);
       }
 
-      Object obj = this.method.invoke(this.serviceObject,parameres);
+      Object obj = this.method.invoke(this.serviceObject,ExpressUtil.transferArray(parameres,parameterClasses));
       if(obj != null){
          return new OperateData(obj,obj.getClass());
       }
