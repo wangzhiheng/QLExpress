@@ -3,7 +3,6 @@ package com.ql.util.express.test;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.ql.util.express.DefaultContext;
 import com.ql.util.express.ExpressRunner;
 
 public class HTMLTest {

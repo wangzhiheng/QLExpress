@@ -1,7 +1,5 @@
 package com.ql.util.express.test;
 
-import java.lang.reflect.Array;
-
 import org.junit.Assert;
 import org.junit.Test;
 

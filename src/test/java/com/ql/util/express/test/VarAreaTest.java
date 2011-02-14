@@ -11,7 +11,7 @@ public class VarAreaTest {
 		String express =
 				" qh = 1; " +
 				"如果 ( 如果 true 则 false 否则 true)  则 {" +
-				"  3 + {3} + {4 + 1}" +
+				"  3 + (3) + (4 + 1)" +
 				" }否则{" +
 				" qh = 3;" +
 				" qh = qh + 100;" +
@@ -33,9 +33,9 @@ public class VarAreaTest {
 		String express =
 				" qh = 1; " +
 				"如果 ( 如果 true 则 false 否则 true)  则 {" +
-				"  3 + {3} + {4 + 1}" +
+				"  3 + (3) + (4 + 1)" +
 				" }否则{" +
-				" def int qh = 3;" +
+				" int qh = 3;" +
 				" qh = qh + 100;" +
 				"}; " +
 				"qh = qh + 1;";

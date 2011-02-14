@@ -1,13 +1,10 @@
 package com.ql.util.express.test;
 
-import org.apache.commons.logging.Log;
 import org.junit.Assert;
 import org.junit.Test;
 
 import com.ql.util.express.DefaultContext;
-import com.ql.util.express.ExpressLoader;
 import com.ql.util.express.ExpressRunner;
-import com.ql.util.express.InstructionSet;
 
 public class ExportDefine {
 

@@ -49,7 +49,6 @@ public class RunExample implements ApplicationContextAware, Runnable {
 	public void run() {
 		run(10000);
 	}
-	@SuppressWarnings("unchecked")
 	public void run(int num) {
 		long start = System.currentTimeMillis();
 		try {
@@ -73,7 +72,7 @@ public class RunExample implements ApplicationContextAware, Runnable {
 						{" 1!=1 and 2==2 and 1 == 2","false"},
 						{" 80 > \"300\"","true"}
 						};
-				IExpressContext expressContext = new ExpressContextExample(	this.applicationContext);
+				IExpressContext<String,Object> expressContext = new ExpressContextExample(	this.applicationContext);
 				expressContext.put("a", j);
 				expressContext.put("b", new Integer(200));
 				expressContext.put("c", new Integer(300));
@@ -82,7 +81,7 @@ public class RunExample implements ApplicationContextAware, Runnable {
 				for (int point = 0; point < expressTest.length; point++) {
 					String s = expressTest[point][0];
 					// 批量处理的时候可以先预处理，会加快执行效率
-					List errorList = new ArrayList();
+					List<String> errorList = new ArrayList<String>();
 					 Object result = runner.execute(s,expressContext, null, false,false);
 					if (expressTest[point][1].equalsIgnoreCase("null")
 							&& result != null

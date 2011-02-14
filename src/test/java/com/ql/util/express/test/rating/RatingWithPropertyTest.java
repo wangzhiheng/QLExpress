@@ -21,7 +21,6 @@ public class RatingWithPropertyTest {
 		Map logisticsOrder = new HashMap();
 		Map tcOrder = new HashMap();
 		Map goodsOrder = new HashMap();
-		Map subjectValue = new HashMap();
 		//设置物流订单信息
 		logisticsOrder.put("重量",4);
 		logisticsOrder.put("仓储TPID","玄难");
@@ -47,7 +46,7 @@ public class RatingWithPropertyTest {
 				loader.getInstructionSet("ratingWithProperty")
 		};
 		//执行指令
-		Object r = runner.execute(sets, loader, context, null, null, false,false,null);
+		runner.execute(sets, loader, context, null, null, false,false,null);
 		//输出分成结果
 		System.out.println("----------分成结果----------------");
 		for(Object item : subjectMananger.getSubjectValues()){
