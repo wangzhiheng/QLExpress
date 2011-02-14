@@ -3,6 +3,8 @@ package com.ql.util.express;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.ql.util.express.instruction.OperateDataAttr;
+
 @SuppressWarnings("serial")
 public class InstructionSetContext<K,V> extends HashMap<K,V> implements IExpressContext<K,V> {
 	 private FuncitonCacheManager functionCachManager;
@@ -42,7 +44,7 @@ public class InstructionSetContext<K,V> extends HashMap<K,V> implements IExpress
 
 	public void exportSymbol(String varName,Object aliasNameObject) throws Exception{
 		if( this.parent != null && this.parent instanceof InstructionSetContext){
-			((InstructionSetContext)this.parent).exportSymbol(varName, aliasNameObject);
+			((InstructionSetContext<K,V>)this.parent).exportSymbol(varName, aliasNameObject);
 		}else{
 		    this.addSymbol(varName, aliasNameObject);
 		}
@@ -63,7 +65,7 @@ public class InstructionSetContext<K,V> extends HashMap<K,V> implements IExpress
 		}
 		if(result == null){
 			if( this.parent != null && this.parent instanceof InstructionSetContext){
-			    result = ((InstructionSetContext)this.parent).findAliasOrDefSymbol(varName);
+			    result = ((InstructionSetContext<K,V>)this.parent).findAliasOrDefSymbol(varName);
 			}else{
 			    result = null;
 			}
@@ -80,7 +82,7 @@ public class InstructionSetContext<K,V> extends HashMap<K,V> implements IExpress
 		}
 		if(result == null){
 			if( this.parent != null && this.parent instanceof InstructionSetContext){
-			    result = ((InstructionSetContext)this.parent).getSymbol(varName);
+			    result = ((InstructionSetContext<K,V>)this.parent).getSymbol(varName);
 			}else{
 			    result = new OperateDataAttr(varName,null);
 			    this.addSymbol(varName, result);

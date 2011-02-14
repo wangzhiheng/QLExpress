@@ -4,9 +4,11 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+
+import com.ql.util.express.instruction.FunctionInstructionSet;
+
 
 /**
  * 表达式装载器
@@ -16,9 +18,9 @@ import java.util.TreeMap;
  */
 public class ExpressLoader {
 	private Map<String, InstructionSet> expressInstructionSetCache = new HashMap<String, InstructionSet>();
-	ExpressRunner runner;
-	public ExpressLoader(ExpressRunner aRunner){
-		this.runner = aRunner;
+	ExpressRunner creator;
+	public ExpressLoader(ExpressRunner aCreator){
+		this.creator = aCreator;
 	}
 	private String loadFromFile(String fileName) throws Exception{
 		fileName = fileName.replace('.', '/') +".ql";
@@ -59,7 +61,7 @@ public class ExpressLoader {
 			throw new Exception("表达是定义重复：" + expressName);
 		}
 		synchronized (expressInstructionSetCache) {
-			parseResult = this.runner.parseInstructionSet(expressString);
+			parseResult = this.creator.parseInstructionSet(expressString);
 			parseResult.setName(expressName);
 			parseResult.setGlobeName(expressName);
 			// 需要将函数和宏定义都提取出来
@@ -90,7 +92,7 @@ public class ExpressLoader {
 				var.setGlobeName(item.getGlobeName() + "." + var.name);
 				result.put(var.getGlobeName(),var);
 			}
-			result.put(item.getGlobeName(),new ExportItem(item.getGlobeName(), item.getName(),item.getType(),item.toResource()));
+			result.put(item.getGlobeName(),new ExportItem(item.getGlobeName(), item.getName(),item.getType(),item.toString()));
 		}
 		return (ExportItem[])result.values().toArray(new ExportItem[0]);
 	}
