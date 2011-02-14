@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.beanutils.PropertyUtils;
 
+
 /**
  * 表达式工具类
  * 
@@ -56,7 +57,7 @@ public class ExpressUtil {
 			{boolean.class,Boolean.class},{Boolean.class,boolean.class}
 	};	
 	
-	public static Class getSimpleDataType(Class aClass) {
+	public static Class<?> getSimpleDataType(Class<?> aClass) {
 		if (Integer.class.equals(aClass))
 			return Integer.TYPE;
 		if (Short.class.equals(aClass))
@@ -169,20 +170,20 @@ public class ExpressUtil {
 		return false;
 	}
 
-	public static boolean isSignatureAssignable(Class[] from, Class[] to) {
+	public static boolean isSignatureAssignable(Class<?>[] from, Class<?>[] to) {
 		for (int i = 0; i < from.length; i++)
 			if (!isAssignable(to[i], from[i]))
 				return false;
 		return true;
 	}
 
-	public static int findMostSpecificSignature(Class[] idealMatch,
-			Class[][] candidates) {
-		Class[] bestMatch = null;
+	public static int findMostSpecificSignature(Class<?>[] idealMatch,
+			Class<?>[][] candidates) {
+		Class<?>[] bestMatch = null;
 		int bestMatchIndex = -1;
 
 		for (int i = candidates.length - 1; i >= 0; i--) {// 先从基类开始查找 墙辉
-			Class[] targetMatch = candidates[i];
+			Class<?>[] targetMatch = candidates[i];
 			if (ExpressUtil.isSignatureAssignable(idealMatch, targetMatch)
 					&& ((bestMatch == null) || ExpressUtil
 							.isSignatureAssignable(targetMatch, bestMatch))) {
@@ -197,10 +198,10 @@ public class ExpressUtil {
 			return -1;
 	}
 
-	public static Method findMethod(Class baseClass, String methodName,
-			Class[] types, boolean publicOnly, boolean isStatic) {
+	public static Method findMethod(Class<?> baseClass, String methodName,
+			Class<?>[] types, boolean publicOnly, boolean isStatic) {
 
-		Vector candidates = gatherMethodsRecursive(baseClass, methodName,
+		Vector<Method> candidates = gatherMethodsRecursive(baseClass, methodName,
 				types.length, publicOnly, isStatic, null /* candidates */);
 		Method method = findMostSpecificMethod(types, (Method[]) candidates
 				.toArray(new Method[0]));
@@ -208,10 +209,10 @@ public class ExpressUtil {
 		return method;
 	}
 
-	public static Constructor findConstructor(Class baseClass, Class[] types) {
-		Constructor[] constructors = baseClass.getConstructors();
-		List listClass = new ArrayList();
-		List<Constructor> constructorList = new ArrayList();
+	public static Constructor<?> findConstructor(Class<?> baseClass, Class<?>[] types) {
+		Constructor<?>[] constructors = baseClass.getConstructors();
+		List<Constructor<?>> constructorList = new ArrayList<Constructor<?>>();
+		List<Class<?>[]> listClass = new ArrayList<Class<?>[]>();
 		for (int i = 0; i < constructors.length; i++) {
 			if (constructors[i].getParameterTypes().length == types.length) {
 				listClass.add(constructors[i].getParameterTypes());
@@ -224,9 +225,9 @@ public class ExpressUtil {
 		return match == -1 ? null : constructorList.get(match);
 	}
 
-	public static Method findMostSpecificMethod(Class[] idealMatch,
+	public static Method findMostSpecificMethod(Class<?>[] idealMatch,
 			Method[] methods) {
-		Class[][] candidateSigs = new Class[methods.length][];
+		Class<?>[][] candidateSigs = new Class[methods.length][];
 		for (int i = 0; i < methods.length; i++)
 			candidateSigs[i] = methods[i].getParameterTypes();
 
@@ -235,21 +236,21 @@ public class ExpressUtil {
 
 	}
 
-	private static Vector gatherMethodsRecursive(Class baseClass,
+	private static Vector<Method> gatherMethodsRecursive(Class<?> baseClass,
 			String methodName, int numArgs, boolean publicOnly,
-			boolean isStatic, Vector candidates) {
+			boolean isStatic, Vector<Method> candidates) {
 		if (candidates == null)
-			candidates = new Vector();
+			candidates = new Vector<Method>();
 
 		addCandidates(baseClass.getDeclaredMethods(), methodName, numArgs,
 				publicOnly, isStatic, candidates);
 
-		Class[] intfs = baseClass.getInterfaces();
+		Class<?>[] intfs = baseClass.getInterfaces();
 		for (int i = 0; i < intfs.length; i++)
 			gatherMethodsRecursive(intfs[i], methodName, numArgs, publicOnly,
 					isStatic, candidates);
 
-		Class superclass = baseClass.getSuperclass();
+		Class<?> superclass = baseClass.getSuperclass();
 		if (superclass != null)
 			gatherMethodsRecursive(superclass, methodName, numArgs, publicOnly,
 					isStatic, candidates);
@@ -257,8 +258,8 @@ public class ExpressUtil {
 		return candidates;
 	}
 
-	private static Vector addCandidates(Method[] methods, String methodName,
-			int numArgs, boolean publicOnly, boolean isStatic, Vector candidates) {
+	private static Vector<Method> addCandidates(Method[] methods, String methodName,
+			int numArgs, boolean publicOnly, boolean isStatic, Vector<Method> candidates) {
 		for (int i = 0; i < methods.length; i++) {
 			Method m = methods[i];
 			if (m.getName().equals(methodName)
@@ -270,7 +271,7 @@ public class ExpressUtil {
 		return candidates;
 	}
 
-	public static boolean isPublic(Class c) {
+	public static boolean isPublic(Class<?> c) {
 		return Modifier.isPublic(c.getModifiers());
 	}
 
@@ -282,7 +283,7 @@ public class ExpressUtil {
 		return Modifier.isStatic(m.getModifiers());
 	}
 
-	public static Class getJavaClass(String type) {
+	public static Class<?> getJavaClass(String type) {
 		int index = type.indexOf("[]");
 		if (index < 0)
 			return getJavaClassInner(type);
@@ -293,7 +294,7 @@ public class ExpressUtil {
 		while ((index = type.indexOf("[]", index + 2)) >= 0) {
 			arrayString.append("[");
 		}
-		Class baseClass = getJavaClassInner(baseType);
+		Class<?> baseClass = getJavaClassInner(baseType);
 
 		try {
 			String baseName = "";
@@ -326,7 +327,7 @@ public class ExpressUtil {
 
 	}
 
-	public static Class getJavaClassInner(String type) {
+	public static Class<?> getJavaClassInner(String type) {
 
 		if (type.equals(DT_STRING))
 			return String.class;
@@ -377,7 +378,7 @@ public class ExpressUtil {
 		}
 	}
 
-	public static String getClassName(Class className) {
+	public static String getClassName(Class<?> className) {
 		String name = className.getName();
 		return getClassName(name);
 	}
@@ -417,7 +418,7 @@ public class ExpressUtil {
 		name = name + arrays;
 		return name;
 	}
-	public static Class loadClass(String name) throws ClassNotFoundException {
+	public static Class<?> loadClass(String name) throws ClassNotFoundException {
 		return Class.forName(name);
 	}
 
@@ -452,11 +453,13 @@ public class ExpressUtil {
 
 	public static Object getProperty(Object bean, Object name) {
 		try {
-			if (bean instanceof Class) {
-				Field f = ((Class) bean).getDeclaredField(name.toString());
+			if(bean.getClass().isArray() && name.equals("length")){
+			   return ((Object[])bean).length;
+			}else if (bean instanceof Class) {
+				Field f = ((Class<?>) bean).getDeclaredField(name.toString());
 				return f.get(null);
 			}else if(bean instanceof Map ){
-				return ((Map)bean).get(name);
+				return ((Map<?,?>)bean).get(name);
 		    }else {
 				Object obj = PropertyUtils.getProperty(bean, name.toString());
 				return obj;
@@ -469,10 +472,10 @@ public class ExpressUtil {
 	public static void setProperty(Object bean, Object name, Object value) {
 		try {
 			if (bean instanceof Class) {
-				Field f = ((Class) bean).getDeclaredField(name.toString());
+				Field f = ((Class<?>) bean).getDeclaredField(name.toString());
 				f.set(null, value);
 			}else if(bean instanceof Map ){
-				((Map)bean).put(name, value);
+				((Map<Object,Object>)bean).put(name, value);
 		    } else {
 				PropertyUtils.setProperty(bean, name.toString(), value);
 			}
@@ -481,7 +484,7 @@ public class ExpressUtil {
 		}
 	}
 
-	public static Class getPropertyType(Object bean, String name) {
+	public static Class<?> getPropertyType(Object bean, String name) {
 		try {
 			return PropertyUtils.getPropertyType(bean, name);
 		} catch (Exception e) {
@@ -506,7 +509,23 @@ public class ExpressUtil {
 		     }
 		     return value;
 		   }    
+	  public static Object castObject(Object value,Class<?> type) throws Exception{
+		     if (value == null) return null;
+		     if(value.getClass() == type || type.isAssignableFrom(value.getClass())){
+		    	 return value;
+		     }
+		     if(value instanceof Number && (type.isPrimitive() || Number.class.isAssignableFrom(type))){
+					if(type.equals(byte.class)  || type.equals(Byte.class) ) return ((Number)value).byteValue(); 
+					if(type.equals(short.class)  || type.equals(Short.class) ) return ((Number)value).shortValue(); 
+					if(type.equals(int.class)  || type.equals(Integer.class) ) return ((Number)value).intValue(); 
+					if(type.equals(long.class)  || type.equals(Long.class) ) return ((Number)value).longValue(); 
+					if(type.equals(float.class)  || type.equals(Float.class) ) return ((Number)value).floatValue(); 
+					if(type.equals(double.class)  || type.equals(Double.class) ) return ((Number)value).doubleValue(); 
+		     }
+		     return value;
+		   }    
 
+	  
 		public static void main(String[] args) throws Exception {
 			System.out.println(replaceString("$1强化$2实施$2", new String[] { "qq",
 					"ff" }));

@@ -96,7 +96,7 @@ public class OperatorOfNumber {
 		throw new RuntimeException("±È½Ï²Ù×÷´íÎó:op1=" + op1.toString() +",op2=" + op2.toString());
 
 	}
-    public static int getSeq(Class aClass){
+    public static int getSeq(Class<?> aClass){
     	if(aClass == Byte.class || aClass == byte.class) return 1;
     	if(aClass == Short.class || aClass == byte.class) return 2;
     	if(aClass == Integer.class || aClass == int.class) return 3;

@@ -1,7 +1,5 @@
 package com.ql.util.express;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -54,7 +52,7 @@ public class FuncitonCacheManager {
 	public void clearCache(){
 		functionCallCache.clear();
 	}
-	public Map getCacheData(){
+	public Map<?,?> getCacheData(){
 		return this.functionCallCache;
 	}
 }
