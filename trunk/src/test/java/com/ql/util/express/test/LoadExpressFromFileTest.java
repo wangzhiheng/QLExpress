@@ -1,7 +1,5 @@
 package com.ql.util.express.test;
 
-import java.util.List;
-
 import org.apache.commons.logging.Log;
 import org.junit.Test;
 

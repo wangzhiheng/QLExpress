@@ -5,7 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@SuppressWarnings({ "serial", "rawtypes" })
 public class SubjectMananger  extends HashMap {
+	@SuppressWarnings("unchecked")
 	public Object get(Object userName){
 		UserSubject userSubject = (UserSubject)super.get(userName);
 		if(userSubject == null){
@@ -18,7 +20,7 @@ public class SubjectMananger  extends HashMap {
 		throw new RuntimeException("不运行的方法");
 	}
 	public List<SubjectValue> getSubjectValues(){
-		List result = new ArrayList<SubjectValue>();
+		List<SubjectValue> result = new ArrayList<SubjectValue>();
 		for(Object f : this.values()){
 		  UserSubject item = (UserSubject)f;
 		  for(Object t : item.entrySet()){
@@ -34,6 +36,7 @@ public class SubjectMananger  extends HashMap {
 	}
 }
 
+@SuppressWarnings({ "serial", "rawtypes" })
 class UserSubject extends HashMap {
 	Object userId;
 	public UserSubject(Object aUserId){
@@ -47,6 +50,7 @@ class UserSubject extends HashMap {
 		}
 		return value;
 	}
+	@SuppressWarnings("unchecked")
 	public Object  put(String subjectId, Object value){
 		return super.put(subjectId, value);
 	}

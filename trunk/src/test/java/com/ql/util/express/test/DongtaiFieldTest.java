@@ -19,9 +19,9 @@ public class DongtaiFieldTest {
 		
 		ExpressRunner runner = new ExpressRunner(true);
 		DefaultContext<String, Object> context = new DefaultContext<String, Object>();
-		Map fee = new HashMap();
+		Map<String,Object> fee = new HashMap<String,Object>();
 		context.put("费用",fee);
-		Object r = runner.execute(express, context, null, false, true);
+		runner.execute(express, context, null, false, true);
 		System.out.println(context.get("费用"));
 		Assert.assertTrue("动态属性错误",fee.get("张三").toString().equals("100"));
 		Assert.assertTrue("动态属性错误",fee.get("李四").toString().equals("200"));

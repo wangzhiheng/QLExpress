@@ -13,17 +13,16 @@ public class TestMap {
 
 	@Test
 	public void testmain() throws Exception {
-		IExpressContext expressContext = new IExpressContext() {
-			Map map = new HashMap<Object, Object>();
-
+		IExpressContext<String,Object> expressContext = new IExpressContext<String,Object> () {
+			Map<String, Object> map = new HashMap<String, Object>();
+			public Object put(String name, Object object) {
+				return map.put(name, object);
+			}
 			public Object get(Object key) {
 				return map.get(key);
 			}
-
-			public Object put(Object name, Object object) {
-				return map.put(name, object);
-			}
 		};
+		
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("key1", 1);
 		expressContext.put("map", map);

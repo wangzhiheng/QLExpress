@@ -21,7 +21,7 @@ class SujectOperator extends Operator {
 	}
 
 	@SuppressWarnings("rawtypes")
-	public OperateData executeInner(InstructionSetContext context,
+	public OperateData executeInner(InstructionSetContext<String,Object> context,
 			OperateData[] list) throws Exception {
 		if (list.length != 2) {
 			throw new Exception("科目操作的参数必须包括：科目主体ID和科目名称");
@@ -40,7 +40,7 @@ class SujectOperator extends Operator {
 		 throw new Exception("不需要实现的方法");
 	}
 }
-
+@SuppressWarnings("rawtypes")
 class OperateDataSubject extends OperateData{
 	Object userId  ;
 	Object subjectId ;
@@ -52,7 +52,7 @@ class OperateDataSubject extends OperateData{
 	 this.subjectId = aSubjectId;
 	 this.container = aContainer;
    }
-   protected Object getObjectInner(InstructionSetContext context){
+   public Object getObjectInner(InstructionSetContext<String,Object> context){
 		String key = this.userId + "-" + this.subjectId;
 		SubjectValue subject = (SubjectValue) container.get(key);
 		if (subject == null) {
@@ -61,7 +61,8 @@ class OperateDataSubject extends OperateData{
 			return subject.value;
 		}
    }
-   public void setObject(InstructionSetContext parent, Object value) {
+   @SuppressWarnings("unchecked")
+public void setObject(InstructionSetContext<String,Object> parent, Object value) {
 	   String key  = this.userId +"-" + this.subjectId;
 	   SubjectValue subject = (SubjectValue)container.get(key);
 	   if(subject == null){

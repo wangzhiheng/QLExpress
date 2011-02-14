@@ -13,7 +13,9 @@ public class BeanExample {
 	public void setChild(BeanExampleChild child) {
 		this.child = child;
 	}
-
+    public String getName(){
+    	return this.name;
+    }
 	public BeanExample(String aName) {
 		name = aName;
 	}

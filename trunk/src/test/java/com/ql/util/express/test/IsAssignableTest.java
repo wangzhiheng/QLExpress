@@ -24,21 +24,22 @@ public class IsAssignableTest {
    
 		System.out.println(index);
 		
-		String express = "bean.testLong(p)";
-//		ExpressRunner runner = new ExpressRunner(true);
-//		DefaultContext<String, Object> context = new DefaultContext<String, Object>();
-//		context.put("bean",new BeanExample());
-//		context.put("p",100);
-//		
-//		Object r = runner.execute(express, context, null, false, true);
-//		System.out.println(r);
-//		Assert.assertTrue("数据类型转换错误：",r.toString().equalsIgnoreCase("toString-int:100"));
-//		
-//		context = new DefaultContext<String, Object>();
-//		context.put("bean",new BeanExample());
-//		context.put("p",100l);
-//		r = runner.execute(express, context, null, false, true);
-//		Assert.assertTrue("数据类型转换错误：",r.toString().equalsIgnoreCase("toString-long:100"));
+		String express = "bean.testInt(p)";
+		ExpressRunner runner = new ExpressRunner(true);
+		DefaultContext<String, Object> context = new DefaultContext<String, Object>();
+		context.put("bean",new BeanExample());
+		context.put("p",100);
+		
+		Object r = runner.execute(express, context, null, false, true);
+		System.out.println(r);
+		Assert.assertTrue("数据类型转换错误：",r.toString().equalsIgnoreCase("toString-int:100"));
+		
+		context = new DefaultContext<String, Object>();
+		express = "bean.testLong(p)";
+		context.put("bean",new BeanExample());
+		context.put("p",100L);
+		r = runner.execute(express, context, null, false, true);
+		Assert.assertTrue("数据类型转换错误：",r.toString().equalsIgnoreCase("toString-long:100"));
 
 	}
 }

@@ -24,15 +24,15 @@ public class ExpressTest {
 		ExpressRunner runner = new ExpressRunner();
 		String express = "10 * 10 + 1 + 2 * 3 + 5 * 2";
 		int num = 100000;
-		Object r = runner.execute(express,null, null, 	true,false);
+		runner.execute(express,null, null, 	true,false);
 		long start = System.currentTimeMillis();
 		for(int i = 0;i< num;i++){
-			r = runner.execute(express,null, null, true,false);
+			runner.execute(express,null, null, true,false);
 		}
 		System.out.println("执行" + num +"次\""+ express +"\" 耗时："
 				+ (System.currentTimeMillis() - start));
 	}
-	@SuppressWarnings("unchecked")
+
 	@org.junit.Test
 	public void testExpress() throws Exception{
 		ExpressRunner runner = new ExpressRunner();
@@ -59,8 +59,8 @@ public class ExpressTest {
 		String[][] expressTest = new String[][] {
 				{ " cache isVIP(\"qh\") ;  cache isVIP(\"xuannan\"); return cache isVIP(\"qh\") ;", "false" },				
 				{ "如果  三星卖家  则  'a' love 'b'  否则   'b' love 'd' ", "b{a}b" },
-				{"def int defVar = 100; defVar = defVar + 100;", "200"},
-				{"def int a=0; if false then a = 5 else  a=10+1 ; return a ","11"},
+				{"int defVar = 100; defVar = defVar + 100;", "200"},
+				{"int a=0; if false then a = 5 else  a=10+1 ; return a ","11"},
 				{ " 3+ (如果 1==2 则 4 否则 3) +8","14"},
 				{ " 如果  (如果 1==2 则 false 否则 true) 则 {2+2;} 否则 {20 + 20;} ","4"},
 				
@@ -87,7 +87,7 @@ public class ExpressTest {
 				
 				{"sum=0;n=7.3;for(i=0;i<n;i=i+1){sum=sum+i;};sum;","28"}
 				};
-		IExpressContext expressContext = new ExpressContextExample(null);
+		IExpressContext<String,Object> expressContext = new ExpressContextExample(null);
 		expressContext.put("b", new Integer(200));
 		expressContext.put("c", new Integer(300));
 		expressContext.put("d", new Integer(400));
@@ -98,7 +98,7 @@ public class ExpressTest {
 		
 		for (int point = 0; point < expressTest.length; point++) {
 			String expressStr = expressTest[point][0];
-			List errorList = new ArrayList();
+			List<String> errorList = new ArrayList<String>();
 			Object result = runner.execute(expressStr,expressContext, null, false,true);
 			if (expressTest[point][1].equalsIgnoreCase("null")
 					&& result != null
@@ -114,17 +114,4 @@ public class ExpressTest {
 		}
 		System.out.println(expressContext);
 	 }
-	
-	@org.junit.Test
-	public void testReadme() throws Exception{		
-		System.out.println("------------------------------");
-		System.out.println("------------------------------");
-		System.out.println("请阅读   QLExpressReadme.xml");
-		System.out.println("请阅读   QLExpressReadme.xml");
-		System.out.println("请阅读   QLExpressReadme.xml");
-		System.out.println("请阅读   QLExpressReadme.xml");
-		System.out.println("------------------------------");
-		System.out.println("------------------------------");
-	
-	}
 }
