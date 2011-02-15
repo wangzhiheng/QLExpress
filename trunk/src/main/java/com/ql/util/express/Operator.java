@@ -2,6 +2,11 @@ package com.ql.util.express;
 
 import com.ql.util.express.instruction.OperatorBase;
 
+/**
+ * 操作符的基类
+ * @author xuannan
+ *
+ */
 public abstract class Operator extends  OperatorBase{
 	
 	public OperateData executeInner(InstructionSetContext<String,Object> context, OperateData[] list) throws Exception{

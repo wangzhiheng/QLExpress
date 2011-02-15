@@ -40,8 +40,7 @@ public class ExpressLoader {
 	public InstructionSet loadExpressFromFile(
 			String fileName)
 			throws Exception {
-		return parseInstructionSet(fileName,loadFromFile(fileName));
-		
+		return parseInstructionSet(fileName,loadFromFile(fileName));		
 	}
 
 	public void addInstructionSet(String expressName, InstructionSet set)

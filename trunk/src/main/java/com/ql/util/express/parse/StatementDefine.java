@@ -60,7 +60,7 @@ class StatementDefine{
 		String[] words = WordSplit.parse(manager, condition);
 		log.debug("执行的表达式:" + condition);
 		log.debug("单词分解结果:" + WordSplit.getPrintInfo(words, ","));
-		List<ExpressNode> tempList = parse.transferWord2ExpressNode(words);
+		List<ExpressNode> tempList = parse.transferWord2ExpressNode(null,words);
 		log.debug("单词分析结果:" + ExpressParse.printInfo(tempList, ","));
 		ExpressNode root = parse.splitExpressBlock(tempList);
 		ExpressParse.printTreeNode(root, 1);
@@ -92,7 +92,7 @@ class StatementDefine{
 		
 	}
 	public MatchResult findMatchStatement(NodeTypeManager aManager,List<ExpressNode> nodes,int point) throws Exception{
-		MatchResult result = new StatementDefine(aManager,this).findMatchStatementWithAddRoot(nodes,point);
+		MatchResult result = this.findMatchStatementWithAddRoot(nodes,point);
 		if(result != null && result.matchs.size() != 1){
 			throw new Exception("语法定义错误，必须有一个根节点：" + this);
 		}
@@ -102,7 +102,7 @@ class StatementDefine{
 		MatchResult result = this.findMatchStatementPrivate(nodes, point);
 		if(result != null && result.matchs.size() >0 && this.rootNodeType != null){
 			MatchResultTree tempTree = new MatchResultTree(this.rootNodeType,new ExpressNode(this.rootNodeType,null));
-			tempTree.left.addAll(result.matchs);
+			tempTree.addLeftAll(result.matchs);
 			result.matchs.clear();
 			result.matchs.add(tempTree);
 		}
@@ -157,14 +157,14 @@ class StatementDefine{
 							if (tempResult.matchs.size() > 1)
 								throw new Exception("根节点的数量必须是1");
 							if (root == null) {
-								tempResult.matchs.get(0).left.addAll(tempList);
+								tempResult.matchs.get(0).addLeftAll(tempList);
 								tempList.clear();
 							} else {
-								tempResult.matchs.get(0).left.add(root);
+								tempResult.matchs.get(0).addLeft(root);
 							}
 							root = tempResult.matchs.get(0);
 						} else if (root != null) {
-							root.right.addAll(tempResult.matchs);
+							root.addRightAll(tempResult.matchs);
 						} else {
 							tempList.addAll(tempResult.matchs);
 						}
@@ -209,7 +209,7 @@ class StatementDefine{
 			throw new Exception("语法定义解析后的结果与原始值不一致，原始值:"+ stateDefine + " 解析结果:" + result.toString());
 		}
 		//log.debug(result);
-		return result;
+		return new StatementDefine(aManager,result);
     }
     public StatementDefine(NodeTypeManager aManager,StatementDefine child){
     	this.children = new StatementDefine[]{child};
@@ -442,8 +442,8 @@ class MatchResultTree{
 	NodeType matchNodeType;
 	ExpressNode ref;	
 	NodeType targetNodeType;
-	List<MatchResultTree> left = new ArrayList<MatchResultTree>();
-	List<MatchResultTree> right = new ArrayList<MatchResultTree>();	
+	private List<MatchResultTree> left;
+	private List<MatchResultTree> right;	
 	
 	public MatchResultTree(NodeType aNodeType,ExpressNode aRef,NodeType aTargetNodeType){
 		this(aNodeType,aRef);
@@ -452,6 +452,30 @@ class MatchResultTree{
 	public MatchResultTree(NodeType aNodeType,ExpressNode aRef){
 		this.matchNodeType = aNodeType;
 		this.ref = aRef;
+	}
+	public void addLeft(MatchResultTree node){
+		if(this.left == null){
+			this.left = new ArrayList<MatchResultTree>();
+		}
+		this.left.add(node);
+	}	
+	public void addLeftAll(List<MatchResultTree> list){
+		if(this.left == null){
+			this.left = new ArrayList<MatchResultTree>();
+		}
+		this.left.addAll(list);
+	}
+	public void addRight(MatchResultTree node){
+		if(this.right == null){
+			this.right = new ArrayList<MatchResultTree>();
+		}
+		this.right.add(node);
+	}
+	public void addRightAll(List<MatchResultTree> list){
+		if(this.right == null){
+			this.right = new ArrayList<MatchResultTree>();
+		}
+		this.right.addAll(list);
 	}
     public ExpressNode transferExpressNodeType(ExpressNode sourceNode,NodeType targetType){
     	sourceNode.setNodeType(targetType);
@@ -465,13 +489,17 @@ class MatchResultTree{
 		if(this.targetNodeType != null){
 			transferExpressNodeType(this.ref,this.targetNodeType);
 		}
-		for(MatchResultTree item: left){
-			this.ref.addLeftChild(item.ref);
-			item.buildExpressNodeTree();
+		if(this.left != null){
+			for (MatchResultTree item : left) {
+				this.ref.addLeftChild(item.ref);
+				item.buildExpressNodeTree();
+			}
 		}
-		for(MatchResultTree item: right){
-			this.ref.addLeftChild(item.ref);
-			item.buildExpressNodeTree();
+		if (this.right != null) {
+			for (MatchResultTree item : right) {
+				this.ref.addLeftChild(item.ref);
+				item.buildExpressNodeTree();
+			}
 		}
 	}
 	public String toString(){
