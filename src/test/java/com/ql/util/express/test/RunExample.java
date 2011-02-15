@@ -42,19 +42,19 @@ public class RunExample implements ApplicationContextAware, Runnable {
     	ExpressRunner runner = new ExpressRunner();
     	initialRunner(runner);
 		new RunExample(runner).run(1);
-		for (int i = 0; i < 1; i++) {
+		for (int i = 0; i < 20; i++) {
 			new Thread(new RunExample(runner)).start();
 		}
 	}
 	public void run() {
-		run(10000);
+		run(10000000);
 	}
 	public void run(int num) {
 		long start = System.currentTimeMillis();
 		try {
 			for (int j = 0; j < num; j++) {
 				String[][] expressTest = new String[][] {
-						{ "System.out.println(\"ss\")", "null" },
+//						{ "System.out.println(\"ss\")", "null" },
 						{"unionName = new com.ql.util.express.test.BeanExample(\"张三\").unionName(\"李四\")",
 								"张三-李四" }, 
 						{ "max(2,3,4,10)", "10" },
@@ -90,8 +90,8 @@ public class RunExample implements ApplicationContextAware, Runnable {
 									.toString()) == false) {
 						throw new Exception("处理错误,计算结果与预期的不匹配");
 					}
-					System.out.println(s + " 执行结果 ： " + result);
-					System.out.println("错误信息" + errorList);
+//					System.out.println(s + " 执行结果 ： " + result);
+//					System.out.println("错误信息" + errorList);
 				}
 			//	System.out.println(expressContext);
 			}

@@ -1,6 +1,10 @@
 package com.ql.util.express;
 
-
+/**
+ * 输出给其它指令共享使用的对象
+ * @author xuannan
+ *
+ */
 public class ExportItem{
 	public static String TYPE_ALIAS ="alias";
 	public static String TYPE_DEF ="def";

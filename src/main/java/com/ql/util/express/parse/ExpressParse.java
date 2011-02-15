@@ -24,11 +24,11 @@ public class ExpressParse {
 	 * @return
 	 * @throws Exception
 	 */
-	public List<ExpressNode> transferWord2ExpressNode(String[] words) throws Exception{
+	public List<ExpressNode> transferWord2ExpressNode(ExpressPackage aRootExpressPackage,String[] words) throws Exception{
 		List<ExpressNode> result = new ArrayList<ExpressNode>();
 		String tempWord;
 		NodeType tempType;
-		ExpressPackage  tmpImportPackage = new ExpressPackage();  
+		ExpressPackage  tmpImportPackage = new ExpressPackage(aRootExpressPackage);  
 
 	    //先处理import，import必须放在文件的最开始，必须以；结束
 	    boolean isImport = false;
@@ -362,13 +362,13 @@ public class ExpressParse {
 			}
 		}
 	}
-	public ExpressNode parse(String express,boolean isTrace) throws Exception{
+	public ExpressNode parse(ExpressPackage rootExpressPackage,String express,boolean isTrace) throws Exception{
 		String[] words = WordSplit.parse(this.nodeTypeManager,express);
 		if(isTrace == true){
 			log.debug("执行的表达式:" + express);	
 			log.debug("单词分解结果:" + WordSplit.getPrintInfo(words,","));  
 		}
-    	List<ExpressNode> tempList = this.transferWord2ExpressNode(words);
+    	List<ExpressNode> tempList = this.transferWord2ExpressNode(rootExpressPackage,words);
     	if(isTrace == true){
     		log.debug("单词分析结果:" + printInfo(tempList,","));
     	}
@@ -397,7 +397,7 @@ public class ExpressParse {
 		String[] words = WordSplit.parse(manager,condition);
 			log.debug("执行的表达式:" + condition);	
 			log.debug("单词分解结果:" + WordSplit.getPrintInfo(words,","));  
-    	List<ExpressNode> tempList = parse.transferWord2ExpressNode(words);    	
+    	List<ExpressNode> tempList = parse.transferWord2ExpressNode(null,words);    	
     		log.debug("单词分析结果:" + printInfo(tempList,","));
     	ExpressNode root = parse.splitExpressBlock(tempList);
     	printTreeNode(root,1);
@@ -413,7 +413,7 @@ public class ExpressParse {
 		String condition="if 1 == 1 then  true ;";
 		NodeTypeManager manager = new NodeTypeManager();
 		ExpressParse parse = new ExpressParse(manager);
-		parse.parse(condition,true);
+		parse.parse(null,condition,true);
   }
 	   protected static String printInfo(List<ExpressNode> list,String splitOp){
 		  	StringBuffer buffer = new StringBuffer();

@@ -12,25 +12,53 @@ import com.ql.util.express.instruction.ForRelBreakContinue;
 import com.ql.util.express.instruction.InstructionFactory;
 import com.ql.util.express.instruction.OperatorFactory;
 import com.ql.util.express.parse.ExpressNode;
+import com.ql.util.express.parse.ExpressPackage;
 import com.ql.util.express.parse.ExpressParse;
 import com.ql.util.express.parse.NodeType;
 import com.ql.util.express.parse.NodeTypeManager;
 
+/**
+ * 语法分析和计算的入口类
+ * @author xuannan
+ *
+ */
 public class ExpressRunner {
 
 	private static final Log log = LogFactory.getLog(ExpressRunner.class);
-	
+	/**
+	 * 是否输出所有的跟踪信息，同时还需要log级别是DEBUG级别
+	 */
 	private boolean isTrace = false;
+	/**
+	 * 一段文本对应的指令集的缓存
+	 */
     private Map<String,InstructionSet> expressInstructionSetCache = new ConcurrentHashMap<String, InstructionSet>();
 
+    /**
+     * 语法定义的管理器
+     */
 	private NodeTypeManager manager = new NodeTypeManager();
+	/**
+	 * 操作符的管理器
+	 */
 	private OperatorFactory operatorManager = new OperatorFactory();
-	private ExpressParse parse = new ExpressParse(manager);
+	/**
+	 * 语法分析器
+	 */
+	private ExpressParse parse = new ExpressParse(manager);	
+	
+	/**
+	 * 缺省的Class查找的包管理器
+	 */
+	ExpressPackage rootExpressPackage = new ExpressPackage(null);
+	
 	public ExpressRunner(boolean aIstrace){
 		this.isTrace = aIstrace;
+		rootExpressPackage.addPackage("java.lang");
+		rootExpressPackage.addPackage("java.util");
 	}
 	public ExpressRunner(){
-		this.isTrace = false;
+		this(false);
 	}
 	/**
 	 * 获取语法定义的管理器
@@ -134,6 +162,14 @@ public class ExpressRunner {
 		this.operatorManager.addOperator(name, op);
 	}
 
+	/**
+	 * 添加操作符和关键字的别名，同时对操作符可以指定错误信息。
+	 * 例如：addOperatorWithAlias("加","+",null)
+	 * @param keyWordName
+	 * @param realKeyWordName
+	 * @param errorInfo
+	 * @throws Exception
+	 */
 	public void addOperatorWithAlias(String keyWordName, String realKeyWordName,
 			String errorInfo) throws Exception {
 		NodeType realNodeType = this.manager.findNodeType(realKeyWordName);
@@ -155,7 +191,13 @@ public class ExpressRunner {
 			this.operatorManager.addOperatorWithAlias(keyWordName, realNodeType.getTag(), errorInfo);
 		}
 	}
-
+	
+	public ExpressPackage getRootExpressPackage(){
+		return this.rootExpressPackage;
+	}
+	  /**
+	   * 清除缓存
+	   */
 	public void clearExpressCache() {
 		this.expressInstructionSetCache.clear();
 	}
@@ -166,12 +208,31 @@ public class ExpressRunner {
 			boolean isCatchException, Log aLog) throws Exception {
 		 return  InstructionSet.executeOuter(instructionSets,loader,context, errorList, aFunctionCacheMananger, isTrace,isCatchException,aLog);
 	}
-
+/**
+ * 执行一段文本
+ * @param expressString 程序文本
+ * @param context 执行上下文
+ * @param errorList 输出的错误信息List
+ * @param isCache 是否使用Cache中的指令集
+ * @param isTrace 是否输出详细的执行指令信息
+ * @return
+ * @throws Exception
+ */
 	public Object execute(String expressString, IExpressContext<String,Object> context,
 			List<String> errorList, boolean isCache, boolean isTrace) throws Exception {
 		return this.execute(expressString, context, errorList, isCache, isTrace, null);
 	}
-
+/**
+ * 执行一段文本
+ * @param expressString 程序文本
+ * @param context 执行上下文
+ * @param errorList 输出的错误信息List
+ * @param isCache 是否使用Cache中的指令集
+ * @param isTrace 是否输出详细的执行指令信息
+ * @param aLog 输出的log
+ * @return
+ * @throws Exception
+ */
 	public Object execute(String expressString, IExpressContext<String,Object> context,
 			List<String> errorList, boolean isCache, boolean isTrace, Log aLog)
 			throws Exception {
@@ -195,9 +256,15 @@ public class ExpressRunner {
 				context, errorList, null, isTrace, false,aLog);
 	}
 
-	public InstructionSet parseInstructionSet(String condition)
+	/**
+	 * 解析一段文本，生成指令集合
+	 * @param text
+	 * @return
+	 * @throws Exception
+	 */
+	public InstructionSet parseInstructionSet(String text)
 			throws Exception {
-		ExpressNode root = this.parse.parse(condition, isTrace);
+		ExpressNode root = this.parse.parse(this.rootExpressPackage,text, isTrace);
 		InstructionSet result = createInstructionSet(root, "main");
 		if (this.isTrace) {
 			log.debug(result);

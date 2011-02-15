@@ -7,7 +7,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * 函数调用cache管理，主要用于支持 cache isVIP("玄难");类似的操作
+ * 函数调用cache管理，主要用于支持 cache isVIP("qhlhl");类似的操作
  * 
  * @author xuannan
  * 

@@ -221,7 +221,7 @@ public class NodeTypeManager {
 		NodeType refNodeType = this.findNodeType(refOperName);
 		target.setInstructionFactory(refNodeType.getInstructionFactory());
 		for(NodeType item:list){
-			if(item.getChildren().contains(refNodeType)){
+			if(item.isContainsChild(refNodeType)){
 				item.addChild(target);
 				return;
 			}
@@ -249,13 +249,16 @@ public class NodeTypeManager {
 	 * @param parent
 	 * @return
 	 */
-	public NodeType isEqualsOrChildAndReturn(NodeType child,NodeType parent){
-		if(child == parent) return child;
-		
-		for(NodeType item:parent.getChildren()){
-			NodeType result = isEqualsOrChildAndReturn(child,item);
-			if(result != null){
-				return result;
+	public NodeType isEqualsOrChildAndReturn2(NodeType child,NodeType parent){
+		if (child == parent)
+			return child;
+		NodeType[] tempList = parent.getChildren();
+		if (tempList != null) {
+			for (NodeType item : tempList) {
+				NodeType result = isEqualsOrChildAndReturn2(child, item);
+				if (result != null) {
+					return result;
+				}
 			}
 		}
 		return null;
