@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ExpressPackage {
 	private List<String> m_packages;
-	private Map<String,Class<?>> name2CallCache = new ConcurrentHashMap<String,Class<?>>();
+	private Map<String,Class<?>> name2CallCache = null;
 	private Class<?> S_NULL = NullClass.class;
 	private ExpressPackage parent;
 	public ExpressPackage(ExpressPackage aParent) {
@@ -32,11 +32,18 @@ public class ExpressPackage {
 
 	public Class<?> getClass(String name) {
 		Class<?> tempClass = null;
-		if(this.parent != null){
+		if (this.parent != null){
 			tempClass = this.parent.getClass(name);
 		}
 		if(tempClass == null){
-			tempClass = this.name2CallCache.get(name);
+			if(this.m_packages == null && this.parent != null){
+				return null;
+			}
+			if (this.name2CallCache == null) {
+				this.name2CallCache = new ConcurrentHashMap<String, Class<?>>();
+			}else{
+			    tempClass = this.name2CallCache.get(name);
+			}
 			if(tempClass == null){
 				tempClass = this.getClassInner(name,this.parent == null);
 				if(tempClass == null){
@@ -45,6 +52,7 @@ public class ExpressPackage {
 			}	
 			this.name2CallCache.put(name, tempClass);
 		}
+		
 		if(tempClass == S_NULL){
 			return null;
 		}else{
