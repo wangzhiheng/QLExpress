@@ -10,11 +10,11 @@ import com.ql.util.express.InstructionSetContext;
 
 public abstract class Instruction {
 	protected static Log staticLog = LogFactory.getLog(Instruction.class);
-	protected Log log = null;
+	protected Log log = staticLog;
 	public void setLog(Log aLog) {
 		if (aLog != null) {
-			this.log = staticLog;
-		}
+			this.log = aLog;
+		}		
 	}
 
 	public abstract void execute(RunEnvironment environment, List<String> errorList)
