@@ -248,6 +248,7 @@ public class NodeType {
 				tempChildren[tempChildren.length - 1] = child;
 				this.children = tempChildren;
 			}
+			//清除所有的儿子缓存
 			Map<NodeType,NodeType> tempMap = this.childrenCache;
 			this.childrenCache = null;
 			if(tempMap != null){
