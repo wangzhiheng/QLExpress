@@ -40,7 +40,11 @@ public class OperateData { // extends ExpressTreeNodeImple {
 		if( this.dataObject == null)
 			return this.type + ":null";
 		else{
-			return this.dataObject.toString();
+			if(this.dataObject instanceof Class){
+				return ExpressUtil.getClassName((Class<?>)this.dataObject);
+			}else{
+			    return this.dataObject.toString();
+			}
 		}
 	}
 	public void toResource(StringBuilder builder,int level){

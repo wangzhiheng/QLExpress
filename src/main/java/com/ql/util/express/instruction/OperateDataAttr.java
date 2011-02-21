@@ -1,5 +1,6 @@
 package com.ql.util.express.instruction;
 
+import com.ql.util.express.ExpressUtil;
 import com.ql.util.express.InstructionSetContext;
 import com.ql.util.express.OperateData;
 
@@ -26,7 +27,7 @@ public class OperateDataAttr extends OperateData {
 				if(this.type == null){
 					str =  name;
 				}else{
-					str = name + "[" + this.type + "]"  ;
+					str = name + "[" + ExpressUtil.getClassName(this.type) + "]"  ;
 				}
 				return str;
 			} catch (Exception ex) {

@@ -1,8 +1,5 @@
 package com.ql.util.express.test;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
@@ -81,7 +78,7 @@ public class RunExample implements ApplicationContextAware, Runnable {
 				for (int point = 0; point < expressTest.length; point++) {
 					String s = expressTest[point][0];
 					// 批量处理的时候可以先预处理，会加快执行效率
-					List<String> errorList = new ArrayList<String>();
+					//List<String> errorList = new ArrayList<String>();
 					 Object result = runner.execute(s,expressContext, null, false,false);
 					if (expressTest[point][1].equalsIgnoreCase("null")
 							&& result != null

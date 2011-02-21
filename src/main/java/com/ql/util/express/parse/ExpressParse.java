@@ -68,19 +68,28 @@ public class ExpressParse {
 			  }
 			  if(lastChar =='d'){
 				  tempType = nodeTypeManager.findNodeType("CONST_DOUBLE");
+				  tempWord = tempWord.substring(0,tempWord.length() -1);
 				  objectValue = Double.valueOf(tempWord);
 			  }else if(lastChar =='f'){
 				  tempType = nodeTypeManager.findNodeType("CONST_FLOAT");
+				  tempWord = tempWord.substring(0,tempWord.length() -1);
 				  objectValue = Float.valueOf(tempWord);
 			  }else if(tempWord.indexOf(".") >=0){
 				  tempType = nodeTypeManager.findNodeType("CONST_FLOAT");
 				  objectValue = Float.valueOf(tempWord);
 			  }else if(lastChar =='l'){
 				  tempType = nodeTypeManager.findNodeType("CONST_LONG");
+				  tempWord = tempWord.substring(0,tempWord.length() -1);
 				  objectValue = Long.valueOf(tempWord);
 			  }else{
-				  tempType = nodeTypeManager.findNodeType("CONST_INTEGER");
-				  objectValue = Integer.valueOf(tempWord);
+				  long tempLong = Long.parseLong(tempWord);
+				  if(tempLong > Integer.MAX_VALUE){
+					  tempType = nodeTypeManager.findNodeType("CONST_LONG");
+					  objectValue = Long.valueOf(tempLong);
+				  }else{
+					  tempType = nodeTypeManager.findNodeType("CONST_INTEGER");
+					  objectValue = Integer.valueOf((int)tempLong);
+				  }				  
 			  }
 			  treeNodeType = nodeTypeManager.findNodeType("CONST");
 			  point = point + 1;

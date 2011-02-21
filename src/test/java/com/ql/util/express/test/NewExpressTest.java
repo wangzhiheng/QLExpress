@@ -12,6 +12,11 @@ public class NewExpressTest {
 	@Test
 	public void testParse() throws Exception{
 		String[][] expresses = new String[][]{
+				{"3240732988055L","3240732988055"},
+				{"3240732988054","3240732988054"},
+				{"0.5d","0.5"},
+				{"0.3f","0.3"},
+				{"0.55","0.55"},
 				{"1+1","2"},
 				{"(1+1)*(9-7);","4"},
 				{"1+1;2+5","7"},

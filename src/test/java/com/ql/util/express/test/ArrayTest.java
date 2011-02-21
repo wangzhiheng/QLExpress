@@ -16,7 +16,7 @@ public class ArrayTest {
 				" b[0] =11;" +
 				" abc[0][1] = 22; " +
 				"return abc;";
-		ExpressRunner runner = new ExpressRunner(true);
+		ExpressRunner runner = new ExpressRunner();
 		DefaultContext<String, Object> context = new DefaultContext<String, Object>();
 		int[][] r = (int[][])runner.execute(express, context, null, false, true);
 		System.out.println(r[0][1]);
