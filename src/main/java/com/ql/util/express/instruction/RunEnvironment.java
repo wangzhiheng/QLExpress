@@ -8,6 +8,7 @@ import com.ql.util.express.OperateData;
 
 
 public class RunEnvironment {
+		private static int INIT_DATA_LENTH = 5;
 	    private boolean isTrace = false;	
 		private int point = -1;
 	    private int programPoint = 0;
@@ -20,11 +21,8 @@ public class RunEnvironment {
 		private InstructionSetContext<String, Object> context;
 		
 		
-		public RunEnvironment(int aStackSize,InstructionSet aInstructionSet,InstructionSetContext<String, Object> aContext,boolean aIsTrace){
-			if(aStackSize <0){
-				aStackSize =0;
-			}
-			dataContainer = new OperateData[aStackSize];
+		public RunEnvironment(InstructionSet aInstructionSet,InstructionSetContext<String, Object> aContext,boolean aIsTrace){
+			dataContainer = new OperateData[INIT_DATA_LENTH];
 			this.instructionSet = aInstructionSet;
 			this.context = aContext;
 			this.isTrace = aIsTrace;
