@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -45,6 +46,8 @@ public class ExpressUtil {
 	public static final String DT_char = "char";
 	public static final String DT_boolean = "boolean";
 
+	public static Map<String,Object> methodCache = new ConcurrentHashMap<String, Object>();
+	
 	public static Class<?>[][] classMatchs =new Class[][]{
 			//原始数据类型
 			{double.class,float.class},{double.class,long.class},{double.class,int.class}, {double.class,short.class},{double.class,byte.class},
@@ -198,9 +201,45 @@ public class ExpressUtil {
 			return -1;
 	}
 
+	public static String createCacheKey(Class<?> aBaseClass,
+			String aMethodName, Class<?>[] aTypes, boolean aPublicOnly,
+			boolean aIsStatic) {
+		StringBuilder builder = new StringBuilder();
+		builder.append(aPublicOnly).append("-").append(aIsStatic).append("-");
+		builder.append(aBaseClass.getName()).append(".").append(aMethodName)
+				.append("(");
+		if (aTypes == null) {
+			builder.append("null");
+		} else {
+			for (int i = 0; i < aTypes.length; i++) {
+				if (i > 0) {
+					builder.append(",");
+				}
+				builder.append(aTypes[i].getName());
+			}
+		}
+		builder.append(")");
+		return builder.toString();
+
+	}
+    public static Method findMethodWithCache(Class<?> baseClass, String methodName,
+			Class<?>[] types, boolean publicOnly, boolean isStatic){
+    	String key = createCacheKey(baseClass, methodName, types, publicOnly, isStatic);
+    	Object result = methodCache.get(key);
+    	if(result == null){
+    		result = findMethod(baseClass, methodName, types, publicOnly, isStatic);
+    		if(result == null){
+    			methodCache.put(key, void.class);    			
+    		}else{
+    			methodCache.put(key,result); 
+    		}
+    	}else if(result == void.class){
+    		result = null;
+    	}
+    	return (Method)result;
+    }
 	public static Method findMethod(Class<?> baseClass, String methodName,
 			Class<?>[] types, boolean publicOnly, boolean isStatic) {
-
 		Vector<Method> candidates = gatherMethodsRecursive(baseClass, methodName,
 				types.length, publicOnly, isStatic, null /* candidates */);
 		Method method = findMostSpecificMethod(types, (Method[]) candidates
@@ -537,4 +576,3 @@ public class ExpressUtil {
 			System.out.println(obj +":" + obj.getClass());
 		}   
 }
-
