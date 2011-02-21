@@ -410,10 +410,10 @@ class OperatorMethod extends OperatorBase {
 			}
 			Method m = null;
 			if (list[0] instanceof OperateClass) {// 调用静态方法
-				m = ExpressUtil.findMethod((Class<?>) obj, methodName,
+				m = ExpressUtil.findMethodWithCache((Class<?>) obj, methodName,
 						types, true, true);
 			} else {
-				m = ExpressUtil.findMethod(obj.getClass(), methodName,
+				m = ExpressUtil.findMethodWithCache(obj.getClass(), methodName,
 						types, true, false);
 			}
 
