@@ -32,7 +32,6 @@ public class InstructionSet {
 	private String type ="main";
 	private String name;
 	private String globeName;
-    private int maxStackSize  = -1;
   /**
    * ЦёБо
    */
@@ -89,7 +88,7 @@ public class InstructionSet {
 		Object result = null;
 		for (int i = 0; i < sets.length; i++) {
 			InstructionSet tmpSet = sets[i];
-			environmen = new RunEnvironment(tmpSet.maxStackSize, tmpSet,
+			environmen = new RunEnvironment(tmpSet,
 					(InstructionSetContext<String,Object>) context, isTrace);
 			try {
 				CallResult tempResult = tmpSet.excuteInner(environmen, context,

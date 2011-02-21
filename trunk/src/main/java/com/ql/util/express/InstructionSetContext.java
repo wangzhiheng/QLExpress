@@ -5,8 +5,7 @@ import java.util.Map;
 
 import com.ql.util.express.instruction.OperateDataAttr;
 
-@SuppressWarnings("serial")
-public class InstructionSetContext<K,V> extends HashMap<K,V> implements IExpressContext<K,V> {
+public class InstructionSetContext<K,V>  implements IExpressContext<K,V> {
 	 private FuncitonCacheManager functionCachManager;
 	/**
 	 * 函数调用开启标志，在Method执行完毕后清除
@@ -14,6 +13,7 @@ public class InstructionSetContext<K,V> extends HashMap<K,V> implements IExpress
     private boolean isStartCachFunctionCall = false;
 
 	private IExpressContext<K,V> parent = null;
+	private Map<K,V> content;
 	/**
 	 * 符号表
 	 */
@@ -109,19 +109,22 @@ public class InstructionSetContext<K,V> extends HashMap<K,V> implements IExpress
 		return  this.parent;
 	}
 	public V get(Object key){
-		if(super.containsKey(key)){
-			return super.get(key);
+		if(this.content != null && this.content.containsKey(key)){
+			return this.content.get(key);
 		}else if(this.parent != null){
 			return this.parent.get(key);
 		}
 		return null;
 	}
 	public void putKeyDefine(K key){
-		super.put(key,null);
+		if(this.content == null){
+			this.content = new HashMap<K,V>();
+		}
+		this.content.put(key,null);
 	}
 	public V put(K key, V value){
-		if(super.containsKey(key) ){
-			return super.put(key,value);
+		if(this.content != null && this.content.containsKey(key) ){
+			return this.content.put(key,value);
 		}else if(this.parent != null){
 			return this.parent.put(key,value);
 		}else{
