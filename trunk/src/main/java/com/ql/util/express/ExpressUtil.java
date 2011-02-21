@@ -77,51 +77,51 @@ public class ExpressUtil {
 		return aClass;
 	}
 
-	public static boolean isAssignable(Class<?> lhsType, Class<?> rhsType) {
-		if (lhsType == rhsType)
+	public static boolean isAssignable(Class<?> target, Class<?> source) {
+		if (target == source)
 			return true;
 
-		if (lhsType == null)
+		if (target == null)
 			return false;
-		if (rhsType == null)//null转换
-			return !lhsType.isPrimitive();
+		if (source == null)//null转换
+			return !target.isPrimitive();
 		
-		if (lhsType.isAssignableFrom(rhsType) == true){
+		if (target.isAssignableFrom(source) == true){
 			return true;
 		}
-		if (lhsType.isPrimitive() == false) {
-			if (lhsType == Byte.class)
-				lhsType = byte.class;
-			else if (lhsType == Short.class)
-				lhsType = short.class;
-			else if (lhsType == Integer.class)
-				lhsType = int.class;
-			else if (lhsType == Long.class)
-				lhsType = long.class;
-			else if (lhsType == Float.class)
-				lhsType = float.class;
-			else if (lhsType == Double.class)
-				lhsType = double.class;
+		if (target.isPrimitive() == false) {
+			if (target == Byte.class)
+				target = byte.class;
+			else if (target == Short.class)
+				target = short.class;
+			else if (target == Integer.class)
+				target = int.class;
+			else if (target == Long.class)
+				target = long.class;
+			else if (target == Float.class)
+				target = float.class;
+			else if (target == Double.class)
+				target = double.class;
 		}
-		if (rhsType.isPrimitive() == false) {
-			if (rhsType == Byte.class)
-				rhsType = byte.class;
-			else if (rhsType == Short.class)
-				rhsType = short.class;
-			else if (rhsType == Integer.class)
-				rhsType = int.class;
-			else if (rhsType == Long.class)
-				rhsType = long.class;
-			else if (rhsType == Float.class)
-				rhsType = float.class;
-			else if (rhsType == Double.class)
-				rhsType = double.class;
+		if (source.isPrimitive() == false) {
+			if (source == Byte.class)
+				source = byte.class;
+			else if (source == Short.class)
+				source = short.class;
+			else if (source == Integer.class)
+				source = int.class;
+			else if (source == Long.class)
+				source = long.class;
+			else if (source == Float.class)
+				source = float.class;
+			else if (source == Double.class)
+				source = double.class;
 		}
-		if (lhsType == rhsType)// 转换后需要在判断一下
+		if (target == source)// 转换后需要在判断一下
 			return true;
 
 		for (int i = 0; i < classMatchs.length; i++) {
-			if (lhsType == classMatchs[i][0] && rhsType == classMatchs[i][1]) {
+			if (target == classMatchs[i][0] && source == classMatchs[i][1]) {
 				return true;
 			}
 		}
@@ -379,6 +379,9 @@ public class ExpressUtil {
 	}
 
 	public static String getClassName(Class<?> className) {
+		if(className == null){
+			return null;
+		}
 		String name = className.getName();
 		return getClassName(name);
 	}

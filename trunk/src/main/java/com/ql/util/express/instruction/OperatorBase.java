@@ -150,6 +150,29 @@ class OperatorEvaluate extends OperatorBase {
 
 	public OperateData executeInner(InstructionSetContext<String,Object> parent,
 			OperateData op1, OperateData op2) throws Exception {
+		Class<?> targetType = op1.getType(parent);
+		Class<?> sourceType = op2.getType(parent);
+		if (targetType != null) {
+			if (ExpressUtil.isAssignable(targetType, sourceType) == false) {
+				if (targetType.isArray()) {
+					if (ExpressUtil.isAssignable(targetType.getComponentType(),
+							sourceType) == false) {
+						throw new Exception("赋值时候，类型转换错误："
+								+ ExpressUtil.getClassName(sourceType)
+								+ " 不能转换为 "
+								+ ExpressUtil.getClassName(targetType
+										.getComponentType()));
+					} else {
+						// 什么都不做
+					}
+				} else {
+					throw new Exception("赋值时候，类型转换错误："
+							+ ExpressUtil.getClassName(sourceType) + " 不能转换为 "
+							+ ExpressUtil.getClassName(targetType));
+				}
+			}
+
+		}
 		 Object result = op2.getObject(parent);
 		 if(op1.getType(parent)!= null){
 			 result = ExpressUtil.castObject(result,op1.getType(parent));
