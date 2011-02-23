@@ -507,17 +507,23 @@ class MatchResultTree{
 		printNode(builder,1);
 		return builder.toString();
 	}
-	public void printNode(StringBuilder builder,int level) {
+
+	public void printNode(StringBuilder builder, int level) {
 		builder.append(level + ":");
 		for (int i = 0; i < level; i++) {
 			builder.append("   ");
 		}
-		builder.append( ref.getValue() + ":" + this.matchNodeType.getTag()).append("\n");
-		for (MatchResultTree item : this.left) {
-			item.printNode(builder,level + 1);
+		builder.append(ref.getValue() + ":" + this.matchNodeType.getTag())
+				.append("\n");
+		if (this.left != null) {
+			for (MatchResultTree item : this.left) {
+				item.printNode(builder, level + 1);
+			}
 		}
-		for (MatchResultTree item : this.right) {
-			item.printNode(builder,level + 1);
+		if (this.right != null) {
+			for (MatchResultTree item : this.right) {
+				item.printNode(builder, level + 1);
+			}
 		}
 	}
 }
