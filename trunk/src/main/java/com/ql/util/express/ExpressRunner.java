@@ -10,6 +10,7 @@ import org.apache.commons.logging.LogFactory;
 
 import com.ql.util.express.instruction.ForRelBreakContinue;
 import com.ql.util.express.instruction.InstructionFactory;
+import com.ql.util.express.instruction.OperatorBase;
 import com.ql.util.express.instruction.OperatorFactory;
 import com.ql.util.express.parse.ExpressNode;
 import com.ql.util.express.parse.ExpressPackage;
@@ -79,7 +80,7 @@ public class ExpressRunner {
 	 * @param name 函数名称
 	 * @param op 对应的操作实现类
 	 */
-	public void addFunction(String name, Operator op) {
+	public void addFunction(String name, OperatorBase op) {
 		this.operatorManager.addOperator(name, op);
 	};
     /**
