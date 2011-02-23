@@ -12,6 +12,7 @@ public class NewExpressTest {
 	@Test
 	public void testParse() throws Exception{
 		String[][] expresses = new String[][]{
+				{"1+2+/** ◊¢ Õ≤‚ ‘ **/ 12+1 ","16"},
 				{"3240732988055L","3240732988055"},
 				{"3240732988054","3240732988054"},
 				{"0.5d","0.5"},

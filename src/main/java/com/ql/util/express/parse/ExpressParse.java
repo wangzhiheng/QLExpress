@@ -203,7 +203,13 @@ public class ExpressParse {
     		}else if(tempNode.getNodeType().getTag().equals("{")){
     			startNodeStack.push(new ExpressNode(nodeTypeManager.findNodeType("{}"),null));
     	    	childrenStack.push(new ArrayList<ExpressNode>());  
-    		}else if(tempNode.getNodeType().getTag().equals(")") || tempNode.getNodeType().getTag().equals("]")||tempNode.getNodeType().getTag().equals("}")   ){
+    		}else if(tempNode.getNodeType().getTag().equals("/**")){
+    			startNodeStack.push(new ExpressNode(nodeTypeManager.findNodeType("COMMENT"),null));
+    	    	childrenStack.push(new ArrayList<ExpressNode>());  
+    		}else if(tempNode.getNodeType().getTag().equals(")") 
+    				|| tempNode.getNodeType().getTag().equals("]")
+    				||tempNode.getNodeType().getTag().equals("}")
+    				||tempNode.getNodeType().getTag().equals("**/")   ){
     			if (startNodeStack.peek().getNodeType().getEndTag().getTag().equals(tempNode.getNodeType().getTag()) ==false){
 					throw new Exception(
 							(startNodeStack.peek().getNodeType().getStartTag() == null ? startNodeStack
@@ -216,8 +222,11 @@ public class ExpressParse {
     			childrenStack.peek().add(tempNode);
     		}
     		if(isMatch == true){
-    			startNodeStack.peek().setLeftChildren(childrenStack.pop());
-    			childrenStack.peek().add(startNodeStack.pop());
+    			startNodeStack.peek().setLeftChildren(childrenStack.pop());    	
+    			ExpressNode  tempBlockNode = startNodeStack.pop();
+    			if(tempBlockNode.getNodeType() != nodeTypeManager.findNodeType("COMMENT") ){
+    		    	childrenStack.peek().add(tempBlockNode);
+    			}
     		}
     	}
     	if(startNodeStack.size() >1){
@@ -400,7 +409,7 @@ public class ExpressParse {
 	}
 
 	public static void main(String[] args) throws Exception {
-		String condition="if 1 == 1 then  true ;";
+		String condition="/** a **/";
 		NodeTypeManager manager = new NodeTypeManager();
 		ExpressParse parse = new ExpressParse(manager);
 		String[] words = WordSplit.parse(manager,condition);

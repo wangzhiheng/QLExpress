@@ -16,7 +16,7 @@ public class NodeTypeManager {
 			 "break", "continue", "return", "macro", "function" ,
 			 "cache", "def","exportDef", "new","array",
 			 "like",  
-			 "=","cast"
+			 "=","cast","/**","**/"
 	};
 		private String[] nodeTypeDefines = new String[] {
 				"EOF:TYPE=KEYWORD,FACTORY=com.ql.util.express.instruction.NullInstructionFactory",
@@ -36,6 +36,8 @@ public class NodeTypeManager {
 				"CONST:TYPE=CONST,CHILDREN=CONST_NUMBER|CONST_CHAR|CONST_STRING|CONST_BOOLEAN|CONST_CLASS,FACTORY=com.ql.util.express.instruction.ConstDataInstructionFactory",
 
 				",:TYPE=KEYWORD,FACTORY=com.ql.util.express.instruction.NullInstructionFactory",
+				
+				"COMMENT:TYPE=BLOCK,STARTTAG=/**,ENDTAG=**/,FACTORY=com.ql.util.express.instruction.NullInstructionFactory",
 				
 				"():TYPE=BLOCK,STARTTAG=(,ENDTAG=),FACTORY=com.ql.util.express.instruction.BlockInstructionFactory",
 				"[]:TYPE=BLOCK,STARTTAG=[,ENDTAG=],FACTORY=com.ql.util.express.instruction.BlockInstructionFactory",
