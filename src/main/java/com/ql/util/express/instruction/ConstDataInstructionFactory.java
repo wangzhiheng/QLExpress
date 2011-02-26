@@ -21,8 +21,12 @@ class ConstDataInstruction extends Instruction {
 	OperateData operateData;
 
 	ConstDataInstruction(ExpressNode node) {
-		this.operateData = new OperateData(node.getObjectValue(), node
+		if(node.isTypeEqualsOrChild("CONST_CLASS")){
+			this.operateData = new OperateClass(node.getValue(),(Class<?>)node.getObjectValue());
+		}else{
+			this.operateData = new OperateData(node.getObjectValue(), node
 				.getObjectValue().getClass());
+		}
 	}
 
 	public void execute(RunEnvironment environment, List<String> errorList)
