@@ -63,7 +63,8 @@ public class ExpressParse {
 						 || result.size() >=2 
 						    && result.get(result.size() - 2).isTypeEqualsOrChild("OP_LIST")
 						    && result.get(result.size() - 2).isTypeEqualsOrChild(")")==false
-						    && result.get(result.size() - 2).isTypeEqualsOrChild("]")==false ){
+						    && result.get(result.size() - 2).isTypeEqualsOrChild("]")==false 
+						    ){
 						  result.remove(result.size() -1);
 						  tempWord = "-" + tempWord;
 					  }
@@ -353,9 +354,7 @@ public class ExpressParse {
     	}	
     	return null;
     }
-
-	public static void printTreeNode(ExpressNode node, int level) {
-		StringBuilder builder = new StringBuilder();
+    public static void printTreeNode(StringBuilder builder,ExpressNode node, int level){
 		builder.append(level+":" );
 		
 		for (int i = 0; i < level; i++) {
@@ -367,21 +366,30 @@ public class ExpressParse {
 				builder.append("   ");
 			}
 		}
-		builder.append("\t"+ node.getTreeType().getTag());
+		builder.append("\t"+ node.getTreeType().getTag()).append("\n");
 		
-		System.out.println(builder);
 		List<ExpressNode> leftChildren = node.getLeftChildren();
 		if (leftChildren != null && leftChildren.size() > 0) {
 			for (ExpressNode item : leftChildren) {
-				printTreeNode(item, level + 1);
+				printTreeNode(builder,item, level + 1);
 			}
 		}
 		List<ExpressNode> rightChildren = node.getRightChildren();
 		if (rightChildren != null && rightChildren.size() > 0) {
 			for (ExpressNode item : rightChildren) {
-				printTreeNode(item, level + 1);
+				printTreeNode(builder,item, level + 1);
 			}
-		}
+		}    	
+    }
+	public static void printTreeNode(ExpressNode node, int level) {
+		StringBuilder builder = new StringBuilder();
+		printTreeNode(builder,node,level);
+		System.out.println(builder.toString());
+	}
+	public static String printTreeNodeToString(ExpressNode node, int level) {
+		StringBuilder builder = new StringBuilder();
+		printTreeNode(builder,node,level);
+		return builder.toString();
 	}
 	public ExpressNode parse(ExpressPackage rootExpressPackage,String express,boolean isTrace) throws Exception{
 		String[] words = WordSplit.parse(this.nodeTypeManager,express);

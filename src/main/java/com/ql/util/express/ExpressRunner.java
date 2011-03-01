@@ -266,6 +266,7 @@ public class ExpressRunner {
 	public InstructionSet parseInstructionSet(String text)
 			throws Exception {
 		ExpressNode root = this.parse.parse(this.rootExpressPackage,text, isTrace);
+		checkExpressNode(root);
 		InstructionSet result = createInstructionSet(root, "main");
 		if (this.isTrace) {
 			log.debug(result);
@@ -273,6 +274,23 @@ public class ExpressRunner {
 		return result;
 	}
 
+/**
+ * 检查语法树是否正确
+ * @param aRoot
+ * @throws Exception 
+ */
+    public void checkExpressNode(ExpressNode aRoot) throws Exception{
+    	ExpressNode[] children = aRoot.getChildren();
+    	if(aRoot.isTypeEqualsOrChild("STAT_SEMICOLON") || aRoot.isTypeEqualsOrChild("STAT_SEMICOLON_EOF")){
+    		if(children.length >1){
+    			throw new Exception("语法分析错误，" + aRoot.getTreeType().getName() +" 应该只有一个儿子节点:\n" 
+    					+ ExpressParse.printTreeNodeToString(aRoot, 0)); 
+    		}
+    	}
+    	for(ExpressNode item:children){
+    		checkExpressNode(item);
+    	}
+    }
 	public InstructionSet createInstructionSet(ExpressNode root, String type)
 			throws Exception {
 		InstructionSet result = new InstructionSet(type);

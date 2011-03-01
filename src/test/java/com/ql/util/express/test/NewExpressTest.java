@@ -12,6 +12,7 @@ public class NewExpressTest {
 	@Test
 	public void testParse() throws Exception{
 		String[][] expresses = new String[][]{
+				{"int[][] abc = new int[10][10]; abc[0][0] = 100; abc[0][0]-10","90"},
 				{"Integer.parseInt(\"1\")-1","0"},
 				{"Double.parseDouble(\"-0.22\")","-0.22"},
 				{"(int)((Double.parseDouble(\"0.22\")-0.21)*100)","1"},
