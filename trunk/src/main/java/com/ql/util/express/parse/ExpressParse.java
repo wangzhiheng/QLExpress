@@ -60,7 +60,10 @@ public class ExpressParse {
 			  if(result.size() >0){//对 负号进行特殊处理
 				  if(result.get(result.size() -1).getValue().equals("-")){
 					  if(result.size() == 1 
-						 || result.size() >=2 && result.get(result.size() - 2).isTypeEqualsOrChild("OP_LIST")){
+						 || result.size() >=2 
+						    && result.get(result.size() - 2).isTypeEqualsOrChild("OP_LIST")
+						    && result.get(result.size() - 2).isTypeEqualsOrChild(")")==false
+						    && result.get(result.size() - 2).isTypeEqualsOrChild("]")==false ){
 						  result.remove(result.size() -1);
 						  tempWord = "-" + tempWord;
 					  }

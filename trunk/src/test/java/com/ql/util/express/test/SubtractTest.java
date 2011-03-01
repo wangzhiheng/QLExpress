@@ -10,7 +10,7 @@ public class SubtractTest {
 	@Test
 	public void testMax() throws Exception {
 		//String express = "return max(max(0.0,1) - 0.95,0);";
-		String express = "-3 - (-5 * -7 - 9 ) - (9-2);";
+		String express = "-3-(-5*-7-9)-(9-2);";
 		ExpressRunner runner = new ExpressRunner(true);
 		DefaultContext<String, Object> context = new DefaultContext<String, Object>();
 		Object r = runner.execute(express, context, null, false, true);
