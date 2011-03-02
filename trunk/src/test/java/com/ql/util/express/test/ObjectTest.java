@@ -7,9 +7,6 @@ import com.ql.util.express.DefaultContext;
 import com.ql.util.express.ExpressRunner;
 
 public class ObjectTest {
-public static void main(String[] args) throws Exception {
-	new ObjectTest().testABC();
-}
 	@Test
 	public void testABC() throws Exception {
 		String express = "object.amount*2+object.volume";
