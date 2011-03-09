@@ -20,12 +20,14 @@ class SelfDefineClassFunctionOperator extends OperatorBase{
   Method method;
   
   public SelfDefineClassFunctionOperator(String aOperName,String aClassName, String aFunctionName,
-          Class<?>[] aParameterClassTypes,String aErrorInfo) throws Exception {
+          Class<?>[] aParameterClassTypes,String[] aParameterDesc,String[] aParameterAnnotation,String aErrorInfo) throws Exception {
 	    this.name = aOperName;
 	    this.errorInfo = aErrorInfo;
 	    this.functionName = aFunctionName;
 	    this.parameterClasses = aParameterClassTypes;
 	    this.parameterTypes = new String[aParameterClassTypes.length];
+	    this.operDataDesc = aParameterDesc;
+	    this.operDataAnnotation = aParameterAnnotation;
 	    for(int i=0;i<this.parameterClasses.length;i++){
 	      this.parameterTypes[i] = this.parameterClasses[i].getName();
 	    }
@@ -34,11 +36,13 @@ class SelfDefineClassFunctionOperator extends OperatorBase{
   }
 
   public SelfDefineClassFunctionOperator(String aOperName,String aClassName, String aFunctionName,
-                         String[] aParameterTypes,String aErrorInfo) throws Exception {
+                         String[] aParameterTypes,String[] aParameterDesc,String[] aParameterAnnotation,String aErrorInfo) throws Exception {
     this.name = aOperName;
     this.errorInfo = aErrorInfo;
     this.functionName = aFunctionName;
     this.parameterTypes = aParameterTypes;
+    this.operDataDesc = aParameterDesc;
+    this.operDataAnnotation = aParameterAnnotation;
     this.parameterClasses = new Class[this.parameterTypes.length];
     for(int i=0;i<this.parameterClasses.length;i++){
       this.parameterClasses[i] = ExpressUtil.getJavaClass(this.parameterTypes[i]);
@@ -84,12 +88,14 @@ class SelfDefineServiceFunctionOperator extends OperatorBase{
   
 	public SelfDefineServiceFunctionOperator(String aOperName,
 			Object aServiceObject, String aFunctionName,
-			Class<?>[] aParameterClassTypes, String aErrorInfo) throws Exception {
+			Class<?>[] aParameterClassTypes,String[] aParameterDesc,String[] aParameterAnnotation, String aErrorInfo) throws Exception {
 		this.name = aOperName;
 		this.errorInfo = aErrorInfo;
 		this.serviceObject = aServiceObject;
 		this.functionName = aFunctionName;
 		this.parameterClasses = aParameterClassTypes;
+	    this.operDataDesc = aParameterDesc;
+	    this.operDataAnnotation = aParameterAnnotation;
 		this.parameterTypes = new String[this.parameterClasses.length];
 		for (int i = 0; i < this.parameterClasses.length; i++) {
 			this.parameterTypes[i] = this.parameterClasses[i].getName();
@@ -100,12 +106,14 @@ class SelfDefineServiceFunctionOperator extends OperatorBase{
 	}
   
   public SelfDefineServiceFunctionOperator(String aOperName,Object aServiceObject, String aFunctionName,
-                         String[] aParameterTypes,String aErrorInfo) throws Exception {
+                         String[] aParameterTypes,String[] aParameterDesc,String[] aParameterAnnotation,String aErrorInfo) throws Exception {
     this.name = aOperName;
     this.errorInfo = aErrorInfo;
     this.serviceObject = aServiceObject;
     this.functionName = aFunctionName;
     this.parameterTypes = aParameterTypes;
+    this.operDataDesc = aParameterDesc;
+    this.operDataAnnotation = aParameterAnnotation;
     this.parameterClasses = new Class[this.parameterTypes.length];
     for(int i=0;i<this.parameterClasses.length;i++){
       this.parameterClasses[i] =ExpressUtil.getJavaClass(this.parameterTypes[i]);

@@ -42,6 +42,15 @@ public abstract class OperatorBase {
 	 * 决定此操作是否能够被缓存
 	 */
 	protected boolean isCanCache = false;
+	/**
+	 * 操作数描述
+	 */
+	protected String[] operDataDesc;
+	/**
+	 * 操作数的其它定义
+	 */
+	protected String[] operDataAnnotation;
+	
     public void setIsCanCache(boolean value){
     	this.isCanCache = value;
     }
@@ -104,6 +113,12 @@ public abstract class OperatorBase {
     }
 	public abstract OperateData executeInner(InstructionSetContext<String,Object> parent, OperateData[] list) throws Exception;
 
+	public String[] getOperDataDesc(){
+		return this.operDataDesc;
+	}
+	public String[] getOperDataAnnotaion(){
+		return this.operDataAnnotation;
+	}
 	public void setName(String aName) {
 		this.name = aName;
 	}

@@ -83,6 +83,14 @@ public class ExpressRunner {
 	public void addFunction(String name, OperatorBase op) {
 		this.operatorManager.addOperator(name, op);
 	};
+	/**
+	 * 获取函数定义，通过函数定义可以拿到参数的说明信息
+	 * @param name 函数名称
+	 * @return
+	 */
+	public OperatorBase getFunciton(String name){
+		return this.operatorManager.getOperator(name);
+	}
     /**
      * 添加一个类的函数定义，例如：Math.abs(double) 映射为表达式中的 "取绝对值(-5.0)"
      * @param name 函数名称
@@ -96,7 +104,25 @@ public class ExpressRunner {
 			String aFunctionName, Class<?>[] aParameterClassTypes,
 			String errorInfo) throws Exception {
 		this.operatorManager.addFunctionOfClassMethod(name, aClassName,
-				aFunctionName, aParameterClassTypes, errorInfo);
+				aFunctionName, aParameterClassTypes,null,null,errorInfo);
+	}
+    /**
+     * 添加一个类的函数定义，例如：Math.abs(double) 映射为表达式中的 "取绝对值(-5.0)"
+     * @param name 函数名称
+     * @param aClassName 类名称
+     * @param aFunctionName 类中的方法名称
+     * @param aParameterClassTypes 方法的参数类型名称
+     * @param aParameterDesc 方法的参数说明     
+     * @param aParameterAnnotation 方法的参数注解
+     * @param errorInfo 如果函数执行的结果是false，需要输出的错误信息
+     * @throws Exception
+     */
+	public void addFunctionOfClassMethod(String name, String aClassName,
+			String aFunctionName, Class<?>[] aParameterClassTypes,
+			String[] aParameterDesc,String[] aParameterAnnotation,
+			String errorInfo) throws Exception {
+		this.operatorManager.addFunctionOfClassMethod(name, aClassName,
+				aFunctionName, aParameterClassTypes,aParameterDesc,aParameterAnnotation,errorInfo);
 	}
     /**
      * 添加一个类的函数定义，例如：Math.abs(double) 映射为表达式中的 "取绝对值(-5.0)"
@@ -111,7 +137,26 @@ public class ExpressRunner {
 			String aFunctionName, String[] aParameterTypes, String errorInfo)
 			throws Exception {
 		this.operatorManager.addFunctionOfClassMethod(name, aClassName,
-				aFunctionName, aParameterTypes, errorInfo);
+				aFunctionName, aParameterTypes,null,null, errorInfo);
+	}
+    /**
+     * 添加一个类的函数定义，例如：Math.abs(double) 映射为表达式中的 "取绝对值(-5.0)"
+     * @param name 函数名称
+     * @param aClassName 类名称
+     * @param aFunctionName 类中的方法名称
+     * @param aParameterTypes 方法的参数类型名称
+     * @param aParameterDesc 方法的参数说明     
+     * @param aParameterAnnotation 方法的参数注解
+     * @param errorInfo 如果函数执行的结果是false，需要输出的错误信息
+     * @throws Exception
+     */
+	public void addFunctionOfClassMethod(String name, String aClassName,
+			String aFunctionName, String[] aParameterTypes,
+			String[] aParameterDesc,String[] aParameterAnnotation,
+			String errorInfo)
+			throws Exception {
+		this.operatorManager.addFunctionOfClassMethod(name, aClassName,
+				aFunctionName, aParameterTypes,aParameterDesc,aParameterAnnotation, errorInfo);
 	}
     /**
      * 用于将一个用户自己定义的对象(例如Spring对象)方法转换为一个表达式计算的函数
@@ -126,7 +171,25 @@ public class ExpressRunner {
 			String aFunctionName, Class<?>[] aParameterClassTypes,
 			String errorInfo) throws Exception {
 		this.operatorManager.addFunctionOfServiceMethod(name, aServiceObject,
-				aFunctionName, aParameterClassTypes, errorInfo);
+				aFunctionName, aParameterClassTypes,null,null,errorInfo);
+	}
+    /**
+     * 用于将一个用户自己定义的对象(例如Spring对象)方法转换为一个表达式计算的函数
+     * @param name
+     * @param aServiceObject
+     * @param aFunctionName
+     * @param aParameterClassTypes
+     * @param aParameterDesc 方法的参数说明     
+     * @param aParameterAnnotation 方法的参数注解
+     * @param errorInfo
+     * @throws Exception
+     */	
+	public void addFunctionOfServiceMethod(String name, Object aServiceObject,
+			String aFunctionName, Class<?>[] aParameterClassTypes,
+			String[] aParameterDesc,String[] aParameterAnnotation,
+			String errorInfo) throws Exception {
+		this.operatorManager.addFunctionOfServiceMethod(name, aServiceObject,
+				aFunctionName, aParameterClassTypes,aParameterDesc,aParameterAnnotation, errorInfo);
 
 	}
     /**
@@ -142,7 +205,15 @@ public class ExpressRunner {
 			String aFunctionName, String[] aParameterTypes, String errorInfo)
 			throws Exception {
 		this.operatorManager.addFunctionOfServiceMethod(name, aServiceObject,
-				aFunctionName, aParameterTypes, errorInfo);
+				aFunctionName, aParameterTypes,null,null,errorInfo);
+	}
+	public void addFunctionOfServiceMethod(String name, Object aServiceObject,
+			String aFunctionName, String[] aParameterTypes,
+			String[] aParameterDesc,String[] aParameterAnnotation,
+			String errorInfo)
+			throws Exception {
+		this.operatorManager.addFunctionOfServiceMethod(name, aServiceObject,
+				aFunctionName, aParameterTypes,aParameterDesc,aParameterAnnotation, errorInfo);
 	}
 	/**
 	 * 添加操作符号，此操作符号的优先级与 "*"相同，语法形式也是  data name data

@@ -58,44 +58,50 @@ public class OperatorFactory {
 	
 	public void addFunctionOfClassMethod(String name, String aClassName,
 			String aFunctionName, Class<?>[] aParameterClassTypes,
+			String[] aParameterDesc,String[] aParameterAnnotation,
 			String errorInfo) throws Exception {
 		if (errorInfo != null && errorInfo.trim().length() == 0) {
 			errorInfo = null;
 		}
 		this.addOperator(name, new SelfDefineClassFunctionOperator(name,
-				aClassName, aFunctionName, aParameterClassTypes, errorInfo));
+				aClassName, aFunctionName, aParameterClassTypes,aParameterDesc,aParameterAnnotation, errorInfo));
 
 	}
 
 	public void addFunctionOfClassMethod(String name, String aClassName,
 			String aFunctionName, String[] aParameterClassTypes,
+			String[] aParameterDesc,String[] aParameterAnnotation,
 			String errorInfo) throws Exception {
 		if (errorInfo != null && errorInfo.trim().length() == 0) {
 			errorInfo = null;
 		}
 		this.addOperator(name, new SelfDefineClassFunctionOperator(name,
-				aClassName, aFunctionName, aParameterClassTypes, errorInfo));
+				aClassName, aFunctionName, aParameterClassTypes, aParameterDesc,aParameterAnnotation,errorInfo));
 
 	}
 
 	public void addFunctionOfServiceMethod(String name, Object aServiceObject,
-			String aFunctionName, Class<?>[] aParameterTypes, String errorInfo)
+			String aFunctionName, Class<?>[] aParameterTypes,
+			String[] aParameterDesc,String[] aParameterAnnotation,
+			String errorInfo)
 			throws Exception {
 		if (errorInfo != null && errorInfo.trim().length() == 0) {
 			errorInfo = null;
 		}
 		this.addOperator(name, new SelfDefineServiceFunctionOperator(name,
-				aServiceObject, aFunctionName, aParameterTypes, errorInfo));
+				aServiceObject, aFunctionName, aParameterTypes,aParameterDesc,aParameterAnnotation, errorInfo));
 	}
 
 	public void addFunctionOfServiceMethod(String name, Object aServiceObject,
-			String aFunctionName, String[] aParameterTypeNames, String errorInfo)
+			String aFunctionName, String[] aParameterTypeNames,
+			String[] aParameterDesc,String[] aParameterAnnotation,
+			String errorInfo)
 			throws Exception {
 		if (errorInfo != null && errorInfo.trim().length() == 0) {
 			errorInfo = null;
 		}
 		this.addOperator(name, new SelfDefineServiceFunctionOperator(name,
-				aServiceObject, aFunctionName, aParameterTypeNames, errorInfo));
+				aServiceObject, aFunctionName, aParameterTypeNames,aParameterDesc,aParameterAnnotation, errorInfo));
 	}
 	 @SuppressWarnings("unchecked")
 	public void addOperatorWithAlias(String aAliasName,String name,String errorInfo) throws Exception{
