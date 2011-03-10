@@ -88,7 +88,21 @@ public class WordSplit
             list.add(tmpWord);
             tmpWord  = "";
         }
-        list.add(str.substring(i,index + 1));
+        String tempDealStr = str.substring(i,index + 1);
+        //处理 \\，\"的情况
+        String tmpResult = "";
+        int tmpPoint = tempDealStr.indexOf("\\");        
+        while(tmpPoint >=0 ){
+        	tmpResult = tmpResult + tempDealStr.substring(0,tmpPoint);
+        	if(tmpPoint == tempDealStr.length() -1){
+        		throw new Exception("字符串中的" + "\\错误:" + tempDealStr);
+        	}
+        	tmpResult = tmpResult + tempDealStr.substring(tmpPoint + 1 ,tmpPoint + 2);
+        	tempDealStr = tempDealStr.substring(tmpPoint + 2);
+        	tmpPoint = tempDealStr.indexOf("\\");  
+        }
+        tmpResult = tmpResult + tempDealStr;
+        list.add(tmpResult);
         i = index + 1;
       }else if (((c >='0') && (c <='9'))
             || ((c >='a') && (c <='z'))
