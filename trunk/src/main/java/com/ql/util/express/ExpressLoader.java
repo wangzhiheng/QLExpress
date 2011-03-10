@@ -26,7 +26,7 @@ public class ExpressLoader {
 		fileName = fileName.replace('.', '/') +".ql";
 		InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream(fileName);
 		if(in  == null){
-			throw new Exception("不能找到表达是文件：" + fileName);
+			throw new Exception("不能找到表达式文件：" + fileName);
 		}
 		BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 		StringBuilder builder = new  StringBuilder();
