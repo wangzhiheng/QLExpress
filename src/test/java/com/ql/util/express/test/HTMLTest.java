@@ -13,6 +13,7 @@ public class HTMLTest {
 		String express ="\"经\\\"费收\\\"入\\\"aaa-\" + 100";
 		Object r = runner.execute(express, null, null, false, true);
 		System.out.println(r);
-		Assert.assertTrue("字符串解析错误：",r.equals("经\\\"费收\\\"入\\\"aaa-100"));		
+		System.out.println("经\"费收\"入\"aaa-100");
+		Assert.assertTrue("字符串解析错误：",r.equals("经\"费收\"入\"aaa-100"));		
 	}
 }
