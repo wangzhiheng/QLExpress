@@ -47,7 +47,7 @@ public class ExpressLoader {
 			throws Exception {
 		synchronized (expressInstructionSetCache) {
 			if (expressInstructionSetCache.containsKey(expressName)) {
-				throw new Exception("表达是定义重复：" + expressName);
+				throw new Exception("表达式定义重复：" + expressName);
 			}
 			expressInstructionSetCache.put(expressName, set);
 		}
@@ -57,7 +57,7 @@ public class ExpressLoader {
 			String expressString) throws Exception {
 		InstructionSet parseResult = null;
 		if (expressInstructionSetCache.containsKey(expressName)) {
-			throw new Exception("表达是定义重复：" + expressName);
+			throw new Exception("表达式定义重复：" + expressName);
 		}
 		synchronized (expressInstructionSetCache) {
 			parseResult = this.creator.parseInstructionSet(expressString);
