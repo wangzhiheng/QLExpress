@@ -326,6 +326,8 @@ public class ExpressParse {
 					buildStatementTree(nodes, i, matchResult);
 					if(i == nodes.size() -1 && nodes.get(i).getRealTreeType() != null){
 						break;
+					}else if(matchResult.matchLastIndex - i == 1){
+						i = i+1;
 					}
 				}else{
 				    i = i + 1;
@@ -343,6 +345,7 @@ public class ExpressParse {
     public MatchResult findMatchStatement(List<ExpressNode> nodes,int point,List<NodeType> aStatementDefines) throws Exception{
     	for(int i =0;i<aStatementDefines.size();i++){
     		StatementDefine statement = aStatementDefines.get(i).getStatementDefine();
+			//System.out.println("match:" + statement + ":" + point + ":" + nodes);
     		if(statement == null){ 
     			throw new RuntimeException("没有为" + aStatementDefines.get(i).getTag() +"定义语法规则DEFINE,检查定义：" + aStatementDefines.get(i).getDefineStr());
     		}

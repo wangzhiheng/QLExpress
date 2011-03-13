@@ -15,7 +15,7 @@ public class NodeTypeManager {
 			 "for", "if", "then", "else", "exportAlias", "alias",
 			 "break", "continue", "return", "macro", "function" ,
 			 "cache", "def","exportDef", "new","array",
-			 "like",  
+			 "like",
 			 "=","cast","/**","**/"
 	};
 		private String[] nodeTypeDefines = new String[] {
@@ -45,13 +45,15 @@ public class NodeTypeManager {
 
 				"STAT_IFELSE:TYPE=TREETYPE,DEFINE=(if^)$(()|(((OPDATA|OP_LIST)*)#()))$then$({}|(((OPDATA|OP_LIST|;)*)#{}))$else$({}|(((OPDATA|OP_LIST)*)$(;|EOF)#{})),FACTORY=com.ql.util.express.instruction.IfInstructionFactory",
 				"STAT_IF:TYPE=TREETYPE,    DEFINE=(if^)$(()|(((OPDATA|OP_LIST)*)#()))$then$({}|(((OPDATA|OP_LIST)*)$(;|EOF)#{})),FACTORY=com.ql.util.express.instruction.IfInstructionFactory",
+				"STAT_IFELSE_JAVA:TYPE=TREETYPE,DEFINE=(if^)$()$({}|(((OPDATA|OP_LIST|;)*)#{}))$else$({}|(((OPDATA|OP_LIST)*)$(;|EOF)#{})),FACTORY=com.ql.util.express.instruction.IfInstructionFactory",
+				"STAT_IF_JAVA:TYPE=TREETYPE,    DEFINE=(if^)$()$({}|(((OPDATA|OP_LIST)*)$(;|EOF)#{})),FACTORY=com.ql.util.express.instruction.IfInstructionFactory",
 				                                    
 				"STAT_FOR:TYPE=TREETYPE,DEFINE=(for^)$()${},FACTORY=com.ql.util.express.instruction.ForInstructionFactory",
 				"STAT_SEMICOLON:TYPE=TREETYPE,FACTORY=com.ql.util.express.instruction.BlockInstructionFactory",
 				"STAT_SEMICOLON_EOF:TYPE=TREETYPE,FACTORY=com.ql.util.express.instruction.BlockInstructionFactory",
 				"STAT_MACRO:TYPE=TREETYPE,DEFINE=(macro^)$ID->CONST_STRING${},FACTORY=com.ql.util.express.instruction.MacroInstructionFactory",
 				"STAT_FUNCTION:TYPE=TREETYPE,DEFINE=(function^)$ID->CONST_STRING$()${},FACTORY=com.ql.util.express.instruction.FunctionInstructionFactory",
-				"STATEMENT:TYPE=TREETYPE,CHILDREN=STAT_SEMICOLON|STAT_SEMICOLON_EOF|STAT_FOR|STAT_IFELSE|STAT_IF |STAT_MACRO ",
+				"STATEMENT:TYPE=TREETYPE,CHILDREN=STAT_SEMICOLON|STAT_SEMICOLON_EOF|STAT_FOR|STAT_IFELSE|STAT_IF|STAT_IF_JAVA|STAT_IFELSE_JAVA |STAT_MACRO ",
 
 				"FUNCTION_DEFINE:TYPE=DEFINE,FACTORY=com.ql.util.express.instruction.BlockInstructionFactory",
 				"ID:TYPE=SYMBOL,FACTORY=com.ql.util.express.instruction.LoadAttrInstructionFactory",
@@ -90,6 +92,7 @@ public class NodeTypeManager {
 				"EXPRESS_LEVEL7:TYPE=TREETYPE,DEFINE=OPDATA$(OP_LEVEL7^)$OPDATA,FACTORY=com.ql.util.express.instruction.OperatorInstructionFactory",			
 				"EXPRESS_LEVEL8:TYPE=TREETYPE,DEFINE=OPDATA$(OP_LEVEL8^)$OPDATA,FACTORY=com.ql.util.express.instruction.OperatorInstructionFactory",			
 				"EXPRESS_LEVEL9:TYPE=TREETYPE,DEFINE=OPDATA$(OP_LEVEL9^)$OPDATA,FACTORY=com.ql.util.express.instruction.OperatorInstructionFactory",			
+				"EXPRESS_JUDGEANDSET:TYPE=TREETYPE,DEFINE=OPDATA$?$OPDATA$:$OPDATA#EXPRESS_JUDGEANDSET,FACTORY=com.ql.util.express.instruction.IfInstructionFactory",
 				"EXPRESS_ASSIGN:TYPE=TREETYPE,DEFINE=OPDATA$(=^)$OPDATA,FACTORY=com.ql.util.express.instruction.OperatorInstructionFactory",
 				
 				"EXPRESS_RETURN_DATA:TYPE=TREETYPE,DEFINE=(return^)$OPDATA,FACTORY=com.ql.util.express.instruction.OperatorInstructionFactory",
@@ -104,16 +107,16 @@ public class NodeTypeManager {
 				
 				"CACHE_CALL:TYPE=TREETYPE,DEFINE=(cache^)$OPDATA,FACTORY=com.ql.util.express.instruction.CacheFunctionCallInstructionFactory",
 				
-				"EXPRESS:TYPE=TREETYPE,CHILDREN=EXPORT_VAR_DEFINE|VAR_DEFINE|NEW_OBJECT|NEW_ARRAY|CAST_CALL|ARRAY_CALL|METHOD_CALL|FIELD_CALL|FUNCTION_CALL|EXPRESS_ASSIGN|EXPRESS_LEVEL1|EXPRESS_LEVEL2|EXPRESS_LEVEL3|EXPRESS_LEVEL4|EXPRESS_LEVEL5|EXPRESS_LEVEL6|EXPRESS_LEVEL7|EXPRESS_LEVEL8|EXPRESS_LEVEL9|EXPRESS_RETURN_DATA|EXPRESS_RETURN_NULL|BREAK_CALL|CONTINUE_CALL|ALIAS_CALL|EXPORT_ALIAS_CALL|CACHE_CALL",
+				"EXPRESS:TYPE=TREETYPE,CHILDREN=EXPORT_VAR_DEFINE|VAR_DEFINE|NEW_OBJECT|NEW_ARRAY|CAST_CALL|ARRAY_CALL|METHOD_CALL|FIELD_CALL|FUNCTION_CALL|EXPRESS_JUDGEANDSET|EXPRESS_ASSIGN|EXPRESS_LEVEL1|EXPRESS_LEVEL2|EXPRESS_LEVEL3|EXPRESS_LEVEL4|EXPRESS_LEVEL5|EXPRESS_LEVEL6|EXPRESS_LEVEL7|EXPRESS_LEVEL8|EXPRESS_LEVEL9|EXPRESS_RETURN_DATA|EXPRESS_RETURN_NULL|BREAK_CALL|CONTINUE_CALL|ALIAS_CALL|EXPORT_ALIAS_CALL|CACHE_CALL",
 				"OPDATA:TYPE=TREETYPE,CHILDREN=CONST|ID|()|EXPRESS"
 		};
-		protected String statementDefineStrs = "STAT_FUNCTION,STAT_MACRO,STAT_FOR,STAT_IFELSE,STAT_IF";
+		protected String statementDefineStrs = "STAT_FUNCTION,STAT_MACRO,STAT_FOR,STAT_IFELSE,STAT_IF,STAT_IFELSE_JAVA,STAT_IF_JAVA";
 		protected String[] expressDefineStrs = {
 				"EXPORT_VAR_DEFINE,VAR_DEFINE,NEW_OBJECT,NEW_ARRAY,ARRAY_CALL,METHOD_CALL,FIELD_CALL,FUNCTION_CALL",
 				"CAST_CALL",
 				"EXPRESS_LEVEL1", "EXPRESS_LEVEL2", "EXPRESS_LEVEL3",
 				"EXPRESS_LEVEL4", "EXPRESS_LEVEL5", "EXPRESS_LEVEL6",
-				"EXPRESS_LEVEL7", "EXPRESS_LEVEL8","EXPRESS_LEVEL9","EXPRESS_ASSIGN", "BREAK_CALL,CONTINUE_CALL",
+				"EXPRESS_LEVEL7", "EXPRESS_LEVEL8","EXPRESS_LEVEL9","EXPRESS_JUDGEANDSET","EXPRESS_ASSIGN", "BREAK_CALL,CONTINUE_CALL",
 				"CACHE_CALL",
 				"EXPRESS_RETURN_DATA", "EXPRESS_RETURN_NULL",
 				"ALIAS_CALL,EXPORT_ALIAS_CALL" };
