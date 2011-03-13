@@ -12,6 +12,8 @@ public class NewExpressTest {
 	@Test
 	public void testParse() throws Exception{
 		String[][] expresses = new String[][]{
+				{"1==1? 50+50:100+100","100"},
+				{"1==2? 50+50:100+100","200"},				
 				{"int[][] abc = new int[10][10]; abc[0][0] = 100; abc[0][0]-10","90"},
 				{"Integer.parseInt(\"1\")-1","0"},
 				{"Double.parseDouble(\"-0.22\")","-0.22"},
@@ -32,7 +34,11 @@ public class NewExpressTest {
 				{"if(1==1) then{ return 100; }else{return 10;}","100"},
 				{"if(1==2) then{ return 100; }else{return 10;}","10"},
 				{"if(1==1) then{ return 100;}","100"},
-				{"if(1==2) then{ return 100;}","null"},
+				{"if(1==2) then{ return 100;}","null"},				
+				{"if(1==1) { return 100; }else{return 10;}","100"},
+				{"if(1==2) { return 100; }else{return 10;}","10"},
+				{"if(1==1) { return 100;}","100"},
+				{"if(1==2) { return 100;}","null"},
 				{"int i = 2","2"},
 				{"i=2;i<10;","true"},
 				{"a  =0 ; for(int i=0;i<10;i=i+1){a = a + 1;} return a;","10"},
