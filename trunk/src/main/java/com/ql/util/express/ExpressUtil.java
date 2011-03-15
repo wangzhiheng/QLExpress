@@ -92,6 +92,10 @@ public class ExpressUtil {
 		if (target.isAssignableFrom(source) == true){
 			return true;
 		}
+		if(source.isPrimitive() && target == Object.class){
+			return true;
+		}
+		
 		if (target.isPrimitive() == false) {
 			if (target == Byte.class)
 				target = byte.class;
