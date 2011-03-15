@@ -6,10 +6,21 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.ql.util.express.DefaultContext;
 import com.ql.util.express.ExpressRunner;
 import com.ql.util.express.IExpressContext;
 
 public class TestMap {
+
+	@Test
+	public void testInt2Object() throws Exception {
+		String express = "Map a = new HashMap(); a.put(\"a\",100 - 10);return a.get(\"a\")";
+		ExpressRunner runner = new ExpressRunner();
+		DefaultContext<String, Object> context = new DefaultContext<String, Object>();
+		Object r = runner.execute(express, context, null, false, true);
+		Assert.assertTrue("Map∂¡»°¥ÌŒÛ", r.toString().equalsIgnoreCase("90"));
+
+	}
 
 	@Test
 	public void testmain() throws Exception {
