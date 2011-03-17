@@ -407,6 +407,8 @@ class OperatorMethod extends OperatorBase {
 		this.isCanCache = true;
 	}
 
+	static Class<?> ArrayClass = (new Object[]{}).getClass();
+	
 	public OperateData executeInner(InstructionSetContext<String,Object> parent, OperateData[] list) throws Exception {
 		Object obj = list[0].getObject(parent);
 		String methodName = list[1].getObject(parent).toString();
@@ -431,7 +433,17 @@ class OperatorMethod extends OperatorBase {
 				m = ExpressUtil.findMethodWithCache(obj.getClass(), methodName,
 						types, true, false);
 			}
-
+			if(m == null){
+				types = new Class[]{ArrayClass};
+				if (list[0] instanceof OperateClass) {// 调用静态方法
+					m = ExpressUtil.findMethod((Class<?>) obj, methodName,
+							types, true, true);
+				} else {
+					m = ExpressUtil.findMethod(obj.getClass(), methodName,
+							types, true, false);
+				}
+				objs = new Object[]{objs};				
+			}
 			if (m == null) {
 				StringBuilder  s = new StringBuilder();
 				s.append("没有找到" + obj.getClass().getName() + "的方法："
@@ -444,7 +456,7 @@ class OperatorMethod extends OperatorBase {
 				s.append(")");
 				throw new Exception(s.toString());
 			}
-
+			
 			if (list[0] instanceof OperateClass) {// 调用静态方法
 				tmpObj = m.invoke(null,ExpressUtil.transferArray(objs,m.getParameterTypes()));
 			} else {
