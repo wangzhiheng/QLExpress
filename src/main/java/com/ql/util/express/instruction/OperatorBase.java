@@ -418,11 +418,14 @@ class OperatorMethod extends OperatorBase {
 			throw new Exception(msg + methodName);
 		} else {
 			Class<?>[] types = new Class[list.length - 2];
+			Class<?>[] orgiTypes = new Class[list.length - 2];
+			
 			Object[] objs = new Object[list.length - 2];
 			Object tmpObj;
 			for (int i = 0; i < types.length; i++) {
 				tmpObj = list[i + 2].getObject(parent);
 				types[i] = list[i + 2].getType(parent);
+				orgiTypes[i] = list[i + 2].getType(parent);
 				objs[i] = tmpObj;
 			}
 			Method m = null;
@@ -448,10 +451,10 @@ class OperatorMethod extends OperatorBase {
 				StringBuilder  s = new StringBuilder();
 				s.append("没有找到" + obj.getClass().getName() + "的方法："
 						+ methodName + "(");
-				for (int i = 0; i < types.length; i++) {
+				for (int i = 0; i < orgiTypes.length; i++) {
 					if (i > 0)
 						s.append(",");
-					s.append(types[i].getName());
+					s.append(orgiTypes[i].getName());
 				}
 				s.append(")");
 				throw new Exception(s.toString());
