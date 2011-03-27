@@ -32,7 +32,7 @@ public class ExpressLoader {
 		StringBuilder builder = new  StringBuilder();
 		String tmpStr = null;
 		while( ( tmpStr = reader.readLine()) != null){
-			builder.append(tmpStr);
+			builder.append(tmpStr).append("\n");
 		}
 		return builder.toString();
 	}
