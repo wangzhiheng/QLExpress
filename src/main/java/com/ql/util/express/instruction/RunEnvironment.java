@@ -1,14 +1,12 @@
 package com.ql.util.express.instruction;
 
-import java.util.Arrays;
-
 import com.ql.util.express.InstructionSet;
 import com.ql.util.express.InstructionSetContext;
 import com.ql.util.express.OperateData;
 
 
 public class RunEnvironment {
-		private static int INIT_DATA_LENTH = 5;
+		private static int INIT_DATA_LENTH = 10;
 	    private boolean isTrace = false;	
 		private int point = -1;
 	    private int programPoint = 0;
@@ -92,13 +90,26 @@ public class RunEnvironment {
 		public void gotoWithOffset(int aOffset ){
 			this.programPoint = this.programPoint + aOffset;
 		}
-
+	/**
+	 * 此方法是调用最频繁的，因此尽量精简代码，提高效率 
+	 * @param context
+	 * @param len
+	 * @return
+	 * @throws Exception
+	 */
 		public OperateData[] popArray(InstructionSetContext<String, Object> context,int len) throws Exception {
+			int start = point - len + 1;
 			OperateData[] result = new OperateData[len];
+			System.arraycopy(this.dataContainer,start, result,0, len);
+			point = point - len;
+			return result;
+		}
+		public OperateData[] popArrayBackUp(InstructionSetContext<String, Object> context,int len) throws Exception {
 			int start = point - len + 1;
 			if(start <0){
 				throw new Exception("堆栈溢出，请检查表达式是否错误");
 			}
+			OperateData[] result = new OperateData[len];
 			for (int i = 0 ; i < len; i++) {
 				result[i] = this.dataContainer[start + i];
 				if(void.class.equals(result[i].getType(context))){
@@ -116,7 +127,9 @@ public class RunEnvironment {
 				if (newCapacity < minCapacity){
 					newCapacity = minCapacity;
 				}
-				this.dataContainer = Arrays.copyOf(this.dataContainer, newCapacity);
+				OperateData[] tempList = new OperateData[newCapacity];
+				System.arraycopy(this.dataContainer,0,tempList,0,this.point + 1);
+				this.dataContainer = tempList;
 			}
 		}
 	}
