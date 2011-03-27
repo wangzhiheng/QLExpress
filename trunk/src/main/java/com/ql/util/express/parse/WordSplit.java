@@ -20,7 +20,7 @@ public class WordSplit
 
 	  private static final Log log = LogFactory.getLog(WordSplit.class);
 	  
-	   public static  void splitOperator(NodeTypeManager nodeManager,String opStr,List<String> objList){
+	   public static  void splitOperator(NodeTypeManager nodeManager,String opStr,List<Word> objList,int aLine,int aCol){
 		     String orgiStr = opStr;
 		     while (opStr.length() >0){ //处理操作符字串
 		          boolean isFind = false;
@@ -29,7 +29,7 @@ public class WordSplit
 		          {
 		              if (nodeManager.isExistNodeTypeDefine(opStr.substring(0,index)) != null)
 		              {
-		            	 objList.add(opStr.substring(0,index));
+		            	 objList.add(new Word(opStr.substring(0,index),aLine,aCol));
 		                 opStr = opStr.substring(index);
 		                 isFind = true;
 		                 break;
@@ -60,15 +60,16 @@ public class WordSplit
    * @throws Exception
    * @return String[]
    */
-   public static String[] parse(NodeTypeManager nodeManager,String str) throws Exception
+   public static Word[] parse(NodeTypeManager nodeManager,String str) throws Exception
   {
     if (str == null){
-       return new String[0];
+       return new Word[0];
     }
     String tmpWord ="";
     String tmpOpStr ="";
     char c;
-    List<String> list = new ArrayList<String>();
+    int line =1;
+    List<Word> list = new ArrayList<Word>();
     int i= 0;
     while(i<str.length())
     {
@@ -82,10 +83,10 @@ public class WordSplit
         if (index < 0)
         	throw new Exception("字符串没有关闭");
         //先将操作符填入队列，再填充操作数
-        splitOperator(nodeManager,tmpOpStr,list);
+        splitOperator(nodeManager,tmpOpStr,list,line,i);
         tmpOpStr="";
         if (tmpWord.length() >0){
-            list.add(tmpWord);
+            list.add(new Word(tmpWord,line,i));
             tmpWord  = "";
         }
         String tempDealStr = str.substring(i,index + 1);
@@ -102,7 +103,7 @@ public class WordSplit
         	tmpPoint = tempDealStr.indexOf("\\");  
         }
         tmpResult = tmpResult + tempDealStr;
-        list.add(tmpResult);
+        list.add(new Word(tmpResult,line,i));
         i = index + 1;
       }else if (((c >='0') && (c <='9'))
             || ((c >='a') && (c <='z'))
@@ -114,21 +115,24 @@ public class WordSplit
        {
            tmpWord = tmpWord + c;
            i = i + 1;
-           splitOperator(nodeManager,tmpOpStr,list);
+           splitOperator(nodeManager,tmpOpStr,list,line,i);
            tmpOpStr = "";
        }else if(c=='.' && isNumber(tmpWord) == true){
            //是数字，当数据处理
            tmpWord = tmpWord + c;
            i = i + 1;
-           splitOperator(nodeManager,tmpOpStr,list);
+           splitOperator(nodeManager,tmpOpStr,list,line,i);
            tmpOpStr = "";
        }else{	   
          if (tmpWord.length() >0)
-         {    list.add(tmpWord);
+         {    list.add(new Word(tmpWord,line,i));
               tmpWord = "";
          }
          if(c == ' ' ||c =='\r'|| c =='\n'||c=='\t'||c=='\u000C'){
-        	 splitOperator(nodeManager,tmpOpStr,list);
+        	 if(c =='\n'){
+        		 line = line + 1;
+        	 }
+        	 splitOperator(nodeManager,tmpOpStr,list,line,i);
         	 tmpOpStr = "";
          }else{
              tmpOpStr = tmpOpStr + c;
@@ -138,12 +142,12 @@ public class WordSplit
     }
 
     if (tmpWord.length() >0)
-    {    list.add(tmpWord);
+    {    list.add(new Word(tmpWord,line,i));
          tmpWord = "";
     }
-    splitOperator(nodeManager,tmpOpStr,list);
+    splitOperator(nodeManager,tmpOpStr,list,line,i);
 
-    String result[] = new String[list.size()];
+    Word result[] = new Word[list.size()];
     list.toArray(result);
     return result;
   }
