@@ -24,7 +24,7 @@ public class ExpressParse {
 	 * @return
 	 * @throws Exception
 	 */
-	public List<ExpressNode> transferWord2ExpressNode(ExpressPackage aRootExpressPackage,String[] words) throws Exception{
+	public List<ExpressNode> transferWord2ExpressNode(ExpressPackage aRootExpressPackage,Word[] wordObjects) throws Exception{
 		List<ExpressNode> result = new ArrayList<ExpressNode>();
 		String tempWord;
 		NodeType tempType;
@@ -34,15 +34,15 @@ public class ExpressParse {
 	    boolean isImport = false;
 	    StringBuffer importName = new StringBuffer();
 	    int point = 0;
-	    while(point <words.length ){
-	      if(words[point].equals("import") ==true){
+	    while(point <wordObjects.length ){
+	      if(wordObjects[point].word.equals("import") ==true){
 	    	  isImport = true;
 	    	  importName.setLength(0);
-	      }else if(words[point].equals(";") ==true) {
+	      }else if(wordObjects[point].word.equals(";") ==true) {
 	    	  isImport = false;
 	    	  tmpImportPackage.addPackage(importName.toString());
 	      }else if(isImport == true){
-	    	  importName.append(words[point]);
+	    	  importName.append(wordObjects[point].word);
 	      }else{
 	    	  break;
 	      }
@@ -52,8 +52,11 @@ public class ExpressParse {
 		String orgiValue = null;
 		Object objectValue = null;
 		NodeType treeNodeType = null;
-		while(point <words.length){
-		  tempWord = words[point];
+		Word tmpWordObject = null;
+		while(point <wordObjects.length){
+		  tmpWordObject = wordObjects[point];
+		  tempWord = wordObjects[point].word;
+		  
 		  char firstChar = tempWord.charAt(0);
 		  char lastChar = tempWord.substring(tempWord.length() - 1).toLowerCase().charAt(0);		  
 		  if(firstChar >='0' && firstChar<='9'){
@@ -130,16 +133,16 @@ public class ExpressParse {
 					int j = point;
 					Class<?> tmpClass = null;
 					String tmpStr = "";
-					while (j < words.length) {
-						tmpStr = tmpStr + words[j];
+					while (j < wordObjects.length) {
+						tmpStr = tmpStr + wordObjects[j].word;
 						tmpClass = tmpImportPackage.getClass(tmpStr);
 						if (tmpClass != null) {
 							point = j + 1;
 							isClass = true;
 							break;
 						}
-						if (j < words.length - 1 && words[j + 1].equals(".") == true) {
-							tmpStr = tmpStr + words[j + 1];
+						if (j < wordObjects.length - 1 && wordObjects[j + 1].word.equals(".") == true) {
+							tmpStr = tmpStr + wordObjects[j + 1].word;
 							j = j + 2;
 							continue;
 						} else {
@@ -150,8 +153,8 @@ public class ExpressParse {
 						// 处理数组问题
 						String arrayStr = "";
 						int tmpPoint = point;
-						while (tmpPoint < words.length) {
-							if (words[tmpPoint].equals("[]")) {
+						while (tmpPoint < wordObjects.length) {
+							if (wordObjects[tmpPoint].word.equals("[]")) {
 								arrayStr = arrayStr + "[]";
 								tmpPoint = tmpPoint + 1;
 							} else {
@@ -176,7 +179,7 @@ public class ExpressParse {
 				}
 		  }	  
 		  //System.out.println(tempWord+":" +objectValue + ":" + (objectValue == null?"":objectValue.getClass()));
-		  result.add(new ExpressNode(tempType,tempWord,orgiValue,objectValue,treeNodeType));
+		  result.add(new ExpressNode(tempType,tempWord,orgiValue,objectValue,treeNodeType,tmpWordObject.line,tmpWordObject.col));
 		  treeNodeType = null;
 		  objectValue = null;
 		  orgiValue = null;
@@ -395,7 +398,7 @@ public class ExpressParse {
 		return builder.toString();
 	}
 	public ExpressNode parse(ExpressPackage rootExpressPackage,String express,boolean isTrace) throws Exception{
-		String[] words = WordSplit.parse(this.nodeTypeManager,express);
+		Word[] words = WordSplit.parse(this.nodeTypeManager,express);
 		if(isTrace == true){
 			log.debug("执行的表达式:" + express);	
 			log.debug("单词分解结果:" + WordSplit.getPrintInfo(words,","));  
@@ -426,7 +429,7 @@ public class ExpressParse {
 		String condition="/** a **/";
 		NodeTypeManager manager = new NodeTypeManager();
 		ExpressParse parse = new ExpressParse(manager);
-		String[] words = WordSplit.parse(manager,condition);
+		Word[] words = WordSplit.parse(manager,condition);
 			log.debug("执行的表达式:" + condition);	
 			log.debug("单词分解结果:" + WordSplit.getPrintInfo(words,","));  
     	List<ExpressNode> tempList = parse.transferWord2ExpressNode(null,words);    	

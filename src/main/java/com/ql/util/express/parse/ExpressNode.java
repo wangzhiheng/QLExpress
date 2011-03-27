@@ -30,13 +30,19 @@ public class ExpressNode{
 	private List<ExpressNode> rightChildren;
 	private boolean isSplitStatement = false;
 	
-	//private int line;
-	//private int position;
+	/**
+	 * 行号
+	 */
+	private int line;
+	/**
+	 * 列号
+	 */
+	private int col;
 	
 	public ExpressNode(NodeType aType,String aValue) throws Exception{
-		this(aType, aValue, null,null,null);
+		this(aType, aValue, null,null,null,-1,-1);
 	}
-	public ExpressNode(NodeType aType,String aValue,String aOrgiValue,Object aObjectValue,NodeType aTreeType) throws Exception{
+	public ExpressNode(NodeType aType,String aValue,String aOrgiValue,Object aObjectValue,NodeType aTreeType,int aLine,int aCol) throws Exception{
 		if(aType == null){
 			throw new Exception(aValue + " 没有找到对应的节点类型");
 		}
@@ -51,6 +57,8 @@ public class ExpressNode{
 		if(aObjectValue != null){
 			this.objectValue = aObjectValue;
 		}
+		this.line = aLine;
+		this.col =aCol;
 	}
 	
 	public NodeType isEqualsOrChildAndReturn(NodeType parent){
@@ -135,9 +143,23 @@ public class ExpressNode{
 		this.parent = parent;
 	}
 	
+	public int getLine() {
+		return line;
+	}
+	public void setLine(int line) {
+		this.line = line;
+	}
+	
+	public int getCol() {
+		return col;
+	}
+	public void setCol(int col) {
+		this.col = col;
+	}
 	public NodeType getRealTreeType(){
 		return this.treeType;
 	}
+	
 	public NodeType getTreeType() {
 		if(this.treeType == null){
 			return this.nodeType;
@@ -145,6 +167,7 @@ public class ExpressNode{
 		    return treeType;
 		}
 	}
+	
 	public void setTreeType(NodeType treeType) {
 		this.treeType = treeType;
 	}
@@ -193,6 +216,8 @@ public class ExpressNode{
 	}
 	
 	public String toString(){
-		  return (this.orgiValue == null ? this.getValue():this.orgiValue) + (this.nodeType.getTag() == null?"":(":" + this.nodeType.getTag()));
+		  String str =  (this.orgiValue == null ? this.getValue():this.orgiValue) + (this.nodeType.getTag() == null?"":(":" + this.nodeType.getTag()));
+		 // return str + "[" + this.line +"," + this.col +"]";
+		  return str;
 	}
 }

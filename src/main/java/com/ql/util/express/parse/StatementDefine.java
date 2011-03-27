@@ -57,7 +57,7 @@ class StatementDefine{
 		String condition = "if 1+2-4+8 then 4+8;3+2 else {1+3;}3+9;";
 		NodeTypeManager manager = new NodeTypeManager();
 		ExpressParse parse = new ExpressParse(manager);
-		String[] words = WordSplit.parse(manager, condition);
+		Word[] words = WordSplit.parse(manager, condition);
 		log.debug("执行的表达式:" + condition);
 		log.debug("单词分解结果:" + WordSplit.getPrintInfo(words, ","));
 		List<ExpressNode> tempList = parse.transferWord2ExpressNode(null,words);
