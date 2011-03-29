@@ -425,6 +425,9 @@ class OperatorMethod extends OperatorBase {
 			for (int i = 0; i < types.length; i++) {
 				tmpObj = list[i + 2].getObject(parent);
 				types[i] = list[i + 2].getType(parent);
+				if(types[i] == null) {
+					types[i] = Object.class;
+				}
 				orgiTypes[i] = list[i + 2].getType(parent);
 				objs[i] = tmpObj;
 			}
