@@ -6,7 +6,7 @@ import com.ql.util.express.OperateData;
 
 
 public class RunEnvironment {
-		private static int INIT_DATA_LENTH = 10;
+		private static int INIT_DATA_LENTH = 15;
 	    private boolean isTrace = false;	
 		private int point = -1;
 	    private int programPoint = 0;
