@@ -136,7 +136,15 @@ public class InstructionSet {
 			}
 			instruction = this.list.get(environmen.getProgramPoint());
 			instruction.setLog(aLog);//设置log
-			instruction.execute(environmen, errorList);
+			try{
+				instruction.execute(environmen, errorList);
+			}catch(Exception e){
+				log.error("当前ProgramPoint = " + environmen.getProgramPoint());
+				log.error("当前指令" +  instruction);
+				log.error("当前指令集" + this.list);
+				log.error(e);
+	            throw e;
+			}
 		}
 		if (environmen.isExit() == false && isLast == true) {// 是在执行完所有的指令后结束的代码
 			if (environmen.getDataStackSize() > 0) {
