@@ -9,6 +9,16 @@ import com.ql.util.express.DefaultContext;
 import com.ql.util.express.ExpressRunner;
 
 public class NumberComputerTest {
+	
+	@Test
+	public void testBigDecimalComputer() throws Exception {
+		String expressString = "1.0-0.42";
+		ExpressRunner runner = new ExpressRunner(true,false);
+		DefaultContext<String, Object>  context = new DefaultContext<String, Object>();	
+		Object r = runner.execute(expressString, context, null, false, false);
+		System.out.println(r);
+		Assert.assertTrue("¾«¶È¼ÆËã´íÎó",r.toString().equals("0.58"));
+	}	
 	@Test
 	public void testBigDecimalTransfer() throws Exception {
 		String expressString = "System.out.println(new java.math.BigDecimal(0.02))";
@@ -18,8 +28,7 @@ public class NumberComputerTest {
 		context.put("bean",bean);
 		Object r = runner.execute(expressString, context, null, false, false);
 		System.out.println(r);
-	}	
-	
+	}		
 	@Test
 	public void testBigDecimal() throws Exception {
 		String expressString = "bean.intValue = 10;" +
