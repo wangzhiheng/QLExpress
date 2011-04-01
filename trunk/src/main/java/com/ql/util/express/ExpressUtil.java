@@ -4,6 +4,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -50,11 +51,12 @@ public class ExpressUtil {
 	
 	public static Class<?>[][] classMatchs =new Class[][]{
 			//原始数据类型
-			{double.class,float.class},{double.class,long.class},{double.class,int.class}, {double.class,short.class},{double.class,byte.class},
-			{float.class,long.class},  {float.class,int.class},  {float.class,short.class},{float.class,byte.class},
+			{BigDecimal.class,double.class},{BigDecimal.class,float.class},{BigDecimal.class,long.class},{BigDecimal.class,int.class}, {BigDecimal.class,short.class},{BigDecimal.class,byte.class},
+			{double.class,float.class},{double.class,long.class},{double.class,int.class}, {double.class,short.class},{double.class,byte.class},{double.class,BigDecimal.class},
+			{float.class,long.class},  {float.class,int.class},  {float.class,short.class},{float.class,byte.class},{float.class,BigDecimal.class},
 			{long.class,int.class},    {long.class,short.class}, {long.class,byte.class},
 			{int.class,short.class},   {int.class,byte.class},
-			{short.class,byte.class},
+			{short.class,byte.class},			
 			//---------
 			{char.class,Character.class},{Character.class,char.class},
 			{boolean.class,Boolean.class},{Boolean.class,boolean.class}
@@ -189,7 +191,7 @@ public class ExpressUtil {
 		Class<?>[] bestMatch = null;
 		int bestMatchIndex = -1;
 
-		for (int i = candidates.length - 1; i >= 0; i--) {// 先从基类开始查找 墙辉
+		for (int i = candidates.length - 1; i >= 0; i--) {// 先从基类开始查找
 			Class<?>[] targetMatch = candidates[i];
 			if (ExpressUtil.isSignatureAssignable(idealMatch, targetMatch)
 					&& ((bestMatch == null) || ExpressUtil
@@ -248,7 +250,6 @@ public class ExpressUtil {
 				types.length, publicOnly, isStatic, null /* candidates */);
 		Method method = findMostSpecificMethod(types, (Method[]) candidates
 				.toArray(new Method[0]));
-
 		return method;
 	}
 
@@ -523,7 +524,8 @@ public class ExpressUtil {
 			}else if(bean instanceof Map ){
 				((Map<Object,Object>)bean).put(name, value);
 		    } else {
-				PropertyUtils.setProperty(bean, name.toString(), value);
+		    	Class<?> filedClass = PropertyUtils.getPropertyType(bean, name.toString());
+				PropertyUtils.setProperty(bean, name.toString(),ExpressUtil.castObject(value, filedClass, false));
 			}
 		} catch (Exception e) {
 			throw new RuntimeException("不能访问" + bean + "的property:" + name,e);
@@ -541,42 +543,38 @@ public class ExpressUtil {
 	  public static Object[] transferArray(Object[] values,Class<?>[] types){
 		  Object[] result = new Object[values.length];
 		  for(int i=0;i <result.length;i++){
-			  result[i] = transfer(values[i],types[i]);
+			  result[i] = castObject(values[i],types[i],false);
 		  }
 		  return result;
-	  }
-	  public static Object transfer(Object value,Class<?> type){
-		     if (value == null) return null;
-		     if(value.getClass() == type || type.isAssignableFrom(value.getClass())){
-		    	 return value;
-		     }
-		     if(value instanceof Number && (type.isPrimitive() || Number.class.isAssignableFrom(type))){
-		    	 return OperatorOfNumber.transfer((Number)value, type);
-		     }
-		     return value;
-		   }    
-	  public static Object castObject(Object value,Class<?> type) throws Exception{
-		     if (value == null) return null;
-		     if(value.getClass() == type || type.isAssignableFrom(value.getClass())){
-		    	 return value;
-		     }
-		     if(value instanceof Number && (type.isPrimitive() || Number.class.isAssignableFrom(type))){
-					if(type.equals(byte.class)  || type.equals(Byte.class) ) return ((Number)value).byteValue(); 
-					if(type.equals(short.class)  || type.equals(Short.class) ) return ((Number)value).shortValue(); 
-					if(type.equals(int.class)  || type.equals(Integer.class) ) return ((Number)value).intValue(); 
-					if(type.equals(long.class)  || type.equals(Long.class) ) return ((Number)value).longValue(); 
-					if(type.equals(float.class)  || type.equals(Float.class) ) return ((Number)value).floatValue(); 
-					if(type.equals(double.class)  || type.equals(Double.class) ) return ((Number)value).doubleValue(); 
-		     }
-		     return value;
-		   }    
+	  }  
+/**
+ * 
+ * @param value
+ * @param type
+ * @param isForce 是否强制转换
+ * @return
+ * @throws Exception
+ */
+	public static Object castObject(Object value, Class<?> type,boolean isForce){
+		if (value == null)
+			return null;
+		if (value.getClass() == type || type.isAssignableFrom(value.getClass())) {
+			return value;
+		}
+		if (value instanceof Number
+				&& (type.isPrimitive() || Number.class.isAssignableFrom(type))) {
+			return OperatorOfNumber.transfer((Number)value, type, isForce);
+		}else{
+			return value;
+		}
+	}
 
 	  
 		public static void main(String[] args) throws Exception {
 			System.out.println(replaceString("$1强化$2实施$2", new String[] { "qq",
 					"ff" }));
 			System.out.println(Number.class.isAssignableFrom(Long.class));
-			Object obj = transfer(Double.valueOf(1d),Double.class);
+			Object obj = castObject(Double.valueOf(1d),Double.class,false);
 			System.out.println(obj +":" + obj.getClass());
 		}   
 }

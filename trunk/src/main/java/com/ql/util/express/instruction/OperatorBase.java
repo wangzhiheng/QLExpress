@@ -37,7 +37,10 @@ public abstract class OperatorBase {
 	protected String name;
 
 	protected String errorInfo;
-	
+	/**
+	 * 是否需要高精度计算
+	 */
+	protected boolean isPrecise = false;
 	/**
 	 * 决定此操作是否能够被缓存
 	 */
@@ -139,6 +142,12 @@ public abstract class OperatorBase {
 		this.aliasName = aliasName;
 	}
 
+	public boolean isPrecise() {
+		return isPrecise;
+	}
+	public void setPrecise(boolean isPrecise) {
+		this.isPrecise = isPrecise;
+	}
 	public String getErrorInfo() {
 		return errorInfo;
 	}
@@ -165,7 +174,7 @@ class OperatorEvaluate extends OperatorBase {
 
 	public OperateData executeInner(InstructionSetContext<String,Object> parent,
 			OperateData op1, OperateData op2) throws Exception {
-		Class<?> targetType = op1.getType(parent);
+		Class<?> targetType = op1.getDefineType();
 		Class<?> sourceType = op2.getType(parent);
 		if (targetType != null) {
 			if (ExpressUtil.isAssignable(targetType, sourceType) == false) {
@@ -189,8 +198,8 @@ class OperatorEvaluate extends OperatorBase {
 
 		}
 		 Object result = op2.getObject(parent);
-		 if(op1.getType(parent)!= null){
-			 result = ExpressUtil.castObject(result,op1.getType(parent));
+		 if(targetType != null){
+			 result = ExpressUtil.castObject(result,targetType,false);
 		 }
 		 op1.setObject(parent,result);
 		return op1;
@@ -255,7 +264,7 @@ class OperatorCast extends OperatorBase {
 
 	public OperateData executeInner(InstructionSetContext<String,Object> parent, OperateData[] list) throws Exception {
 		Class<?> tmpClass = (Class<?>) list[0].getObject(parent);
-		Object castObj = ExpressUtil.castObject(list[1].getObject(parent), tmpClass);
+		Object castObj = ExpressUtil.castObject(list[1].getObject(parent), tmpClass,true);
 		OperateData result = new OperateData(castObj,tmpClass);
 		return result;
 	}
@@ -442,10 +451,10 @@ class OperatorMethod extends OperatorBase {
 			if(m == null){
 				types = new Class[]{ArrayClass};
 				if (list[0] instanceof OperateClass) {// 调用静态方法
-					m = ExpressUtil.findMethod((Class<?>) obj, methodName,
+					m = ExpressUtil.findMethodWithCache((Class<?>) obj, methodName,
 							types, true, true);
 				} else {
-					m = ExpressUtil.findMethod(obj.getClass(), methodName,
+					m = ExpressUtil.findMethodWithCache(obj.getClass(), methodName,
 							types, true, false);
 				}
 				objs = new Object[]{objs};				
@@ -507,9 +516,9 @@ class OperatorField extends OperatorBase {
 			Object op2) throws Exception {
 		Object obj = null;
 		if (this.getName().equals("+")) {
-			obj = OperatorOfNumber.Add.execute(op1, op2);
+			obj = OperatorOfNumber.add(op1, op2,this.isPrecise);
 		} else if (this.getName().equals("-")) {
-			obj = OperatorOfNumber.Subtract.execute(op1, op2);
+			obj = OperatorOfNumber.subtract(op1, op2,this.isPrecise);
 		}
 		return obj;
 	}
@@ -524,9 +533,9 @@ class OperatorField extends OperatorBase {
 			Object obj = list[0].getObject(parent);
 			Object result = null;
 			if (this.getName().equals("++")) {
-				result = OperatorOfNumber.Add.execute(obj, 1);
+				result = OperatorOfNumber.add(obj, 1,this.isPrecise);
 			} else if (this.getName().equals("--")) {
-				result = OperatorOfNumber.Subtract.execute(obj, 1);
+				result = OperatorOfNumber.subtract(obj, 1,this.isPrecise);
 			}
 			((OperateData)list[0]).setObject(parent, result);
 			
@@ -548,7 +557,7 @@ class OperatorRound extends Operator {
 	}
 
 	public Object executeInner(Object op1,Object op2) throws Exception {
-		double r = OperatorOfNumber.Arith.round(
+		double r = OperatorOfNumber.round(
 				((Number) op1).doubleValue(), ((Number) op2).intValue());
 		return new Double(r);
 	}
@@ -632,13 +641,13 @@ class OperatorMultiDiv extends Operator {
 			Object op2) throws Exception {
 		Object obj = null;
 		if (this.getName().equals("*"))
-			obj = OperatorOfNumber.Multiply.execute(op1, op2);
+			obj = OperatorOfNumber.multiply(op1, op2,this.isPrecise);
 		else if (this.getName().equals("/"))
-			obj = OperatorOfNumber.Divide.execute(op1, op2);
+			obj = OperatorOfNumber.divide(op1, op2,this.isPrecise);
 		else if (this.getName().equals("%"))
-			obj = OperatorOfNumber.Modulo.execute(op1, op2);
+			obj = OperatorOfNumber.modulo(op1, op2);
 		else if (this.getName().equals("mod"))
-			obj = OperatorOfNumber.Modulo.execute(op1, op2);
+			obj = OperatorOfNumber.modulo(op1, op2);
 
 		return obj;
 

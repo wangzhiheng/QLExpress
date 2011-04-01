@@ -7,8 +7,15 @@ import java.util.Map;
 import com.ql.util.express.parse.ExpressNode;
 
 public class OperatorFactory {	
-	  private Map<String, OperatorBase> operator = new HashMap<String, OperatorBase>();
-	  public OperatorFactory(){
+	  
+	/**
+	 * 是否需要高精度计算
+	 */
+	protected boolean isPrecise = false;
+	private Map<String, OperatorBase> operator = new HashMap<String, OperatorBase>();
+	  
+	  public OperatorFactory(boolean aIsPrecise){
+		  this.isPrecise = aIsPrecise;
 		  addOperator("new",new OperatorNew("new"));
 		  addOperator("def",  new OperatorDef("VAR_DEFINE"));
 		  addOperator("exportDef",  new OperatorExportDef("exportDef"));
@@ -53,6 +60,7 @@ public class OperatorFactory {
 			throw new RuntimeException("重复定义操作符：" + name + "定义1："
 					+ oldOp.getClass() + " 定义2：" + op.getClass());
 		}
+		op.setPrecise(this.isPrecise);
 		operator.put(name, op);
 	}
 	
@@ -128,7 +136,7 @@ public class OperatorFactory {
 	    	 if(this.operator.containsKey(aAliasName)){
 	    		 throw new RuntimeException("操作符号：\"" + aAliasName + "\" 已经存在");
 	    	 }
-	    	 this.operator.put(aAliasName,destOperator);    
+	    	 this.addOperator(aAliasName,destOperator);    
 		 }		 
 	 }
 	public boolean isExistOperator(String operName) throws Exception {

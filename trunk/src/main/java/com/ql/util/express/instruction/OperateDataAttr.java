@@ -15,6 +15,9 @@ public class OperateDataAttr extends OperateData {
 			super(null,null);
 			this.name = name;
 		}
+		public Class<?> getDefineType(){
+	    	return this.type;
+	    }
 	    public String getName(){
 	    	return name;
 	    }
