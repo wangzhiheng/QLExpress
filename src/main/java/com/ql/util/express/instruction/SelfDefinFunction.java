@@ -62,7 +62,7 @@ class SelfDefineClassFunctionOperator extends OperatorBase{
       }
       Object obj = null;
       if( Modifier.isStatic(this.method.getModifiers())){
-         obj = this.method.invoke(null,parameres);
+         obj = this.method.invoke(null,ExpressUtil.transferArray(parameres,parameterClasses));
       }else{
     	 obj = this.method.invoke(this.operClass.newInstance(),ExpressUtil.transferArray(parameres,parameterClasses));
       }

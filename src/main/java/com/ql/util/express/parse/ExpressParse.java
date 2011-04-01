@@ -1,5 +1,6 @@
 package com.ql.util.express.parse;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
@@ -13,9 +14,13 @@ public class ExpressParse {
 
 	private static final Log log = LogFactory.getLog(ExpressParse.class);
 	NodeTypeManager nodeTypeManager;
-	
-	public ExpressParse(NodeTypeManager aNodeTypeManager){
+	/**
+	 * 是否需要高精度计算
+	 */
+	private boolean isPrecise = false;
+	public ExpressParse(NodeTypeManager aNodeTypeManager,boolean aIsPrecise){
 		this.nodeTypeManager = aNodeTypeManager;
+		this.isPrecise = aIsPrecise;
 	}
 	
 	/**
@@ -76,14 +81,26 @@ public class ExpressParse {
 			  if(lastChar =='d'){
 				  tempType = nodeTypeManager.findNodeType("CONST_DOUBLE");
 				  tempWord = tempWord.substring(0,tempWord.length() -1);
-				  objectValue = Double.valueOf(tempWord);
+				  if(this.isPrecise == true){
+					  objectValue = new BigDecimal(tempWord);
+				  }else{
+				      objectValue = Double.valueOf(tempWord);
+				  }
 			  }else if(lastChar =='f'){
 				  tempType = nodeTypeManager.findNodeType("CONST_FLOAT");
 				  tempWord = tempWord.substring(0,tempWord.length() -1);
-				  objectValue = Float.valueOf(tempWord);
+				  if(this.isPrecise == true){
+					  objectValue = new BigDecimal(tempWord);
+				  }else{
+				      objectValue = Float.valueOf(tempWord);
+				  }
 			  }else if(tempWord.indexOf(".") >=0){
-				  tempType = nodeTypeManager.findNodeType("CONST_FLOAT");
-				  objectValue = Float.valueOf(tempWord);
+				  tempType = nodeTypeManager.findNodeType("CONST_DOUBLE");
+				  if(this.isPrecise == true){
+					  objectValue = new BigDecimal(tempWord);
+				  }else{
+					  objectValue = Double.valueOf(tempWord);
+				  }
 			  }else if(lastChar =='l'){
 				  tempType = nodeTypeManager.findNodeType("CONST_LONG");
 				  tempWord = tempWord.substring(0,tempWord.length() -1);
@@ -428,7 +445,7 @@ public class ExpressParse {
 	public static void main(String[] args) throws Exception {
 		String condition="/** a **/";
 		NodeTypeManager manager = new NodeTypeManager();
-		ExpressParse parse = new ExpressParse(manager);
+		ExpressParse parse = new ExpressParse(manager,false);
 		Word[] words = WordSplit.parse(manager,condition);
 			log.debug("执行的表达式:" + condition);	
 			log.debug("单词分解结果:" + WordSplit.getPrintInfo(words,","));  
@@ -447,7 +464,7 @@ public class ExpressParse {
 	public static void main2(String[] args) throws Exception {
 		String condition="if 1 == 1 then  true ;";
 		NodeTypeManager manager = new NodeTypeManager();
-		ExpressParse parse = new ExpressParse(manager);
+		ExpressParse parse = new ExpressParse(manager,false);
 		parse.parse(null,condition,true);
   }
 	   protected static String printInfo(List<ExpressNode> list,String splitOp){

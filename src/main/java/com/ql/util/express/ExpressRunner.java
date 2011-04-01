@@ -1,9 +1,9 @@
 package com.ql.util.express;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -30,10 +30,16 @@ public class ExpressRunner {
 	 * 是否输出所有的跟踪信息，同时还需要log级别是DEBUG级别
 	 */
 	private boolean isTrace = false;
+	
+	/**
+	 * 是否需要高精度计算
+	 */
+	private boolean isPrecise = false;
+	
 	/**
 	 * 一段文本对应的指令集的缓存
 	 */
-    private Map<String,InstructionSet> expressInstructionSetCache = new ConcurrentHashMap<String, InstructionSet>();
+    private Map<String,InstructionSet> expressInstructionSetCache = new HashMap<String, InstructionSet>();
 
     /**
      * 语法定义的管理器
@@ -42,24 +48,39 @@ public class ExpressRunner {
 	/**
 	 * 操作符的管理器
 	 */
-	private OperatorFactory operatorManager = new OperatorFactory();
+	private OperatorFactory operatorManager;
 	/**
 	 * 语法分析器
 	 */
-	private ExpressParse parse = new ExpressParse(manager);	
+	private ExpressParse parse ;	
 	
 	/**
 	 * 缺省的Class查找的包管理器
 	 */
 	ExpressPackage rootExpressPackage = new ExpressPackage(null);
 	
-	public ExpressRunner(boolean aIstrace){
+	/**
+	 * 
+	 * @param aIstrace 是否跟踪执行指令的过程
+	 */
+	public ExpressRunner(boolean aIsPrecise){
+		this(aIsPrecise,false);
+	}
+	/**
+	 * 
+	 * @param aIsPrecise 是否需要高精度计算支持
+	 * @param aIstrace 是否跟踪执行指令的过程
+	 */
+	public ExpressRunner(boolean aIsPrecise,boolean aIstrace){
 		this.isTrace = aIstrace;
+		this.isPrecise = aIsPrecise;
+		this.operatorManager = new OperatorFactory(this.isPrecise);
+		this.parse =  new ExpressParse(manager,this.isPrecise);
 		rootExpressPackage.addPackage("java.lang");
 		rootExpressPackage.addPackage("java.util");
 	}
 	public ExpressRunner(){
-		this(false);
+		this(false,false);
 	}
 	/**
 	 * 获取语法定义的管理器

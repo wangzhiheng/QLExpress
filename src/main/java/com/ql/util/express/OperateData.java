@@ -15,7 +15,9 @@ public class OperateData { // extends ExpressTreeNodeImple {
 		this.type = aType;
 		this.dataObject = obj;
 	}
-
+    public Class<?> getDefineType(){
+    	throw new RuntimeException(this.getClass().getName() + "必须实现方法:getDefineType");
+    }
 	public Class<?> getType(InstructionSetContext<String,Object> parent) throws Exception {
 		if (type != null)
 			return type;

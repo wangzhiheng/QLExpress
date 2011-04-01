@@ -265,7 +265,9 @@ public class NodeType {
 
 	}	
 
-class NodeTypeComparator implements Comparator<NodeType>{
+class NodeTypeComparator implements Comparator<NodeType>,java.io.Serializable{
+
+	private static final long serialVersionUID = 1L;
 
 	public int compare(NodeType o1, NodeType o2) {
 		 int r = o1.getKind().compareTo(o2.getKind());
