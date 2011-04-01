@@ -12,7 +12,7 @@ import com.ql.util.express.InstructionSet;
 public class LoadExpressFromFileTest {
 	@Test
 	public void testLoadFromFile() throws Exception {
-		ExpressRunner runner = new ExpressRunner(true);
+		ExpressRunner runner = new ExpressRunner(false,true);
 		ExpressLoader loader = new ExpressLoader(runner);
 		loader.loadExpressFromFile("functiondef");
 		loader.loadExpressFromFile("main");

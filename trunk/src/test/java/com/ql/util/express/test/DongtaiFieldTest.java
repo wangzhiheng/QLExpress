@@ -17,7 +17,7 @@ public class DongtaiFieldTest {
 				"用户 = \"李四\";" +
 				"费用.用户  = 200;";
 		
-		ExpressRunner runner = new ExpressRunner(true);
+		ExpressRunner runner = new ExpressRunner(false,true);
 		DefaultContext<String, Object> context = new DefaultContext<String, Object>();
 		Map<String,Object> fee = new HashMap<String,Object>();
 		context.put("费用",fee);

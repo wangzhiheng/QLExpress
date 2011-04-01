@@ -9,7 +9,7 @@ public class HTMLTest {
 	@Test
 	public void testABC() throws Exception {
 		//String express ="\"<div style=\\\"font-family:宋体;font-size:12px;line-height:25px;\\\">经费收入（\"";
-		ExpressRunner runner = new ExpressRunner(true);
+		ExpressRunner runner = new ExpressRunner(false,true);
 		String express ="\"经\\\"费收\\\"入\\\"aaa-\" + 100";
 		Object r = runner.execute(express, null, null, false, true);
 		System.out.println(r);

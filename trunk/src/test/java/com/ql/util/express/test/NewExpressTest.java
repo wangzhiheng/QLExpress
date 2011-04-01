@@ -72,7 +72,7 @@ public class NewExpressTest {
 		};
 		for(int i=0;i<expresses.length;i++){
 			IExpressContext<String,Object> expressContext = new DefaultContext<String,Object>();
-			ExpressRunner runner = new ExpressRunner(true);
+			ExpressRunner runner = new ExpressRunner(false,true);
 			runner.addOperatorWithAlias("¼Ó", "+",null);
 			runner.addOperator("love","+",new LoveOperator("love"));
 			Object result = runner.execute(expresses[i][0],expressContext, null, false,true);

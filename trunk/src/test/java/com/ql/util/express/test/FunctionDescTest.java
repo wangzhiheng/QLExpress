@@ -17,6 +17,7 @@ public class FunctionDescTest {
 		System.out.println(op.getOperDataAnnotaion());
 		
 		Object r = runner.execute(express,context, null, false,false);
+		System.out.println(r);
 //		Assert.assertTrue("属性操作错误", r.toString().equalsIgnoreCase("ffff"));
 //		Assert.assertTrue("属性操作错误", ((BeanExample)context.get("example")).child.a.toString().equalsIgnoreCase("ssssssss"));		
 	}	

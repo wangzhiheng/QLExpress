@@ -39,7 +39,7 @@ public class TestMap {
 		expressContext.put("map", map);
 
 		String expressionstr = "map.key1";
-		ExpressRunner runner = new ExpressRunner(true);
+		ExpressRunner runner = new ExpressRunner(false,true);
 		Object r =runner.execute(expressionstr, expressContext, null,
 				true, true);
 		Assert.assertTrue("Map∂¡»°¥ÌŒÛ", r.toString().equalsIgnoreCase("1"));

@@ -52,6 +52,9 @@ class OperateDataSubject extends OperateData{
 	 this.subjectId = aSubjectId;
 	 this.container = aContainer;
    }
+   public Class<?> getDefineType(){
+   	  return this.type;
+   }
    public Object getObjectInner(InstructionSetContext<String,Object> context){
 		String key = this.userId + "-" + this.subjectId;
 		SubjectValue subject = (SubjectValue) container.get(key);
