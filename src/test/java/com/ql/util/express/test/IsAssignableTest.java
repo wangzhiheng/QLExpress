@@ -25,7 +25,7 @@ public class IsAssignableTest {
 		System.out.println(index);
 		
 		String express = "bean.testInt(p)";
-		ExpressRunner runner = new ExpressRunner(true);
+		ExpressRunner runner = new ExpressRunner(false,true);
 		DefaultContext<String, Object> context = new DefaultContext<String, Object>();
 		context.put("bean",new BeanExample());
 		context.put("p",100);

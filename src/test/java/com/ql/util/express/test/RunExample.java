@@ -36,7 +36,7 @@ public class RunExample implements ApplicationContextAware, Runnable {
 				"upper", new String[] { "String" }, null);
     }
 	public static void main(String[] args) throws Exception {
-    	ExpressRunner runner = new ExpressRunner();
+    	ExpressRunner runner = new ExpressRunner(false,true);
     	initialRunner(runner);
 		new RunExample(runner).run(1);
 		for (int i = 0; i < 20; i++) {
@@ -47,6 +47,43 @@ public class RunExample implements ApplicationContextAware, Runnable {
 		run(10000000);
 	}
 	public void run(int num) {
+		long start = System.currentTimeMillis();
+		try {
+			for (int j = 0; j < num; j++) {
+				String[][] expressTest = new String[][] {
+						{"100+200.0","300.0"}
+						};
+				IExpressContext<String,Object> expressContext = new ExpressContextExample(	this.applicationContext);
+				expressContext.put("a", j);
+				expressContext.put("b", new Integer(200));
+				expressContext.put("c", new Integer(300));
+				expressContext.put("d", new Integer(400));
+				expressContext.put("bean", new BeanExample());
+				for (int point = 0; point < expressTest.length; point++) {
+					String s = expressTest[point][0];
+					// 批量处理的时候可以先预处理，会加快执行效率
+					//List<String> errorList = new ArrayList<String>();
+					 Object result = runner.execute(s,expressContext, null, true,false);
+					if (expressTest[point][1].equalsIgnoreCase("null")
+							&& result != null
+							|| result != null
+							&& expressTest[point][1].equalsIgnoreCase(result							
+									.toString()) == false) {
+						throw new Exception("处理错误,计算结果与预期的不匹配");
+					}
+//					System.out.println(s + " 执行结果 ： " + result);
+//					System.out.println("错误信息" + errorList);
+				}
+			//	System.out.println(expressContext);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		System.out.println(Thread.currentThread() + "耗时："
+				+ (System.currentTimeMillis() - start));
+	}
+	
+	public void run2(int num) {
 		long start = System.currentTimeMillis();
 		try {
 			for (int j = 0; j < num; j++) {
@@ -98,8 +135,7 @@ public class RunExample implements ApplicationContextAware, Runnable {
 		System.out.println(Thread.currentThread() + "耗时："
 				+ (System.currentTimeMillis() - start));
 	}
-	
-	
+		
 }
 class EqualIn extends Operator{
 

@@ -2,12 +2,40 @@ package com.ql.util.express.test;
 
 public class BeanExample {
 	public String name = "qhlhl2010@gmail.com";
+	public int intValue;
+	public long longValue;
+	public double doubleValue;
+	
 	public BeanExampleChild child = new BeanExampleChild();
 	public BeanExample() {
 	}
 
 	public BeanExampleChild getChild() {
 		return child;
+	}
+
+	public int getIntValue() {
+		return intValue;
+	}
+
+	public void setIntValue(int intValue) {
+		this.intValue = intValue;
+	}
+
+	public long getLongValue() {
+		return longValue;
+	}
+
+	public void setLongValue(long longValue) {
+		this.longValue = longValue;
+	}
+
+	public double getDoubleValue() {
+		return doubleValue;
+	}
+
+	public void setDoubleValue(double doubleValue) {
+		this.doubleValue = doubleValue;
 	}
 
 	public void setChild(BeanExampleChild child) {

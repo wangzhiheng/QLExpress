@@ -13,7 +13,7 @@ public class ForFlowFunctionTest {
 	public void testABC() throws Exception {
 		String express = "for(i=0;i<1;i=i+1){" + "´òÓ¡(70)"
 				+ "}´òÓ¡(70); return 10";
-		ExpressRunner runner = new ExpressRunner(true);
+		ExpressRunner runner = new ExpressRunner(false,true);
 		runner.addFunctionOfServiceMethod("´òÓ¡", System.out, "println",
 				new String[] { "int" }, null);
 		DefaultContext<String, Object> context = new DefaultContext<String, Object>();

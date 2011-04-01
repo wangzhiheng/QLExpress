@@ -22,7 +22,7 @@ public class ExportDefine {
 				+ " qh =qh + \"-ssss\";" 
 				+ "};" 
 				+" qh.a = qh.a +\"-qh\";" + " return example.child.a ";
-		ExpressRunner runner = new ExpressRunner(true);
+		ExpressRunner runner = new ExpressRunner(false,true);
 		DefaultContext<String, Object> context = new DefaultContext<String, Object>();
 		context.put("example", new BeanExample());
 		Object r = runner.execute(express, context, null, false, true);
