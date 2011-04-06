@@ -52,6 +52,7 @@ public class OperatorFactory {
 		  addOperator("function",new OperatorFunction("function"));
 		  addOperator("in", new OperatorIn("in"));		
 		  addOperator("max", new OperatorMinMax("max"));	
+		  addOperator("round", new OperatorRound("round"));
 	  }
 	  
 	public void addOperator(String name, OperatorBase op) {

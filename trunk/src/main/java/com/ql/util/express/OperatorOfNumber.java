@@ -26,8 +26,9 @@ public class OperatorOfNumber {
 		}
 		BigDecimal b = new BigDecimal(Double.toString(v));
 		BigDecimal one = new BigDecimal("1");
-		return b.divide(one, scale, BigDecimal.ROUND_DOWN).doubleValue();
+		return b.divide(one, scale, BigDecimal.ROUND_HALF_UP).doubleValue();
 	}
+
 	/**
 	 * 获取数据类型精度顺序
 	 * @param aClass
