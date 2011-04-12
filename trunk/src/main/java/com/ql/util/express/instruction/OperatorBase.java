@@ -473,9 +473,15 @@ class OperatorMethod extends OperatorBase {
 			}
 			
 			if (list[0] instanceof OperateClass) {// 调用静态方法
+				boolean oldA = m.isAccessible();
+				m.setAccessible(true);
 				tmpObj = m.invoke(null,ExpressUtil.transferArray(objs,m.getParameterTypes()));
+				m.setAccessible(oldA);
 			} else {
+				boolean oldA = m.isAccessible();
+				m.setAccessible(true);
 				tmpObj = m.invoke(obj, ExpressUtil.transferArray(objs,m.getParameterTypes()));
+				m.setAccessible(oldA);
 			}
 			return new OperateData(tmpObj, m.getReturnType());
 		}
