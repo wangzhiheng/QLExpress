@@ -35,7 +35,7 @@ public class InstructionSet {
   /**
    * 指令
    */
-  private List<Instruction> list = new ArrayList<Instruction>();
+  private Instruction[] instructionList = new Instruction[0];
   /**
    * 函数和宏定义
    */
@@ -47,6 +47,30 @@ public class InstructionSet {
   private List<OperateDataLocalVar> parameterList = new ArrayList<OperateDataLocalVar>();
   public InstructionSet(String aType){
 	  this.type = aType;
+  }
+  
+  /**
+   * 添加指令，为了提高运行期的效率，指令集用数组存储
+   * @param item
+   * @return
+   */
+  private void addArrayItem(Instruction item){
+	  Instruction[] newArray = new Instruction[this.instructionList.length + 1];
+	  System.arraycopy(this.instructionList, 0, newArray, 0, this.instructionList.length);
+	  newArray[this.instructionList.length] = item;
+	  this.instructionList = newArray;
+  }
+  /**
+   * 插入数据
+   * @param aPoint
+   * @param item
+   */
+  private void insertArrayItem(int aPoint,Instruction item){
+	  Instruction[] newArray = new Instruction[this.instructionList.length + 1];
+	  System.arraycopy(this.instructionList, 0, newArray, 0, aPoint);
+	  System.arraycopy(this.instructionList, aPoint, newArray, aPoint + 1,this.instructionList.length - aPoint);
+	  newArray[aPoint] = item;
+	  this.instructionList = newArray;
   }
   public static Object executeOuter(InstructionSet[] sets,ExpressLoader loader,
 			IExpressContext<String,Object> aContext, List<String> errorList,
@@ -130,18 +154,18 @@ public class InstructionSet {
 		for(FunctionInstructionSet item : this.functionDefine.values()){
 			context.addSymbol(item.name, item.instructionSet);
 		}
-		while (environmen.getProgramPoint() < this.list.size()) {
+		while (environmen.getProgramPoint() < this.instructionList.length) {
 			if (environmen.isExit() == true) {
 				break;
 			}
-			instruction = this.list.get(environmen.getProgramPoint());
+			instruction = this.instructionList[environmen.getProgramPoint()];
 			instruction.setLog(aLog);//设置log
 			try{
 				instruction.execute(environmen, errorList);
 			}catch(Exception e){
 				log.error("当前ProgramPoint = " + environmen.getProgramPoint());
 				log.error("当前指令" +  instruction);
-				log.error("当前指令集" + this.list);
+				log.error("当前指令集" + this.instructionList);
 				log.error(e);
 	            throw e;
 			}
@@ -196,20 +220,17 @@ public class InstructionSet {
 	public void addParameter(OperateDataLocalVar localVar) {
 		this.parameterList.add(localVar);
 	}	
-  public List<Instruction> getInstructionList(){
-	  return this.list;
-  }
   public void addInstruction(Instruction instruction){
-	  this.list.add(instruction);
+	  this.addArrayItem(instruction);
   }
   public void insertInstruction(int point,Instruction instruction){
-	  this.list.add(point,instruction);
+	  this.insertArrayItem(point, instruction);
   } 
   public Instruction getInstruction(int point){
-	  return this.list.get(point);
+	  return this.instructionList[point];
   }
   public int getCurrentPoint(){
-	  return this.list.size() - 1; 
+	  return this.instructionList.length - 1; 
   }
   
   public String getName() {
@@ -228,7 +249,7 @@ public void setGlobeName(String globeName) {
 	this.globeName = globeName;
 }
 public boolean hasMain(){
-	return this.list.size() >0;
+	return this.instructionList.length >0;
 }
 public String getType() {
 	return type;
@@ -248,8 +269,8 @@ public String getType() {
 						.append(var.getType(null)).append("\n");
 			}
 			buffer.append("指令集：\n");
-			for (int i = 0; i < list.size(); i++) {
-				buffer.append(i + 1).append(":").append(list.get(i))
+			for (int i = 0; i < this.instructionList.length; i++) {
+				buffer.append(i + 1).append(":").append(this.instructionList[i])
 						.append("\n");
 			}
 			return buffer.toString();
