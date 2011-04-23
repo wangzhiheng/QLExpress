@@ -74,9 +74,9 @@ public class InstructionSet {
   }
   public static Object executeOuter(InstructionSet[] sets,ExpressLoader loader,
 			IExpressContext<String,Object> aContext, List<String> errorList,
-			FuncitonCacheManager aFunctionCacheMananger, boolean isTrace,boolean isCatchException,
+			boolean isTrace,boolean isCatchException,
 			Log aLog) throws Exception{
-	 return execute(sets, loader, aContext, errorList, aFunctionCacheMananger, isTrace, isCatchException,true, aLog);
+	 return execute(sets, loader, aContext, errorList, isTrace, isCatchException,true, aLog);
   }
   
   /**
@@ -92,17 +92,13 @@ public class InstructionSet {
    */
   public static Object execute(InstructionSet[] sets,ExpressLoader loader,
 			IExpressContext<String,Object> aContext, List<String> errorList,
-			FuncitonCacheManager aFunctionCacheMananger, boolean isTrace,boolean isCatchException,
+			boolean isTrace,boolean isCatchException,
 			boolean isReturnLastData,Log aLog)
 			throws Exception {
 	  InstructionSetContext<String,Object> context = new InstructionSetContext<String, Object>(
-				aContext,loader, aFunctionCacheMananger);
+				aContext,loader);
 	  Object result = execute(sets,context,errorList,isTrace,isCatchException,isReturnLastData,aLog);
-		if (aFunctionCacheMananger == null) {
-			// 如果是指令集自身创建的缓存，则清除
-			context.clearFuncitonCacheManager();
-		}
-     return result;
+      return result;
   }
 
 	public static Object execute(InstructionSet[] sets,

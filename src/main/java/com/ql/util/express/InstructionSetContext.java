@@ -6,12 +6,6 @@ import java.util.Map;
 import com.ql.util.express.instruction.OperateDataAttr;
 
 public class InstructionSetContext<K,V>  implements IExpressContext<K,V> {
-	 private FuncitonCacheManager functionCachManager;
-	/**
-	 * 函数调用开启标志，在Method执行完毕后清除
-	 */
-    private boolean isStartCachFunctionCall = false;
-
 	private IExpressContext<K,V> parent = null;
 	private Map<K,V> content;
 	/**
@@ -21,27 +15,10 @@ public class InstructionSetContext<K,V>  implements IExpressContext<K,V> {
 	
 	private ExpressLoader expressLoader;
 		
-	public InstructionSetContext(IExpressContext<K,V> aParent,ExpressLoader aExpressLoader, FuncitonCacheManager aFunctionCachManager){
+	public InstructionSetContext(IExpressContext<K,V> aParent,ExpressLoader aExpressLoader){
 		parent = aParent;
-		this.functionCachManager =  aFunctionCachManager;
 		this.expressLoader = aExpressLoader;
 	}
-
-	public void clearFuncitonCacheManager(){
-		if(this.functionCachManager != null){
-			this.functionCachManager.clearCache();
-		}
-	}
-	public FuncitonCacheManager getFunctionCachManagerNoCreate() {
-		return this.functionCachManager;
-	}
-	public FuncitonCacheManager getFunctionCachManagerWithCreate() {
-		if(this.functionCachManager == null){
-			this.functionCachManager = new FuncitonCacheManager();
-		}
-		return functionCachManager;
-	}
-
 	public void exportSymbol(String varName,Object aliasNameObject) throws Exception{
 		if( this.parent != null && this.parent instanceof InstructionSetContext){
 			((InstructionSetContext<K,V>)this.parent).exportSymbol(varName, aliasNameObject);
@@ -95,16 +72,6 @@ public class InstructionSetContext<K,V>  implements IExpressContext<K,V> {
 		return expressLoader;
 	}
 
-	public void  startFunctionCallCache(){
-		this.isStartCachFunctionCall = true;
-	}
-	public boolean isStartFunctionCallCache(){
-		return this.isStartCachFunctionCall;
-	}
-	public void stopStartFunctionCallCache(){
-		this.isStartCachFunctionCall = false;
-	}
-	
 	public IExpressContext<K,V> getParent(){
 		return  this.parent;
 	}

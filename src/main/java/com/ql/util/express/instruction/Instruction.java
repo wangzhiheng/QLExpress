@@ -127,8 +127,7 @@ class InstructionOpenNewArea extends Instruction{
 			log.debug(this);
 		}
 		environment.setContext(new InstructionSetContext<String, Object>(
-				environment.getContext(),environment.getContext().getExpressLoader(), environment.getContext()
-						.getFunctionCachManagerNoCreate()));
+				environment.getContext(),environment.getContext().getExpressLoader()));
 		environment.programPointAddOne();
 	}
 	public String toString(){
