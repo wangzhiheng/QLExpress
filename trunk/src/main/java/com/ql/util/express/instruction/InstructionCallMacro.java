@@ -19,7 +19,7 @@ public class InstructionCallMacro extends Instruction{
 			Object functionSet = environment.getContext().getSymbol(this.name);
 			
 			Object result =InstructionSet.execute(new InstructionSet[]{(InstructionSet)functionSet},environment.getContext().getExpressLoader(),
-					environment.getContext(), errorList, environment.getContext().getFunctionCachManagerNoCreate(),
+					environment.getContext(), errorList,
 					environment.isTrace(),false,false,this.log);
 			if(result instanceof OperateData){
 				environment.push((OperateData)result);

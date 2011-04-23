@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.ql.util.express.ExpressUtil;
-import com.ql.util.express.FuncitonCacheManager;
 import com.ql.util.express.IExpressContext;
 import com.ql.util.express.InstructionSetContext;
 import com.ql.util.express.OperateData;
@@ -42,10 +41,6 @@ public abstract class OperatorBase {
 	 */
 	protected boolean isPrecise = false;
 	/**
-	 * 决定此操作是否能够被缓存
-	 */
-	protected boolean isCanCache = false;
-	/**
 	 * 操作数描述
 	 */
 	protected String[] operDataDesc;
@@ -53,10 +48,6 @@ public abstract class OperatorBase {
 	 * 操作数的其它定义
 	 */
 	protected String[] operDataAnnotation;
-	
-    public void setIsCanCache(boolean value){
-    	this.isCanCache = value;
-    }
 	public Object[] toObjectList(InstructionSetContext<String,Object> parent, OperateData[] list)
 			throws Exception {
 		if (list == null) {
@@ -71,27 +62,7 @@ public abstract class OperatorBase {
 	public OperateData execute(InstructionSetContext<String,Object> context,
 			OperateData[] list, List<String> errorList) throws Exception {
 		OperateData result = null;
-		if (context.isStartFunctionCallCache()&& this.isCanCache == true) {
-			//缓存处理
-			try {
-				Object[] tmpList = new Object[list.length];
-				for (int i = 0; i < tmpList.length; i++) {
-					tmpList[i] = list[i].getObject(context);
-				}
-				String key = FuncitonCacheManager.genKey(this.getAliasName(),
-						tmpList);
-				if (context.getFunctionCachManagerWithCreate().containsKey(key)) {
-					result = (OperateData) context.getFunctionCachManagerWithCreate().get(key);
-				}else{
-					result = this.executeInner(context, list);
-					context.getFunctionCachManagerWithCreate().put(key, result);
-				}
-			} finally {
-				context.stopStartFunctionCallCache();
-			}
-		}else{
-			result = this.executeInner(context, list);
-		}
+		result = this.executeInner(context, list);
 		//输出错误信息
 		if (errorList != null && this.errorInfo != null && result != null) {
 			Object obj = result.getObject(context);
@@ -413,7 +384,6 @@ class OperatorCache extends OperatorBase {
 class OperatorMethod extends OperatorBase {
 	public OperatorMethod() {
 		this.name ="MethodCall";
-		this.isCanCache = true;
 	}
 
 	static Class<?> ArrayClass = (new Object[]{}).getClass();

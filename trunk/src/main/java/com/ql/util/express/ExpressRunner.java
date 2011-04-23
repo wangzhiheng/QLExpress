@@ -297,9 +297,9 @@ public class ExpressRunner {
 
 	public Object execute(InstructionSet[] instructionSets,
 			ExpressLoader loader, IExpressContext<String,Object> context, List<String> errorList,
-			FuncitonCacheManager aFunctionCacheMananger, boolean isTrace,
-			boolean isCatchException, Log aLog) throws Exception {
-		 return  InstructionSet.executeOuter(instructionSets,loader,context, errorList, aFunctionCacheMananger, isTrace,isCatchException,aLog);
+			boolean isTrace,boolean isCatchException, Log aLog) throws Exception {
+		 return  InstructionSet.executeOuter(instructionSets,loader,context, errorList,
+				 	isTrace,isCatchException,aLog);
 	}
 /**
  * 执行一段文本
@@ -346,7 +346,7 @@ public class ExpressRunner {
 			parseResult = this.parseInstructionSet(expressString);
 		}
 		return this.execute(new InstructionSet[] { parseResult }, null,
-				context, errorList, null, isTrace, false,aLog);
+				context, errorList, isTrace, false,aLog);
 	}
 
 	/**
