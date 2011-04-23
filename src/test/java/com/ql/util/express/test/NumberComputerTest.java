@@ -9,14 +9,20 @@ import com.ql.util.express.DefaultContext;
 import com.ql.util.express.ExpressRunner;
 
 public class NumberComputerTest {
-	
+	public static void main(String args[]){
+		System.out.println(0.05+0.01);
+		System.out.println(1.0-0.42);
+		System.out.println(4.015*100);
+		System.out.println(123.3/100);
+		}
 	@Test
 	public void testBigDecimalComputer() throws Exception {
+		System.out.println(1.0-0.42);  // 0.5800000000000001
 		String expressString = "1.0-0.42";
 		ExpressRunner runner = new ExpressRunner(true,false);
 		DefaultContext<String, Object>  context = new DefaultContext<String, Object>();	
 		Object r = runner.execute(expressString, context, null, false, false);
-		System.out.println(r);
+		System.out.println(r); //0.58
 		Assert.assertTrue("¾«¶È¼ÆËã´íÎó",r.toString().equals("0.58"));
 	}	
 	@Test
