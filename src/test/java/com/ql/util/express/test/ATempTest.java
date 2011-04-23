@@ -36,7 +36,7 @@ public class ATempTest {
 		context.put("bean",bean);
 		Object r = runner.execute(new InstructionSet[]{
 				loader.getInstructionSet("Test")
-		}, loader, context, null, null, false,false,null);
+		}, loader, context, null, false,false,null);
 		System.out.println(r );
 		System.out.println(context);
 	}	
