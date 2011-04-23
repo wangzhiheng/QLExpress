@@ -50,7 +50,7 @@ public class DefineTest {
 	}
 	@org.junit.Test
 	public void testMacro() throws Exception{
-		String express ="∂®“Â∫Í  ≥Õ∑£   {cache bean.unionName(name)}; ≥Õ∑£; return  ≥Õ∑£";
+		String express ="∂®“Â∫Í  ≥Õ∑£   {bean.unionName(name)}; ≥Õ∑£; return  ≥Õ∑£";
 		ExpressRunner runner = new ExpressRunner();
 		runner.addOperatorWithAlias("∂®“Â∫Í", "macro", null);
 		DefaultContext<String, Object>  context = new DefaultContext<String, Object>();		
@@ -107,7 +107,7 @@ public class DefineTest {
 				runner.parseInstructionSet("≥Õ∑£;"),
 				runner.parseInstructionSet("qh = qh + 1000;"),
 		};
-		Object r = runner.execute(sets, null, context, null,null, true,false,null);
+		Object r = runner.execute(sets, null, context, null, true,false,null);
 //		 public Object execute(InstructionSet[] instructionSets,ExpressLoader loader,IExpressContext context,
 //				  List errorList,FuncitonCacheManager aFunctionCacheMananger,boolean isTrace,boolean isCatchException,
 //					Log aLog);
@@ -132,7 +132,7 @@ public class DefineTest {
 				loader.getInstructionSet("÷¥––"),
 				loader.getInstructionSet("÷¥––"),
 				loader.getInstructionSet("∑µªÿ")				
-		}, loader, context, null, null, true,false,null);
+		}, loader, context, null,  true,false,null);
 		
 		System.out.println(r);
 		Assert.assertTrue("±√˚ µœ÷ ¥ÌŒÛ", r.toString().equalsIgnoreCase("500"));

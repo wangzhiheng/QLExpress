@@ -46,7 +46,7 @@ public class RatingWithPropertyTest {
 				loader.getInstructionSet("ratingWithProperty")
 		};
 		//执行指令
-		runner.execute(sets, loader, context, null, null, false,false,null);
+		runner.execute(sets, loader, context, null, false,false,null);
 		//输出分成结果
 		System.out.println("----------分成结果----------------");
 		for(Object item : subjectMananger.getSubjectValues()){

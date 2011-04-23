@@ -23,7 +23,7 @@ public class LoadExpressFromFileTest {
 		DefaultContext<String, Object> context = new DefaultContext<String, Object>();
 		Log log = new MyLog("玄难测试");
 		Object r = runner.execute(new InstructionSet[] { loader
-				.getInstructionSet("main") }, loader, context, null, null,
+				.getInstructionSet("main") }, loader, context, null,
 				true, false, log);
 		System.out.println("运行结果" + r);
 		System.out.println("context:" + context);
@@ -31,7 +31,7 @@ public class LoadExpressFromFileTest {
 		context = new DefaultContext<String, Object>();
 		r = runner.execute(new InstructionSet[] { runner
 				.parseInstructionSet("initial;累加;累加;return qh;") }, loader,
-				context, null, null, true, false, log);
+				context, null, true, false, log);
 
 		System.out.println("运行结果" + r);
 		System.out.println("context:" + context);
