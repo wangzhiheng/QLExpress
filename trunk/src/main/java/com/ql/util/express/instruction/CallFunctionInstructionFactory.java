@@ -78,7 +78,7 @@ class InstructionCallSelfDefineFunction extends Instruction{
 	}
 	public OperateData executeSelfFunction(RunEnvironment environment,InstructionSet functionSet,OperateData[] parameters,List<String> errorList)throws Exception{	
 		InstructionSetContext<String, Object> context = new InstructionSetContext<String, Object>(
-			environment.getContext(),environment.getContext().getExpressLoader());
+			environment.getContext(),environment.getContext().getExpressLoader(),environment.getContext().isSupportDynamicFieldName());
 		OperateDataLocalVar[] vars = functionSet.getParameters();
 		for(int i=0;i<vars.length;i++){
 			//注意此处必须new 一个新的对象，否则就会在多次调用的时候导致数据冲突

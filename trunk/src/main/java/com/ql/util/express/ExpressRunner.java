@@ -299,7 +299,7 @@ public class ExpressRunner {
 			ExpressLoader loader, IExpressContext<String,Object> context, List<String> errorList,
 			boolean isTrace,boolean isCatchException, Log aLog) throws Exception {
 		 return  InstructionSet.executeOuter(instructionSets,loader,context, errorList,
-				 	isTrace,isCatchException,aLog);
+				 	isTrace,isCatchException,aLog,false);
 	}
 /**
  * 执行一段文本
