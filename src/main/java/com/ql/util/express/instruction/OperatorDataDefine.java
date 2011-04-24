@@ -60,16 +60,21 @@ class OperateDataField extends OperateDataAttr {
 	}
 
     public Object transferFieldName(InstructionSetContext<String,Object> context,String oldName){
-    	try{
-    	   OperateDataAttr o = (OperateDataAttr)context.findAliasOrDefSymbol(oldName);
-    	   if(o != null){
-    		  return o.getObject(context);
-    	   }else{
-    	     return oldName;
-    	   }
-    	}catch(Exception e){
-    		throw new RuntimeException(e);
-    	}
+		if (context.isSupportDynamicFieldName() == false) {
+			return oldName;
+		} else {
+			try {
+				OperateDataAttr o = (OperateDataAttr) context
+						.findAliasOrDefSymbol(oldName);
+				if (o != null) {
+					return o.getObject(context);
+				} else {
+					return oldName;
+				}
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		}
     }
 	public Object getObjectInner(InstructionSetContext<String,Object> context) {
 		//如果能找到aFieldName的定义,则再次运算

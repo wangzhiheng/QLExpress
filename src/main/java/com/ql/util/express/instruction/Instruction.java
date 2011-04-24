@@ -127,7 +127,7 @@ class InstructionOpenNewArea extends Instruction{
 			log.debug(this);
 		}
 		environment.setContext(new InstructionSetContext<String, Object>(
-				environment.getContext(),environment.getContext().getExpressLoader()));
+				environment.getContext(),environment.getContext().getExpressLoader(),environment.getContext().isSupportDynamicFieldName()));
 		environment.programPointAddOne();
 	}
 	public String toString(){
