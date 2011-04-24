@@ -20,7 +20,7 @@ public class InstructionCallMacro extends Instruction{
 			
 			Object result =InstructionSet.execute(new InstructionSet[]{(InstructionSet)functionSet},environment.getContext().getExpressLoader(),
 					environment.getContext(), errorList,
-					environment.isTrace(),false,false,this.log);
+					environment.isTrace(),false,false,this.log,environment.getContext().isSupportDynamicFieldName());
 			if(result instanceof OperateData){
 				environment.push((OperateData)result);
 			}else{

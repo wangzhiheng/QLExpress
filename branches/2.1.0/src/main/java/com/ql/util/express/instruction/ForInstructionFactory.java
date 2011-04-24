@@ -11,16 +11,16 @@ public class ForInstructionFactory extends  InstructionFactory {
 			Stack<ForRelBreakContinue> forStack, ExpressNode node,boolean isRoot)
 			throws Exception {		
     	if(node.getChildren().length < 2){
-    		throw new Exception("if 操作符至少需要2个操作数 " );
+    		throw new Exception("for 操作符至少需要2个操作数 " );
     	}else if(node.getChildren().length > 2){
-    		throw new Exception("if 操作符最多只有2个操作数 " );
+    		throw new Exception("for 操作符最多只有2个操作数 " );
     	}
     	if(node.getChildren()[0].getChildren()!= null && node.getChildren()[0].getChildren().length > 3){
     		throw new Exception("循环语句的设置不合适:" + node.getChildren()[0]);	
     	}
     	//生成作用域开始指令
 	    result.addInstruction(new InstructionOpenNewArea());			
-	    forStack.push(new ForRelBreakContinue(node));
+	    forStack.push(new ForRelBreakContinue());
 	    
     	//生成条件语句部分指令
     	ExpressNode conditionNode = node.getChildren()[0];
