@@ -4,6 +4,10 @@ import java.util.Stack;
 
 import com.ql.util.express.ExpressRunner;
 import com.ql.util.express.InstructionSet;
+import com.ql.util.express.instruction.detail.InstructionCloseNewArea;
+import com.ql.util.express.instruction.detail.InstructionGoTo;
+import com.ql.util.express.instruction.detail.InstructionGoToWithCondition;
+import com.ql.util.express.instruction.detail.InstructionOpenNewArea;
 import com.ql.util.express.parse.ExpressNode;
 
 public class ForInstructionFactory extends  InstructionFactory {
@@ -62,16 +66,16 @@ public class ForInstructionFactory extends  InstructionFactory {
     	
     	//修改条件判断的跳转位置
     	if(conditionInstruction != null){
-    	   conditionInstruction.offset = result.getCurrentPoint() - conditionPoint + 1;
+    	   conditionInstruction.setOffset( result.getCurrentPoint() - conditionPoint + 1);
     	}
     	
     	//修改Break和Continue指令的跳转位置,循环出堆
     	ForRelBreakContinue rel =  forStack.pop();
     	for(InstructionGoTo item:rel.breakList){
-    		item.offset = result.getCurrentPoint() -  item.offset ;
+    		item.setOffset(result.getCurrentPoint() -  item.getOffset()) ;
     	}
     	for(InstructionGoTo item:rel.continueList){
-    		item.offset = selfAddPoint -  item.offset - 1;
+    		item.setOffset(selfAddPoint -  item.getOffset() - 1);
     	}    	
     	
     	//生成作用域结束指令
