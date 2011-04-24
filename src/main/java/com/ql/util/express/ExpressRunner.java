@@ -10,8 +10,8 @@ import org.apache.commons.logging.LogFactory;
 
 import com.ql.util.express.instruction.ForRelBreakContinue;
 import com.ql.util.express.instruction.InstructionFactory;
-import com.ql.util.express.instruction.OperatorBase;
-import com.ql.util.express.instruction.OperatorFactory;
+import com.ql.util.express.instruction.op.OperatorBase;
+import com.ql.util.express.instruction.op.OperatorFactory;
 import com.ql.util.express.parse.ExpressNode;
 import com.ql.util.express.parse.ExpressPackage;
 import com.ql.util.express.parse.ExpressParse;
@@ -298,7 +298,7 @@ public class ExpressRunner {
 	public Object execute(InstructionSet[] instructionSets,
 			ExpressLoader loader, IExpressContext<String,Object> context, List<String> errorList,
 			boolean isTrace,boolean isCatchException, Log aLog) throws Exception {
-		 return  InstructionSet.executeOuter(instructionSets,loader,context, errorList,
+		 return  InstructionSetRunner.executeOuter(this,instructionSets,loader,context, errorList,
 				 	isTrace,isCatchException,aLog,false);
 	}
 /**
