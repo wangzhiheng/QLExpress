@@ -1,6 +1,6 @@
 package com.ql.util.express;
 
-import com.ql.util.express.instruction.OperatorBase;
+import com.ql.util.express.instruction.op.OperatorBase;
 
 /**
  * 操作符的基类

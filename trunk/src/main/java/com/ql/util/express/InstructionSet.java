@@ -4,14 +4,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.ql.util.express.instruction.FunctionInstructionSet;
-import com.ql.util.express.instruction.Instruction;
-import com.ql.util.express.instruction.OperateDataLocalVar;
-import com.ql.util.express.instruction.RunEnvironment;
+import com.ql.util.express.instruction.detail.Instruction;
+import com.ql.util.express.instruction.op.OperatorBase;
+import com.ql.util.express.instruction.opdata.OperateDataLocalVar;
 
 
 
@@ -24,7 +25,7 @@ import com.ql.util.express.instruction.RunEnvironment;
 public class InstructionSet {
 
 	private static final Log log = LogFactory.getLog(InstructionSet.class);
-	  
+	public static AtomicInteger uniqIndex = new AtomicInteger(1);
 	public static String TYPE_MAIN ="main";
 	public static String TYPE_FUNCTION ="function";
 	public static String TYPE_MARCO ="marco";
@@ -45,8 +46,13 @@ public class InstructionSet {
    * 函数参数定义
    */
   private List<OperateDataLocalVar> parameterList = new ArrayList<OperateDataLocalVar>();
+  
   public InstructionSet(String aType){
 	  this.type = aType;
+  }
+  
+  public static int getUniqClassIndex(){
+	  return uniqIndex.getAndIncrement();
   }
   
   /**
@@ -72,66 +78,7 @@ public class InstructionSet {
 	  newArray[aPoint] = item;
 	  this.instructionList = newArray;
   }
-  public static Object executeOuter(InstructionSet[] sets,ExpressLoader loader,
-			IExpressContext<String,Object> aContext, List<String> errorList,
-			boolean isTrace,boolean isCatchException,
-			Log aLog,boolean isSupportDynamicFieldName) throws Exception{
-	 return execute(sets, loader, aContext, errorList, isTrace, isCatchException,true, aLog,isSupportDynamicFieldName);
-  }
-  
-  /**
-   * 批量执行指令集合，指令集间可以共享 变量和函数
-   * @param sets
-   * @param aOperatorManager
-   * @param aContext
-   * @param errorList
-   * @param aFunctionCacheMananger
-   * @param isTrace
-   * @return
-   * @throws Exception
-   */
-  public static Object execute(InstructionSet[] sets,ExpressLoader loader,
-			IExpressContext<String,Object> aContext, List<String> errorList,
-			boolean isTrace,boolean isCatchException,
-			boolean isReturnLastData,Log aLog,boolean isSupportDynamicFieldName)
-			throws Exception {
-	  InstructionSetContext<String,Object> context = new InstructionSetContext<String, Object>(
-				aContext,loader,isSupportDynamicFieldName);
-	  Object result = execute(sets,context,errorList,isTrace,isCatchException,isReturnLastData,aLog);
-      return result;
-  }
 
-	public static Object execute(InstructionSet[] sets,
-			InstructionSetContext<String,Object> context, List<String> errorList, boolean isTrace,boolean isCatchException,
-			boolean isReturnLastData,Log aLog) throws Exception {
-		RunEnvironment environmen = null;
-		Object result = null;
-		for (int i = 0; i < sets.length; i++) {
-			InstructionSet tmpSet = sets[i];
-			environmen = new RunEnvironment(tmpSet,
-					(InstructionSetContext<String,Object>) context, isTrace);
-			try {
-				CallResult tempResult = tmpSet.excuteInner(environmen, context,
-						errorList, i == sets.length - 1,isReturnLastData,aLog);
-				if (tempResult.isExit == true) {
-					result = tempResult.returnValue;
-					break;
-				}
-			} catch (Exception e) {
-				if(isCatchException == true){
-					if (aLog != null){
-				       aLog.error(e.getMessage(), e);
-					}else{
-					   log.error(e.getMessage(),e);
-					}
-				}else{
-					throw e;
-				}
-			}
-		}
-		return result;
-
-	}
 /**
  * 
  * @param environmen
@@ -143,31 +90,18 @@ public class InstructionSet {
  * @return
  * @throws Exception
  */
-	public CallResult excuteInner(RunEnvironment environmen,InstructionSetContext<String,Object> context,List<String> errorList,boolean isLast,boolean isReturnLastData,Log aLog)
+	public CallResult excute(RunEnvironment environmen,InstructionSetContext<String,Object> context,
+			List<String> errorList,boolean isLast,boolean isReturnLastData,Log aLog)
 			throws Exception {
-		Instruction instruction;
 		//将函数export到上下文中
 		for(FunctionInstructionSet item : this.functionDefine.values()){
 			context.addSymbol(item.name, item.instructionSet);
 		}
-		while (environmen.getProgramPoint() < this.instructionList.length) {
-			if (environmen.isExit() == true) {
-				break;
-			}
-			instruction = this.instructionList[environmen.getProgramPoint()];
-			instruction.setLog(aLog);//设置log
-			try{
-				instruction.execute(environmen, errorList);
-			}catch(Exception e){
-				log.error("当前ProgramPoint = " + environmen.getProgramPoint());
-				log.error("当前指令" +  instruction);
-				log.error(e);
-	            throw e;
-			}
-		}
+		//循环执行指令
+		this.executeInner(environmen, errorList, aLog);
+		
 		if (environmen.isExit() == false && isLast == true) {// 是在执行完所有的指令后结束的代码
 			if (environmen.getDataStackSize() > 0) {
-
 				OperateData tmpObject = environmen.pop();
 				if (tmpObject == null) {
 					environmen.quitExpress(null);
@@ -188,7 +122,55 @@ public class InstructionSet {
 		result.isExit = environmen.isExit();
 		return result;
 	}
-  
+
+	/**
+	 * 循环执行指令
+	 * 
+	 * @param environmen
+	 * @param errorList
+	 * @param aLog
+	 * @throws Exception
+	 */
+  public void executeInner(RunEnvironment environmen,List<String> errorList,Log aLog) throws Exception{
+		Instruction instruction;
+		while (environmen.getProgramPoint() < this.instructionList.length) {
+			if (environmen.isExit() == true) {
+				return;
+			}
+			instruction = this.instructionList[environmen.getProgramPoint()];
+			instruction.setLog(aLog);//设置log
+			try{
+				instruction.execute(environmen, errorList);
+			}catch(Exception e){
+				log.error("当前ProgramPoint = " + environmen.getProgramPoint());
+				log.error("当前指令" +  instruction);
+				log.error(e);
+	            throw e;
+			}
+		}
+  }
+  public String toJavaCode(){
+	  StringBuilder javaCode = new StringBuilder();
+	  StringBuilder staticFieldDefine = new StringBuilder();
+	  StringBuilder functionDefine = new StringBuilder();
+	  functionDefine.append("public void execute(RunEnvironment environment,List<String> errorList,Log aLog)  throws Exception{").append("\n");
+	  for(int i = 0; i< this.instructionList.length;i++){
+		  this.instructionList[i].toJavaCode(staticFieldDefine,functionDefine,i);
+	  }
+	  functionDefine.append("}").append("\n");
+	  javaCode.append("package com.ql.util.express.test.asm;").append("\n");
+	  javaCode.append("import ").append(OperateData.class.getName()+";").append("\n");
+	  javaCode.append("import ").append(RunEnvironment.class.getName()+";").append("\n");
+	  javaCode.append("import ").append(OperatorBase.class.getName()+";").append("\n");	  
+	  javaCode.append("import ").append(List.class.getName()+";").append("\n");
+	  javaCode.append("import ").append(Log.class.getName()+";").append("\n");	  
+	  javaCode.append("\n");
+	  javaCode.append("public class ExpressClass_" + getUniqClassIndex() + "{").append("\n");
+	  javaCode.append(staticFieldDefine.toString());
+	  javaCode.append(functionDefine.toString());
+	  javaCode.append("}").append("\n");	  
+	  return javaCode.toString();
+  }
   public void addMacroDefine(String macroName,FunctionInstructionSet iset){
 	  this.functionDefine.put(macroName, iset);
   }

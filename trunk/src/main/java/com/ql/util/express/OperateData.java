@@ -38,6 +38,22 @@ public class OperateData { // extends ExpressTreeNodeImple {
     public void setObject(InstructionSetContext<String,Object> parent, Object object) {
 		throw new RuntimeException("必须在子类中实现此方法");
 	}
+	public String toJavaCode(){		
+		if(this.getClass().equals(OperateData.class) == false){
+			throw new RuntimeException(this.getClass().getName() + "没有实现：toJavaCode()");
+		}
+		String result ="new " + OperateData.class.getName() +"(";
+		if(String.class.equals(this.type)){
+			result = result + "\"" + this.dataObject + "\"";
+		}else if(this.type.isPrimitive()){
+			result = result + this.dataObject.getClass().getName() +".valueOf(\"" + this.dataObject + "\")";
+		}else{
+			result = result + "new " + this.dataObject.getClass().getName() + "(\"" + this.dataObject.toString() + "\")";
+		}
+		result = result + "," + type.getName() + ".class";
+		result = result + ")";
+		return result;
+	}
 	public String toString() {
 		if( this.dataObject == null)
 			return this.type + ":null";

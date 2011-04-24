@@ -3,7 +3,7 @@ package com.ql.util.express;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.ql.util.express.instruction.OperateDataAttr;
+import com.ql.util.express.instruction.opdata.OperateDataAttr;
 
 public class InstructionSetContext<K,V>  implements IExpressContext<K,V> {
 	private IExpressContext<K,V> parent = null;
@@ -16,11 +16,13 @@ public class InstructionSetContext<K,V>  implements IExpressContext<K,V> {
 	private ExpressLoader expressLoader;
 	
 	private boolean isSupportDynamicFieldName = false;
-		
-	public InstructionSetContext(IExpressContext<K,V> aParent,ExpressLoader aExpressLoader,boolean aIsSupportDynamicFieldName){
-		parent = aParent;
+	private ExpressRunner runner;	
+	public InstructionSetContext(ExpressRunner aRunner,IExpressContext<K,V> aParent,ExpressLoader aExpressLoader,boolean aIsSupportDynamicFieldName){
+		this.runner = aRunner;
+		this.parent = aParent;
 		this.expressLoader = aExpressLoader;
 		this.isSupportDynamicFieldName = aIsSupportDynamicFieldName;
+		
 	}
 	public void exportSymbol(String varName,Object aliasNameObject) throws Exception{
 		if( this.parent != null && this.parent instanceof InstructionSetContext){
@@ -44,6 +46,9 @@ public class InstructionSetContext<K,V>  implements IExpressContext<K,V> {
 	}
 	public boolean isSupportDynamicFieldName(){
 		 return this.isSupportDynamicFieldName;
+	}
+	public ExpressRunner getExpressRunner(){
+		return this.runner;
 	}
 	public Object findAliasOrDefSymbol(String varName)throws Exception{
 		Object result = null;
