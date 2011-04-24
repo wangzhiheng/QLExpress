@@ -9,6 +9,7 @@ import org.junit.Test;
 import com.ql.util.express.DefaultContext;
 import com.ql.util.express.ExpressRunner;
 import com.ql.util.express.InstructionSet;
+import com.ql.util.express.InstructionSetRunner;
 
 public class DongtaiFieldTest {
 	@Test
@@ -23,7 +24,7 @@ public class DongtaiFieldTest {
 		Map<String,Object> fee = new HashMap<String,Object>();
 		context.put("费用",fee);
 		InstructionSet set = runner.parseInstructionSet(express);
-		InstructionSet.executeOuter(new InstructionSet[]{set},null, context, null, true, false,null, true);
+		InstructionSetRunner.executeOuter(runner,new InstructionSet[]{set},null, context, null, true, false,null, true);
 		runner.execute(express, context, null, false, true);
 		System.out.println(context.get("费用"));
 		Assert.assertTrue("动态属性错误",fee.get("张三").toString().equals("100"));
