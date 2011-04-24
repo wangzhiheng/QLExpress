@@ -80,10 +80,10 @@ class StatementDefine{
 		ExpressParse.printTreeNode(root, 1);
 	}
 	public static ExpressNode builderStatementTree(List<ExpressNode> nodes,int point,MatchResult match) throws Exception{
-		if(match != null && match.matchs.size() != 1){
-			throw new Exception("语法定义错误，必须有一个根节点");
-		}		
-		match.matchs.get(0).buildExpressNodeTree();
+		if(match == null || match.matchs == null || match.matchs.size() != 1){
+			throw new Exception("语法定义错误，必须有且只有一个根节点");
+		}
+		match.matchs.get(0).buildExpressNodeTree();		
 		for(int i = match.matchLastIndex - 1; i > point;i--){
 			nodes.remove(i);
 		}
@@ -114,8 +114,8 @@ class StatementDefine{
 			NodeType tempNodeType = null;
 			ExpressNode tempNode = null;
 			if(point == nodes.size() && this.sourceNodeType == manager.findNodeType("EOF") ){
-				tempNodeType = manager.findNodeType(";");
-				tempNode = new ExpressNode(tempNodeType,null);
+				//tempNodeType = manager.findNodeType(";");
+				//tempNode = new ExpressNode(tempNodeType,null);
 				return new MatchResult(new ArrayList<MatchResultTree>(), point);
 			}else if( point < nodes.size()){
 				tempNodeType = nodes.get(point).isEqualsOrChildAndReturn(

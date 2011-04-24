@@ -75,8 +75,8 @@ public class InstructionSet {
   public static Object executeOuter(InstructionSet[] sets,ExpressLoader loader,
 			IExpressContext<String,Object> aContext, List<String> errorList,
 			boolean isTrace,boolean isCatchException,
-			Log aLog) throws Exception{
-	 return execute(sets, loader, aContext, errorList, isTrace, isCatchException,true, aLog);
+			Log aLog,boolean isSupportDynamicFieldName) throws Exception{
+	 return execute(sets, loader, aContext, errorList, isTrace, isCatchException,true, aLog,isSupportDynamicFieldName);
   }
   
   /**
@@ -93,10 +93,10 @@ public class InstructionSet {
   public static Object execute(InstructionSet[] sets,ExpressLoader loader,
 			IExpressContext<String,Object> aContext, List<String> errorList,
 			boolean isTrace,boolean isCatchException,
-			boolean isReturnLastData,Log aLog)
+			boolean isReturnLastData,Log aLog,boolean isSupportDynamicFieldName)
 			throws Exception {
 	  InstructionSetContext<String,Object> context = new InstructionSetContext<String, Object>(
-				aContext,loader);
+				aContext,loader,isSupportDynamicFieldName);
 	  Object result = execute(sets,context,errorList,isTrace,isCatchException,isReturnLastData,aLog);
       return result;
   }
@@ -161,7 +161,6 @@ public class InstructionSet {
 			}catch(Exception e){
 				log.error("当前ProgramPoint = " + environmen.getProgramPoint());
 				log.error("当前指令" +  instruction);
-				log.error("当前指令集" + this.instructionList);
 				log.error(e);
 	            throw e;
 			}

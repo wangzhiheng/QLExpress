@@ -14,10 +14,13 @@ public class InstructionSetContext<K,V>  implements IExpressContext<K,V> {
 	private Map<String,Object> symbolTable;
 	
 	private ExpressLoader expressLoader;
+	
+	private boolean isSupportDynamicFieldName = false;
 		
-	public InstructionSetContext(IExpressContext<K,V> aParent,ExpressLoader aExpressLoader){
+	public InstructionSetContext(IExpressContext<K,V> aParent,ExpressLoader aExpressLoader,boolean aIsSupportDynamicFieldName){
 		parent = aParent;
 		this.expressLoader = aExpressLoader;
+		this.isSupportDynamicFieldName = aIsSupportDynamicFieldName;
 	}
 	public void exportSymbol(String varName,Object aliasNameObject) throws Exception{
 		if( this.parent != null && this.parent instanceof InstructionSetContext){
@@ -34,6 +37,13 @@ public class InstructionSetContext<K,V>  implements IExpressContext<K,V> {
 			throw new Exception("变量" + varName + "已经存在，不能重复定义，也不能再从函数内部 exprot ");
 		}
 		this.symbolTable.put(varName,aliasNameObject);
+	}
+	
+	public void setSupportDynamicFieldName(boolean isSupportDynamicFieldName) {
+		this.isSupportDynamicFieldName = isSupportDynamicFieldName;
+	}
+	public boolean isSupportDynamicFieldName(){
+		 return this.isSupportDynamicFieldName;
 	}
 	public Object findAliasOrDefSymbol(String varName)throws Exception{
 		Object result = null;
