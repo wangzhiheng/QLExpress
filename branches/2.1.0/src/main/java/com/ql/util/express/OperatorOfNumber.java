@@ -279,6 +279,9 @@ class NormalNumberOperator {
  * @author xuannan
  */
 class PreciseNumberOperator {
+	
+	public static int DIVIDE_PRECISION = 10;
+	
 	public static Number addPrecise(Number op1, Number op2) throws Exception {
 		BigDecimal result =  null;
 		if(op1 instanceof BigDecimal){
@@ -362,15 +365,15 @@ class PreciseNumberOperator {
 		BigDecimal result =  null;
 		if(op1 instanceof BigDecimal){
 			if(op2 instanceof BigDecimal){
-				result = ((BigDecimal)op1).divide((BigDecimal)op2);
+				result = ((BigDecimal)op1).divide((BigDecimal)op2, DIVIDE_PRECISION, BigDecimal.ROUND_HALF_UP);
 			}else{
-				result = ((BigDecimal)op1).divide(new BigDecimal(op2.toString()));
+				result = ((BigDecimal)op1).divide(new BigDecimal(op2.toString()), DIVIDE_PRECISION, BigDecimal.ROUND_HALF_UP);
 			}
 		}else{
 			if(op2 instanceof BigDecimal){
-				result = new BigDecimal(op1.toString()).divide((BigDecimal)op2);
+				result = new BigDecimal(op1.toString()).divide((BigDecimal)op2, DIVIDE_PRECISION, BigDecimal.ROUND_HALF_UP);
 			}else{
-				result = new BigDecimal(op1.toString()).divide(new BigDecimal(op2.toString()));
+				result = new BigDecimal(op1.toString()).divide(new BigDecimal(op2.toString()), DIVIDE_PRECISION, BigDecimal.ROUND_HALF_UP);
 			}
 		}
 		if(result.scale() ==0){
