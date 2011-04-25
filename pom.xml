@@ -2,10 +2,6 @@
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<!--
-		<parent> <groupId>com.taobao</groupId> <artifactId>parent</artifactId>
-		<version>1.0.2</version> </parent>
-	-->
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.taobao.util</groupId>
 	<artifactId>taobao-express</artifactId>
@@ -54,16 +50,50 @@
 		</dependency>
 	</dependencies>
 
-	<distributionManagement>
+	<repositories>
 		<repository>
-			<id>taocodeReleases</id>
-			<url>http://code.taobao.org/mvn/repositories/releases/</url>
+			<id>central</id>
+			<url>http://mvnrepo.taobao.ali.com/mvn/repository</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
 		</repository>
-		<snapshotRepository>
-			<id>taocodeSnapshots</id>
-			<url>http://code.taobao.org/mvn/repositories/snapshots</url>
-		</snapshotRepository>
-	</distributionManagement>
+		<repository>
+			<id>snapshots</id>
+			<url>http://mvnrepo.taobao.ali.com/mvn/repository</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>central</id>
+			<url>http://mvnrepo.taobao.ali.com/mvn/repository</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</pluginRepository>
+		<pluginRepository>
+			<id>snapshots</id>
+			<url>http://mvnrepo.taobao.ali.com/mvn/repository</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</pluginRepository>
+	</pluginRepositories>
 
 	<build>
 		<plugins>
