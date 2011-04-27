@@ -4,6 +4,9 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Type;
+import org.objectweb.asm.commons.GeneratorAdapter;
 
 import com.ql.util.express.RunEnvironment;
 
@@ -16,7 +19,7 @@ public abstract class Instruction {
 			this.log = aLog;
 		}
 	}
-	public abstract void toJavaCode(StringBuilder staticFieldDefine,StringBuilder methodDefine,int index);
+	public abstract void toJavaCode(Type classType,ClassWriter cw,GeneratorAdapter staticInitialMethod,GeneratorAdapter executeMethod,int index);
 	
 	public abstract void execute(RunEnvironment environment, List<String> errorList)
 			throws Exception;

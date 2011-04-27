@@ -1,5 +1,8 @@
 package com.ql.util.express;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -8,10 +11,16 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.FieldVisitor;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
+import org.objectweb.asm.commons.GeneratorAdapter;
+import org.objectweb.asm.commons.Method;
 
 import com.ql.util.express.instruction.FunctionInstructionSet;
 import com.ql.util.express.instruction.detail.Instruction;
-import com.ql.util.express.instruction.op.OperatorBase;
 import com.ql.util.express.instruction.opdata.OperateDataLocalVar;
 
 
@@ -122,7 +131,24 @@ public class InstructionSet {
 		result.isExit = environmen.isExit();
 		return result;
 	}
-
+	  public void executeInner(RunEnvironment environmen,List<String> errorList,Log aLog) throws Exception{
+			Instruction instruction;
+			while (environmen.getProgramPoint() < this.instructionList.length) {
+				if (environmen.isExit() == true) {
+					return;
+				}
+				instruction = this.instructionList[environmen.getProgramPoint()];
+				instruction.setLog(aLog);//设置log
+				try{
+					instruction.execute(environmen, errorList);
+				}catch(Exception e){
+					log.error("当前ProgramPoint = " + environmen.getProgramPoint());
+					log.error("当前指令" +  instruction);
+					log.error(e);
+		            throw e;
+				}
+			}
+	}
 	/**
 	 * 循环执行指令
 	 * 
@@ -131,46 +157,47 @@ public class InstructionSet {
 	 * @param aLog
 	 * @throws Exception
 	 */
-  public void executeInner(RunEnvironment environmen,List<String> errorList,Log aLog) throws Exception{
-		Instruction instruction;
-		while (environmen.getProgramPoint() < this.instructionList.length) {
-			if (environmen.isExit() == true) {
-				return;
-			}
-			instruction = this.instructionList[environmen.getProgramPoint()];
-			instruction.setLog(aLog);//设置log
-			try{
-				instruction.execute(environmen, errorList);
-			}catch(Exception e){
-				log.error("当前ProgramPoint = " + environmen.getProgramPoint());
-				log.error("当前指令" +  instruction);
-				log.error(e);
-	            throw e;
-			}
+  public void executeInnerNew(RunEnvironment environmen,List<String> errorList,Log aLog) throws Exception{
+	  String className = "ExpressCode" ;//"com.ql.util.express.test.asm.ExpressClass_" + getUniqClassIndex();
+	  byte[] code = toJavaCode(className);
+	  Class<?> tempClass = new ExpressClassLoader(this.getClass().getClassLoader()).loadClass(className,code);
+	  java.lang.reflect.Method m =tempClass.getMethod("execute",new Class[]{
+			  RunEnvironment.class,List.class,Log.class
+	  });
+	  m.invoke(null, new Object[]{environmen,errorList,aLog});	  
+  }
+
+  public byte[] toJavaCode(String className){	  
+		Type classType = Type.getType("L" + className.replaceAll("\\.", "\\/") + ";");
+		ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS);
+		classWriter.visit(Opcodes.V1_1, Opcodes.ACC_PUBLIC, className, null,
+				"java/lang/Object", null);
+		Method mStaticInitial = Method.getMethod("void <clinit>()");
+		GeneratorAdapter mgStaticInitial = new GeneratorAdapter(Opcodes.ACC_STATIC, mStaticInitial, null, null, classWriter);
+
+		String methodName = "void execute(" + RunEnvironment.class.getName()
+				+ "," + List.class.getName() + "," + Log.class.getName() + ")";
+		Method m = Method.getMethod(methodName);
+		GeneratorAdapter mgExecuteMethod = new GeneratorAdapter(Opcodes.ACC_PUBLIC
+				+ Opcodes.ACC_STATIC, m, null, null, classWriter);
+
+		for (int i = 0; i < this.instructionList.length; i++) {
+			this.instructionList[i].toJavaCode(classType, classWriter,
+					mgStaticInitial, mgExecuteMethod, i);
 		}
+		
+		mgStaticInitial.returnValue();
+        mgStaticInitial.endMethod();
+         
+        mgExecuteMethod.returnValue();
+        mgExecuteMethod.endMethod();
+        
+		classWriter.visitEnd();
+		byte[] code = classWriter.toByteArray();
+		AsmUtil.writeClass(code, className);
+		return code;
   }
-  public String toJavaCode(){
-	  StringBuilder javaCode = new StringBuilder();
-	  StringBuilder staticFieldDefine = new StringBuilder();
-	  StringBuilder functionDefine = new StringBuilder();
-	  functionDefine.append("public void execute(RunEnvironment environment,List<String> errorList,Log aLog)  throws Exception{").append("\n");
-	  for(int i = 0; i< this.instructionList.length;i++){
-		  this.instructionList[i].toJavaCode(staticFieldDefine,functionDefine,i);
-	  }
-	  functionDefine.append("}").append("\n");
-	  javaCode.append("package com.ql.util.express.test.asm;").append("\n");
-	  javaCode.append("import ").append(OperateData.class.getName()+";").append("\n");
-	  javaCode.append("import ").append(RunEnvironment.class.getName()+";").append("\n");
-	  javaCode.append("import ").append(OperatorBase.class.getName()+";").append("\n");	  
-	  javaCode.append("import ").append(List.class.getName()+";").append("\n");
-	  javaCode.append("import ").append(Log.class.getName()+";").append("\n");	  
-	  javaCode.append("\n");
-	  javaCode.append("public class ExpressClass_" + getUniqClassIndex() + "{").append("\n");
-	  javaCode.append(staticFieldDefine.toString());
-	  javaCode.append(functionDefine.toString());
-	  javaCode.append("}").append("\n");	  
-	  return javaCode.toString();
-  }
+
   public void addMacroDefine(String macroName,FunctionInstructionSet iset){
 	  this.functionDefine.put(macroName, iset);
   }

@@ -2,6 +2,10 @@ package com.ql.util.express.instruction.detail;
 
 import java.util.List;
 
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Type;
+import org.objectweb.asm.commons.GeneratorAdapter;
+
 import com.ql.util.express.RunEnvironment;
 
 public class InstructionGoToWithCondition extends Instruction{
@@ -49,7 +53,7 @@ public class InstructionGoToWithCondition extends Instruction{
 	  result = result + this.offset;
 	  return result;
 	}
-	public void toJavaCode(StringBuilder staticFieldDefine,StringBuilder methodDefine,int index){
+	public void toJavaCode(Type classType,ClassWriter cw,GeneratorAdapter staticInitialMethod,GeneratorAdapter executeMethod,int index){
 		throw new RuntimeException("还没有实现方法：toJavaCode" );
 	}
 	public int getOffset() {
