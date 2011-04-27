@@ -65,6 +65,8 @@ public class OperatorOfNumber {
 			} else if (type.equals(double.class)
 					|| type.equals(Double.class)) {
 				return ((Number) value).doubleValue();
+			} else if (type.equals(BigDecimal.class)) {
+				return new BigDecimal(value.toString());
 			}else{
 				throw new RuntimeException("没有处理的数据类型：" + type.getName());
 			}
