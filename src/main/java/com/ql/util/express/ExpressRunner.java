@@ -284,7 +284,14 @@ public class ExpressRunner {
 			this.operatorManager.addOperatorWithAlias(keyWordName, realNodeType.getTag(), errorInfo);
 		}
 	}
-	
+	/**
+	 * Ìæ»»²Ù×÷·û´¦Àí
+	 * @param name
+	 */
+    public OperatorBase replaceOperator(String name,Operator op){
+    	return this.operatorManager.replaceOperator(name, op);
+    }
+    
 	public ExpressPackage getRootExpressPackage(){
 		return this.rootExpressPackage;
 	}

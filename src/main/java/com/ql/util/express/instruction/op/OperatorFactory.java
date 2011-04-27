@@ -64,7 +64,11 @@ public class OperatorFactory {
 		op.setPrecise(this.isPrecise);
 		operator.put(name, op);
 	}
-	
+	public OperatorBase replaceOperator(String name, OperatorBase op){
+		OperatorBase old =  this.operator.remove(name);
+		this.addOperator(name, op);
+		return old;
+	}
 	public void addFunctionOfClassMethod(String name, String aClassName,
 			String aFunctionName, Class<?>[] aParameterClassTypes,
 			String[] aParameterDesc,String[] aParameterAnnotation,
