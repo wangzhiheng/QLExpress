@@ -414,4 +414,13 @@ public class ExpressRunner {
 		boolean hasLocalVar = factory.createInstruction(this,result, forStack, node, isRoot);
 		return hasLocalVar;
 	}
+	/**
+	 * 获取一个表达式需要的外部变量名称列表
+	 * @param express
+	 * @return
+	 * @throws Exception 
+	 */
+	public String[] getOutVarNames(String express) throws Exception{
+		return this.parseInstructionSet(express).getOutAttrNames();
+	}
 }

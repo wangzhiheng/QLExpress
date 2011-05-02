@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.logging.Log;
@@ -17,8 +18,11 @@ import org.objectweb.asm.commons.Method;
 
 import com.ql.util.express.instruction.FunctionInstructionSet;
 import com.ql.util.express.instruction.detail.Instruction;
+import com.ql.util.express.instruction.detail.InstructionConstData;
 import com.ql.util.express.instruction.detail.InstructionGoTo;
 import com.ql.util.express.instruction.detail.InstructionGoToWithCondition;
+import com.ql.util.express.instruction.detail.InstructionLoadAttr;
+import com.ql.util.express.instruction.detail.InstructionOperator;
 import com.ql.util.express.instruction.op.OperatorFactory;
 import com.ql.util.express.instruction.opdata.OperateDataLocalVar;
 
@@ -33,7 +37,7 @@ import com.ql.util.express.instruction.opdata.OperateDataLocalVar;
 public class InstructionSet {
 
 	private static final Log log = LogFactory.getLog(InstructionSet.class);
-	public static boolean IS_COMPILE2JAVACODE = false;
+	public static boolean IS_COMPILE2JAVACODE = true;
 	public static AtomicInteger uniqIndex = new AtomicInteger(1);
 	public static String TYPE_MAIN ="main";
 	public static String TYPE_FUNCTION ="function";
@@ -58,13 +62,43 @@ public class InstructionSet {
    */
   private List<OperateDataLocalVar> parameterList = new ArrayList<OperateDataLocalVar>();
   
+  public static int getUniqClassIndex(){
+	  return uniqIndex.getAndIncrement();
+  }
   public InstructionSet(String aType){
 	  this.type = aType;
   }
   
-  public static int getUniqClassIndex(){
-	  return uniqIndex.getAndIncrement();
+  public String[] getOutAttrNames() throws Exception{
+	  Map<String,String> result = new TreeMap<String,String>();
+	  for(Instruction instruction:instructionList){
+		   if(instruction instanceof InstructionLoadAttr){
+			   result.put(((InstructionLoadAttr)instruction).getAttrName(),null);
+		   }
+	  }
+	 
+	  //剔除本地变量定义和别名定义
+		for (int i = 0; i < instructionList.length; i++) {
+			Instruction instruction = instructionList[i];
+			if (instruction instanceof InstructionOperator) {
+				String opName = ((InstructionOperator) instruction)
+						.getOperator().getName();
+				if (opName.equalsIgnoreCase("def")
+						|| opName.equalsIgnoreCase("exportDef")) {
+					String varLocalName = (String) ((InstructionConstData) instructionList[i - 1])
+							.getOperateData().getObject(null);
+					result.remove(varLocalName);
+				} else if (opName.equalsIgnoreCase("alias")
+						|| opName.equalsIgnoreCase("exportAlias")) {
+					String varLocalName = (String) ((InstructionConstData) instructionList[i - 2])
+							.getOperateData().getObject(null);
+					result.remove(varLocalName);
+				}
+			}
+		}
+	  return result.keySet().toArray(new String[0]);
   }
+
   
   /**
    * 添加指令，为了提高运行期的效率，指令集用数组存储

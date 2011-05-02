@@ -24,6 +24,9 @@ public class InstructionOperator extends Instruction{
 	  this.operator = aOperator;
 	  this.opDataNumber =aOpDataNumber;
 	}
+	public OperatorBase getOperator(){
+		return this.operator;
+	}
 	public void execute(RunEnvironment environment,List<String> errorList) throws Exception{
 		execute(this.operator,this.opDataNumber, environment, errorList, this.log);
 	}
