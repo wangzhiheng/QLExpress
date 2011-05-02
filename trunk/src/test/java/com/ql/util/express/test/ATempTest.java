@@ -11,13 +11,10 @@ public class ATempTest {
 	@Test
 	public void test2Java() throws Exception {
 		String express = " 3 + 4 + 5 + 3";
-		String className = "com.ql.util.express.test.asm.ExpressClass_1";
-		ExpressRunner runner = new ExpressRunner();
-		String javaCode = runner.parseInstructionSet(express).toJavaCode();
-		System.out.println(javaCode);
-//		DefaultContext<String, Object> context = new DefaultContext<String, Object>();
-//		Object r =   runner.execute(express, context, null, false,true);
-//		System.out.println(r);	
+		ExpressRunner runner = new ExpressRunner();		
+		DefaultContext<String, Object> context = new DefaultContext<String, Object>();
+		Object r =   runner.execute(express, context, null, false,true);
+		System.out.println(r);	
 	}
 	
 	
