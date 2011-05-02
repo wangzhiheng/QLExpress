@@ -1,9 +1,11 @@
 package com.ql.util.express.instruction.detail;
 
 import java.util.List;
+import java.util.Map;
 
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.FieldVisitor;
+import org.objectweb.asm.Label;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.commons.GeneratorAdapter;
@@ -42,27 +44,25 @@ public class InstructionConstData extends Instruction {
 		environment.programPointAddOne();
 	}
 
-	public void toJavaCode(Type classType,ClassWriter cw,GeneratorAdapter staticInitialMethod,GeneratorAdapter executeMethod,int index){
+	public void toJavaCode(Type classType,ClassWriter cw,GeneratorAdapter staticInitialMethod,GeneratorAdapter executeMethod,int index, Map<Integer,Label>  lables){
+		Class<?> realDataClass = this.operateData.getClass();
 		String constFieldName = "const_" + index;
 		//定义静态变量
 		FieldVisitor fv = cw.visitField(Opcodes.ACC_PRIVATE + Opcodes.ACC_STATIC,
-				constFieldName,AsmUtil.getInnerClassDesc(OperateData.class),null,null);  
+				constFieldName,AsmUtil.getInnerClassDesc(realDataClass),null,null);  
         fv.visitEnd();   
         
         //定义静态变量的初始化
+        AsmUtil.transferOperatorData(staticInitialMethod,this.operateData);
+        staticInitialMethod.putStatic(classType,constFieldName, Type.getType(realDataClass));
 
-        staticInitialMethod.newInstance(Type.getType(OperateData.class));
-        staticInitialMethod.dup();
-        //staticInitialMethod.visitLdcInsn(this.operateData.getObjectInner(null).toString());
-        AsmUtil.transferCode(staticInitialMethod,this.operateData.getObjectInner(null));
-        AsmUtil.transferCode(staticInitialMethod,this.operateData.type);
-	    staticInitialMethod.invokeConstructor(Type.getType(OperateData.class), Method.getMethod("void <init>(Object,Class)"));
-	    staticInitialMethod.putStatic(classType,constFieldName, Type.getType(OperateData.class));
-	        //定义运行期代码
+	    //定义运行期代码
         executeMethod.loadArg(0);   
-        executeMethod.getStatic(classType, constFieldName, Type.getType(OperateData.class));
+        executeMethod.getStatic(classType, constFieldName, Type.getType(realDataClass));
         executeMethod.invokeVirtual(Type.getType(RunEnvironment.class),Method.getMethod("void push(" + OperateData.class.getName() + ")"));
     }
+	
+	
 	public String toString() {
 		if (this.operateData instanceof OperateDataAttr) {
 			return "LoadData attr:" + this.operateData.toString();

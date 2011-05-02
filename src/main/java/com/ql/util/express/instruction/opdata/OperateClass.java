@@ -28,4 +28,7 @@ public class OperateClass extends OperateData {
 	public Object getObjectInner(InstructionSetContext<String,Object> parent) {
 		return m_class;
 	}
+	public String getName(){
+		return this.name;
+	}
 }

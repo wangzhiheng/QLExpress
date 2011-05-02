@@ -1,13 +1,15 @@
 package com.ql.util.express.instruction.detail;
 
 import java.util.List;
+import java.util.Map;
 
+import org.apache.commons.logging.Log;
 import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Label;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.commons.GeneratorAdapter;
 import org.objectweb.asm.commons.Method;
 
-import com.ql.util.express.ExpressRunner;
 import com.ql.util.express.InstructionSetContext;
 import com.ql.util.express.OperateData;
 import com.ql.util.express.RunEnvironment;
@@ -22,10 +24,13 @@ public class InstructionOperator extends Instruction{
 	  this.operator = aOperator;
 	  this.opDataNumber =aOpDataNumber;
 	}
-	public void execute(RunEnvironment environment,List<String> errorList) throws Exception{		
-		OperateData[] parameters = environment.popArray(environment.getContext(),this.opDataNumber);		
+	public void execute(RunEnvironment environment,List<String> errorList) throws Exception{
+		execute(this.operator,this.opDataNumber, environment, errorList, this.log);
+	}
+	public static void execute(OperatorBase aOperator,int aOpNum,RunEnvironment environment,List<String> errorList,Log log) throws Exception{		
+		OperateData[] parameters = environment.popArray(environment.getContext(),aOpNum);		
 		if(environment.isTrace()){
-			String str = this.operator.toString() + "(";
+			String str = aOperator.toString() + "(";
 			for(int i=0;i<parameters.length;i++){
 				if(i > 0){
 					str = str + ",";
@@ -40,42 +45,34 @@ public class InstructionOperator extends Instruction{
 			log.debug(str);
 		}
 		
-		OperateData result = this.operator.execute(environment.getContext(),parameters, errorList);
+		OperateData result = aOperator.execute(environment.getContext(),parameters, errorList);
 		environment.push(result);
 		environment.programPointAddOne();
 	}
-	public void toJavaCode(Type classType,ClassWriter cw,GeneratorAdapter staticInitialMethod,GeneratorAdapter executeMethod,int index){
-		//OperateData[] parameters = environment.popArray(environment.getContext(),this.opDataNumber);
-		executeMethod.loadArg(0);
-		executeMethod.loadArg(0);
-		executeMethod.invokeVirtual(Type.getType(RunEnvironment.class),Method.getMethod(InstructionSetContext.class.getName() + "  getContext()"));
-		executeMethod.visitLdcInsn(this.opDataNumber);
-		executeMethod.invokeVirtual(Type.getType(RunEnvironment.class),Method.getMethod(OperateData.class.getName() + "[]  popArray(" + InstructionSetContext.class.getName()+"," + int.class +")"));
-		executeMethod.storeLocal(3,Type.getType(OperateData[].class));
-		//OperatorBase tempOp =   environment.getContext().getExpressRunner().getOperatorFactory().getOperator("+");
-		executeMethod.loadArg(0);
-		executeMethod.invokeVirtual(Type.getType(RunEnvironment.class),Method.getMethod(InstructionSetContext.class.getName() + "  getContext()"));
-		executeMethod.invokeVirtual(Type.getType(InstructionSetContext.class),Method.getMethod(ExpressRunner.class.getName() + "  getExpressRunner()"));
-		executeMethod.invokeVirtual(Type.getType(ExpressRunner.class),Method.getMethod(OperatorFactory.class.getName() + "  getOperatorFactory()"));
-		executeMethod.visitLdcInsn(this.operator.getAliasName());
-		executeMethod.invokeVirtual(Type.getType(OperatorFactory.class),Method.getMethod(OperatorBase.class.getName() + "  getOperator(String)"));
-		
-		executeMethod.storeLocal(4,Type.getType(OperatorBase.class));
-		executeMethod.loadLocal(4);
-		
-		executeMethod.loadArg(0);
-		executeMethod.invokeVirtual(Type.getType(RunEnvironment.class),Method.getMethod(InstructionSetContext.class.getName() + "  getContext()"));
-		executeMethod.loadLocal(3);
-		executeMethod.loadArg(2);
-		executeMethod.invokeVirtual(Type.getType(OperatorBase.class),Method.getMethod(OperateData.class.getName() + "  execute(" 
-				  + InstructionSetContext.class.getName() +"," + OperateData.class.getName() + "[]," + List.class.getName()  + ")"));
-		executeMethod.storeLocal(5,Type.getType(OperateData.class));
-
-		
-		//environment.push(result);
+	public void toJavaCode(Type classType,ClassWriter cw,GeneratorAdapter staticInitialMethod,GeneratorAdapter executeMethod,int index, Map<Integer,Label>  lables){
+		toJavaCode(this.operator.getAliasName(),this.opDataNumber, classType, cw, staticInitialMethod, executeMethod, index);
+	}	
+	public static void toJavaCode(String opAliasName,int opNumber,Type classType,ClassWriter cw,GeneratorAdapter staticInitialMethod,GeneratorAdapter executeMethod,int index){
+		//paramRunEnvironment.push(localOperatorFactory.getOperator("+")
+		//  .execute(localInstructionSetContext, paramRunEnvironment.popArray(localInstructionSetContext, 2),
+		//   paramList));
 		executeMethod.loadArg(0);   
-		executeMethod.loadLocal(5);
-        executeMethod.invokeVirtual(Type.getType(RunEnvironment.class),Method.getMethod("void push(" + OperateData.class.getName() + ")"));
+		executeMethod.loadLocal(4);
+		executeMethod.visitLdcInsn(opAliasName);
+		executeMethod.invokeVirtual(Type.getType(OperatorFactory.class),
+				Method.getMethod(OperatorBase.class.getName() + "  getOperator(String)"));
+		executeMethod.loadLocal(3);		
+		executeMethod.loadArg(0);
+		executeMethod.loadLocal(3);
+		executeMethod.visitLdcInsn(opNumber);
+		executeMethod.invokeVirtual(Type.getType(RunEnvironment.class),
+				Method.getMethod(OperateData.class.getName() + "[]  popArray(" + InstructionSetContext.class.getName()+"," + int.class +")"));	
+		executeMethod.loadArg(1);
+		executeMethod.invokeVirtual(Type.getType(OperatorBase.class),
+				Method.getMethod(OperateData.class.getName() + "  execute(" 
+				  + InstructionSetContext.class.getName() +"," + OperateData.class.getName() + "[]," + List.class.getName()  + ")"));
+        executeMethod.invokeVirtual(Type.getType(RunEnvironment.class),
+        		Method.getMethod("void push(" + OperateData.class.getName() + ")"));
     }
 	public String toString(){
 		String result = "OP : " + this.operator.toString() +  " OPNUMBER[" + this.opDataNumber +"]";
