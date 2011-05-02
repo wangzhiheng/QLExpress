@@ -37,7 +37,7 @@ import com.ql.util.express.instruction.opdata.OperateDataLocalVar;
 public class InstructionSet {
 
 	private static final Log log = LogFactory.getLog(InstructionSet.class);
-	public static boolean IS_COMPILE2JAVACODE = true;
+	public static boolean IS_COMPILE2JAVACODE = false;
 	public static AtomicInteger uniqIndex = new AtomicInteger(1);
 	public static String TYPE_MAIN ="main";
 	public static String TYPE_FUNCTION ="function";
