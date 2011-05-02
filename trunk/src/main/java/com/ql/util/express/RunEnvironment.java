@@ -49,6 +49,10 @@ public class RunEnvironment {
 			this.isExit = true;
 			this.returnValue = aReturnValue;
 		}
+		public void quitExpress(){
+			this.isExit = true;
+			this.returnValue = null;
+		}
 		public boolean isTrace(){
 			return this.isTrace;
 		}

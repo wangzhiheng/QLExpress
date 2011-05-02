@@ -7,10 +7,12 @@ import org.objectweb.asm.Type;
 import org.objectweb.asm.commons.GeneratorAdapter;
 import org.objectweb.asm.commons.Method;
 
+import com.ql.util.express.instruction.opdata.OperateClass;
+
 public class AsmUtil {
 	public static void writeClass(byte[] code, String className) {
 		try {
-			FileOutputStream fos = new FileOutputStream(className + ".class");
+			FileOutputStream fos = new FileOutputStream("express_temp/" + className.replaceAll("\\.","\\_") + ".class");
 			fos.write(code);
 			fos.close();
 		} catch (IOException e) {
@@ -25,18 +27,63 @@ public class AsmUtil {
     }
 	public static void transferCode(GeneratorAdapter method, Object value) {
 		if (value instanceof String) {
-			method.visitLdcInsn((String)value);
+			method.visitLdcInsn(value);
 		}else if(value instanceof Number){
 			method.newInstance(Type.getType(value.getClass()));
 			method.dup();
 			method.visitLdcInsn(value.toString());
 			method.invokeConstructor(Type.getType(value.getClass()),
 					Method.getMethod("void <init>(String)"));
+		}else if(value instanceof Character){
+			method.visitLdcInsn(value);
+			method.invokeStatic(Type.getType(Character.class),Method.getMethod("Character valueOf(char)"));
+		}else if(value instanceof Boolean){
+			method.visitLdcInsn(value.toString());
+			method.invokeStatic(Type.getType(value.getClass()),Method.getMethod("Boolean valueOf(String)"));
 		}else if(value instanceof Class){
-			method.visitLdcInsn(((Class<?>)value).getName());
-			method.invokeStatic(Type.getType(Class.class),Method.getMethod("Class forName(String)"));
-		}else {		
+			Class<?> tempClass = (Class<?>)value;
+			if (tempClass.equals(byte.class)) {
+				method.getStatic(Type.getType(Byte.class), "TYPE",Type.getType(Class.class));
+			} else if (tempClass.equals(char.class)) {
+				method.getStatic(Type.getType(Character.class), "TYPE",Type.getType(Class.class));
+			} else if (tempClass.equals(short.class)) {
+				method.getStatic(Type.getType(Short.class), "TYPE",Type.getType(Class.class));
+			} else if (tempClass.equals(int.class)) {
+				method.getStatic(Type.getType(Integer.class), "TYPE",Type.getType(Class.class));
+			} else if (tempClass.equals(long.class)) {
+				method.getStatic(Type.getType(Long.class), "TYPE",Type.getType(Class.class));
+			} else if (tempClass.equals(float.class)) {
+				method.getStatic(Type.getType(Float.class), "TYPE",Type.getType(Class.class));
+			} else if (tempClass.equals(double.class)) {
+				method.getStatic(Type.getType(Double.class), "TYPE",Type.getType(Class.class));
+			} else {
+				method.visitLdcInsn(tempClass.getName());
+				method.invokeStatic(Type.getType(Class.class),
+						Method.getMethod("Class forName(String)"));
+			}
+		}else {
 			throw new RuntimeException("不支持的数据类型：" + value.getClass().getName());
 		}
+	}
+	public static void transferOperatorData(GeneratorAdapter staticInitialMethod, OperateData value) {
+		Class<?> realClass = value.getClass();
+		staticInitialMethod.newInstance(Type.getType(realClass));
+		staticInitialMethod.dup();
+		if(OperateData.class.equals(realClass)){
+			AsmUtil.transferCode(staticInitialMethod,value.getObjectInner(null));
+			AsmUtil.transferCode(staticInitialMethod,value.type);
+			staticInitialMethod.invokeConstructor(
+					Type.getType(OperateData.class),
+					Method.getMethod("void <init>(Object,Class)"));
+		}else if(OperateClass.class.equals(realClass)){
+			AsmUtil.transferCode(staticInitialMethod,((OperateClass)value).getName());
+			AsmUtil.transferCode(staticInitialMethod,((OperateClass)value).getVarClass());
+			staticInitialMethod.invokeConstructor(
+					Type.getType(realClass),
+					Method.getMethod("void <init>(String,Class)"));			
+		}else{
+			throw new RuntimeException("不支持的数据类型：" +realClass.getName());
+		}
+		
 	}
 }

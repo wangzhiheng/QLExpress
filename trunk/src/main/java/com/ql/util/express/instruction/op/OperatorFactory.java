@@ -17,7 +17,7 @@ public class OperatorFactory {
 	  public OperatorFactory(boolean aIsPrecise){
 		  this.isPrecise = aIsPrecise;
 		  addOperator("new",new OperatorNew("new"));
-		  addOperator("def",  new OperatorDef("VAR_DEFINE"));
+		  addOperator("def",  new OperatorDef("def"));
 		  addOperator("exportDef",  new OperatorExportDef("exportDef"));
 		  addOperator("!",new OperatorNot("!"));
 		  addOperator("*", new OperatorMultiDiv("*"));
@@ -62,6 +62,7 @@ public class OperatorFactory {
 					+ oldOp.getClass() + " ∂®“Â2£∫" + op.getClass());
 		}
 		op.setPrecise(this.isPrecise);
+		op.setAliasName(name);
 		operator.put(name, op);
 	}
 	public OperatorBase replaceOperator(String name, OperatorBase op){
