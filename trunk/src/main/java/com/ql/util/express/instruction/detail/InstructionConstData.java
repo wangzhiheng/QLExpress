@@ -29,7 +29,9 @@ public class InstructionConstData extends Instruction {
 				.getObjectValue().getClass());
 		}
 	}
-
+    public OperateData getOperateData(){
+    	return this.operateData;
+    }
 	public void execute(RunEnvironment environment, List<String> errorList)
 			throws Exception {
 		if (environment.isTrace()) {

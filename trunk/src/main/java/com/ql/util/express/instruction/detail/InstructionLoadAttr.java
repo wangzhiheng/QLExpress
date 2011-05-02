@@ -23,6 +23,9 @@ public class InstructionLoadAttr extends Instruction{
     public InstructionLoadAttr(String aName){
     	this.attrName = aName;
     }
+    public String getAttrName(){
+    	return this.attrName;
+    }
 	public void execute(RunEnvironment environment,List<String> errorList)throws Exception{
 		Object o = environment.getContext().getSymbol(this.attrName);
 		if(o != null && o instanceof InstructionSet){//是函数，则执行
