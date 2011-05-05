@@ -6,7 +6,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.ql.util.express.DefaultContext;
-import com.ql.util.express.ExpressLoader;
 import com.ql.util.express.ExpressRunner;
 import com.ql.util.express.InstructionSet;
 
@@ -107,7 +106,7 @@ public class DefineTest {
 				runner.parseInstructionSet("惩罚;"),
 				runner.parseInstructionSet("qh = qh + 1000;"),
 		};
-		Object r = runner.execute(sets, null, context, null, true,false,null);
+		Object r = runner.execute(sets, context, null, true,false,null);
 //		 public Object execute(InstructionSet[] instructionSets,ExpressLoader loader,IExpressContext context,
 //				  List errorList,FuncitonCacheManager aFunctionCacheMananger,boolean isTrace,boolean isCatchException,
 //					Log aLog);
@@ -119,20 +118,16 @@ public class DefineTest {
 	public void test调用其他脚本() throws Exception{
 		ExpressRunner runner = new ExpressRunner();
 		runner.addOperatorWithAlias("定义宏", "macro", null);
-		ExpressLoader loader = new ExpressLoader(runner);
-		loader.parseInstructionSet("定义", "int qh = 100;");
-		loader.parseInstructionSet("累加", "qh = qh + 100;");
-		loader.parseInstructionSet("执行", "累加;累加;");
-		loader.parseInstructionSet("返回", "return qh;");
+		runner.loadMutilExpress("定义", "int qh = 100;");
+		runner.loadMutilExpress("累加", "qh = qh + 100;");
+		runner.loadMutilExpress("执行", "累加;累加;");
+		runner.loadMutilExpress("返回", "return qh;");
 		DefaultContext<String, Object>  context = new DefaultContext<String, Object>();		
 		context.put("bean", new BeanExample("qhlhl2010@gmail.com"));
 		context.put("name","xuannn");
-		Object r = runner.execute(new InstructionSet[]{
-				loader.getInstructionSet("定义"),
-				loader.getInstructionSet("执行"),
-				loader.getInstructionSet("执行"),
-				loader.getInstructionSet("返回")				
-		}, loader, context, null,  true,false,null);
+		Object r = runner.executeByExpressName(new String[]{
+				"定义","执行","执行","返回"			
+		}, context, null,  true,false,null);
 		
 		System.out.println(r);
 		Assert.assertTrue("别名实现 错误", r.toString().equalsIgnoreCase("500"));
