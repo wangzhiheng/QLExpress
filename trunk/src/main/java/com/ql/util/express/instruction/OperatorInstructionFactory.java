@@ -26,7 +26,7 @@ class OperatorInstructionFactory  extends InstructionFactory{
 		}
 		
 		if(node.isTypeEqualsOrChild("return")){
-			result.addInstruction(new InstructionReturn());	
+			result.addInstruction(new InstructionReturn(children.length > 0));	
 		}else{	
 			OperatorBase op = aCompile.getOperatorFactory().newInstance(node);
 			result.addInstruction(new InstructionOperator(op,children.length));
