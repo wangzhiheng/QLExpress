@@ -198,24 +198,27 @@ public class InstructionSet {
 	 * @throws Exception
 	 */
   public void executeInnerJavaCode(RunEnvironment environmen,List<String> errorList,Log aLog) throws Exception{
-	  initialExecuteMethod();
+		if (this.executeMethod == null) {
+			initialExecuteMethod();
+		}
 	  executeMethod.invoke(null, new Object[]{environmen,errorList,aLog});	  
   }
-  public void initialExecuteMethod() throws SecurityException, NoSuchMethodException{
-	    if(this.executeMethod != null){
-	    	return ;
-	    }
-	    
+
+	public synchronized void initialExecuteMethod() throws SecurityException,
+			NoSuchMethodException {
+		if (this.executeMethod != null) {
+			return;
+		}
 		String className = "ExpressClass_" + getUniqClassIndex();
 		byte[] code = toJavaCode(className);
-		if(log.isDebugEnabled()){
+		if (log.isDebugEnabled()) {
 			AsmUtil.writeClass(code, className);
 		}
 		Class<?> tempClass = new ExpressClassLoader(this.getClass()
 				.getClassLoader()).loadClass(className, code);
 		executeMethod = tempClass.getMethod("execute", new Class[] {
 				RunEnvironment.class, List.class, Log.class });
-  }
+	}
   public byte[] toJavaCode(String className){	  
 		Type classType = Type.getType("L" + className.replaceAll("\\.", "\\/") + ";");
 		ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS);
@@ -252,6 +255,10 @@ public class InstructionSet {
 				lables.put(((InstructionGoTo)this.instructionList[i]).getOffset() + i,mgExecuteMethod.newLabel());
 			}
 		}
+		
+		//为最后的push到环境做准备
+		//mgExecuteMethod.loadArg(0); 
+        
 		for (int i = 0; i < this.instructionList.length; i++) {
 			if(lables.containsKey(i)){
 				Label label =lables.get(i);
@@ -268,7 +275,10 @@ public class InstructionSet {
 		
 		mgStaticInitial.returnValue();
         mgStaticInitial.endMethod();
-         
+         //--------------
+//        mgExecuteMethod.invokeVirtual(Type.getType(RunEnvironment.class),
+//        		Method.getMethod("void push(" + OperateData.class.getName() + ")"));
+        //--------------
         mgExecuteMethod.returnValue();
         mgExecuteMethod.endMethod();
         
