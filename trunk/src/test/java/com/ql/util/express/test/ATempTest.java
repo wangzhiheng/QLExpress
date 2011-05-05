@@ -10,11 +10,14 @@ import com.ql.util.express.InstructionSet;
 public class ATempTest {
 	@Test
 	public void test2Java() throws Exception {
-		String express = " 3 + 4 + 5 + 3";
-		ExpressRunner runner = new ExpressRunner();		
+		String express = "macro ÐþÄÑ { abc(100);}   ÐþÄÑ;";
+		ExpressRunner runner = new ExpressRunner(false,true);	
+		runner.addFunctionOfClassMethod("abc", BeanExample.class.getName(),
+				"testLong", new String[] { "long" }, null);	
 		DefaultContext<String, Object> context = new DefaultContext<String, Object>();
+		InstructionSet.IS_COMPILE2JAVACODE = true;
 		Object r =   runner.execute(express, context, null, false,true);
-		System.out.println(r);	
+		System.out.println(r);		
 	}
 	
 	
@@ -26,9 +29,7 @@ public class ATempTest {
 		BeanExample bean = new BeanExample();
 		DefaultContext<String, Object>  context = new DefaultContext<String, Object>();	
 		context.put("bean",bean);
-		Object r = runner.execute(new InstructionSet[]{
-				loader.getInstructionSet("Test")
-		}, loader, context, null, false,false,null);
+		Object r = runner.executeByExpressName("Test", context, null, false,false,null);
 		System.out.println(r );
 		System.out.println(context);
 	}	

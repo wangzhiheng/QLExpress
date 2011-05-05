@@ -6,9 +6,7 @@ import java.util.Map;
 import org.junit.Test;
 
 import com.ql.util.express.DefaultContext;
-import com.ql.util.express.ExpressLoader;
 import com.ql.util.express.ExpressRunner;
-import com.ql.util.express.InstructionSet;
 /**
  * 分成配置范例
  * @author xuannan
@@ -32,21 +30,15 @@ public class RatingTest {
 		//增加自定义函数
 		runner.addFunction("费用科目",new SujectOperator("费用科目"));
         //装载分成规则rating.ql文件
-		ExpressLoader loader = new ExpressLoader(runner);
-		loader.loadExpressFromFile("rating");
+		runner.loadExpressFromFile("rating");
 		//设置上下文
 		DefaultContext<String, Object> context = new DefaultContext<String, Object>();
 		context.put("物流订单", logisticsOrder);
 		context.put("交易订单", tcOrder);
 		context.put("仓储订单", goodsOrder);
 		context.put("费用科目", subjectValue);
-		
-		//获取编译后的指令集
-		InstructionSet[] sets = new InstructionSet[]{
-				loader.getInstructionSet("rating")
-		};
 		//执行指令
-		runner.execute(sets, loader, context, null, false,false,null);
+		runner.executeByExpressName("rating",context, null, false,false,null);
 		
 		//输出分成结果
 		System.out.println("----------分成结果----------------");

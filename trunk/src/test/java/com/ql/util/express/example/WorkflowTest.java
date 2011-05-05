@@ -3,10 +3,8 @@ package com.ql.util.express.example;
 import org.junit.Test;
 
 import com.ql.util.express.DefaultContext;
-import com.ql.util.express.ExpressLoader;
 import com.ql.util.express.ExpressRunner;
 import com.ql.util.express.IExpressContext;
-import com.ql.util.express.InstructionSet;
 import com.ql.util.express.example.operator.ApproveOperator;
 
 /**
@@ -84,13 +82,10 @@ public class WorkflowTest {
 		runner.addFunction("审批通过", new ApproveOperator(1));
 		runner.addFunction("报销入账", new ApproveOperator(2));
 		runner.addFunction("打回修改", new ApproveOperator(3));
-		ExpressLoader loader = new ExpressLoader(runner);
 		//加载文件
-		loader.loadExpressFromFile("example/approve1");
+		runner.loadExpressFromFile("example/approve1");
 		//从指定文件中获取表示式构造指令集
-		InstructionSet[] is = new InstructionSet[]{
-				loader.getInstructionSet("example/approve1")
-		};
+		
 		//设置上下文变量
 		IExpressContext<String,Object> expressContext = new DefaultContext<String, Object>();
 		expressContext.put("经理", "王经理");
@@ -99,7 +94,7 @@ public class WorkflowTest {
 		expressContext.put("申请人", "小强");
 		expressContext.put("金额", new Integer(5000));
 		
-		runner.execute(is, loader, expressContext, null, false,false,null);
+		runner.executeByExpressName("example/approve1", expressContext, null, false,false,null);
 	}
 	
 	/**
@@ -114,15 +109,9 @@ public class WorkflowTest {
 	  runner.addOperatorWithAlias("否则", "else",null);
   	runner.addOperatorWithAlias("大于", ">",null);
 		//
-		runner.addFunctionOfServiceMethod("打印", System.out, "println",new String[] { "String" }, null);
-		
-		ExpressLoader loader = new ExpressLoader(runner);
+		runner.addFunctionOfServiceMethod("打印", System.out, "println",new String[] { "String" }, null);		
 		//加载文件
-		loader.loadExpressFromFile("example/approve");
-		//从指定文件中获取表示式构造指令集
-		InstructionSet[] is = new InstructionSet[]{
-				loader.getInstructionSet("example/approve")
-		};
+		runner.loadExpressFromFile("example/approve");
 		//设置上下文变量
 		IExpressContext<String,Object> expressContext = new DefaultContext<String, Object>();
 		expressContext.put("经理", "王经理");
@@ -131,7 +120,7 @@ public class WorkflowTest {
 		expressContext.put("申请人", "小强");
 		expressContext.put("金额", new Integer(6000));
 		
-		runner.execute(is, loader, expressContext, null, false,false,null);
+		runner.executeByExpressName("example/approve", expressContext, null, false,false,null);
 	}
 	
 	/**
@@ -148,14 +137,9 @@ public class WorkflowTest {
 		//
 		runner.addFunctionOfServiceMethod("打印", System.out, "println",new String[] { "String" }, null);
 		
-		ExpressLoader loader = new ExpressLoader(runner);
 		//加载文件
-		loader.loadExpressFromFile("example/approve1");
-		loader.loadExpressFromFile("example/approve2");
-		//从指定文件中获取表示式构造指令集
-		InstructionSet[] is = new InstructionSet[]{
-				loader.getInstructionSet("example/approve1")
-		};
+		runner.loadExpressFromFile("example/approve1");
+		runner.loadExpressFromFile("example/approve2");
 		//设置上下文变量
 		IExpressContext<String,Object> expressContext = new DefaultContext<String, Object>();
 		expressContext.put("经理", "王经理");
@@ -164,7 +148,7 @@ public class WorkflowTest {
 		expressContext.put("申请人", "小强");
 		expressContext.put("金额", new Integer(7000));
 		
-		runner.execute(is, loader, expressContext, null, false,false,null);
+		runner.executeByExpressName("example/approve1", expressContext, null, false,false,null);
 	}
 	
 }

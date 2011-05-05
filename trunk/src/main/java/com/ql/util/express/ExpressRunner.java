@@ -26,6 +26,7 @@ import com.ql.util.express.parse.NodeTypeManager;
 public class ExpressRunner {
 
 	private static final Log log = LogFactory.getLog(ExpressRunner.class);
+	private static final String GLOBAL_DEFINE_NAME="全局定义";
 	/**
 	 * 是否输出所有的跟踪信息，同时还需要log级别是DEBUG级别
 	 */
@@ -40,7 +41,8 @@ public class ExpressRunner {
 	 * 一段文本对应的指令集的缓存
 	 */
     private Map<String,InstructionSet> expressInstructionSetCache = new HashMap<String, InstructionSet>();
-
+    
+    private ExpressLoader loader;
     /**
      * 语法定义的管理器
      */
@@ -75,6 +77,7 @@ public class ExpressRunner {
 		this.isTrace = aIstrace;
 		this.isPrecise = aIsPrecise;
 		this.operatorManager = new OperatorFactory(this.isPrecise);
+		this.loader = new ExpressLoader(this);
 		this.parse =  new ExpressParse(manager,this.isPrecise);
 		rootExpressPackage.addPackage("java.lang");
 		rootExpressPackage.addPackage("java.util");
@@ -95,6 +98,34 @@ public class ExpressRunner {
 	 */
 	public OperatorFactory getOperatorFactory(){
 		return this.operatorManager;
+	}
+	/**
+	 * 添加宏定义 例如： macro 玄难 { abc(userinfo.userId);}
+	 * @param macroName：玄难
+	 * @param express ：abc(userinfo.userId);
+	 * @throws Exception 
+	 */
+	public void addMacro(String macroName,String express) throws Exception{		
+		String macroExpress = "macro " + macroName  +" {" + express + "}";
+		this.loader.parseInstructionSet(GLOBAL_DEFINE_NAME,macroExpress);
+	}
+	
+	/**
+	 * 装载表达式，但不执行，例如一些宏定义，或者自定义函数
+	 * @param groupName
+	 * @param express
+	 * @throws Exception
+	 */
+	public void loadMutilExpress(String groupName,String express) throws Exception{		
+		this.loader.parseInstructionSet(groupName,express);
+	}
+    /**
+     * 装载文件中定义的Express
+     * @param fileName
+     * @throws Exception
+     */
+	public void loadExpressFromFile(String fileName) throws Exception {
+		this.loader.loadExpressFromFile(fileName);
 	}
 	/**
 	 * 添加函数定义
@@ -301,11 +332,55 @@ public class ExpressRunner {
 	public void clearExpressCache() {
 		this.expressInstructionSetCache.clear();
 	}
-
-	public Object execute(InstructionSet[] instructionSets,
-			ExpressLoader loader, IExpressContext<String,Object> context, List<String> errorList,
+	/**
+	 * 根据表达式的名称进行执行
+	 * @param name
+	 * @param context
+	 * @param errorList
+	 * @param isTrace
+	 * @param isCatchException
+	 * @param aLog
+	 * @return
+	 * @throws Exception
+	 */
+	public Object executeByExpressName(String name,IExpressContext<String,Object> context, List<String> errorList,
 			boolean isTrace,boolean isCatchException, Log aLog) throws Exception {
-		 return  InstructionSetRunner.executeOuter(this,instructionSets,loader,context, errorList,
+		return this.executeByExpressName(new String[]{name}, context, errorList, isTrace, isCatchException, aLog);
+	}
+	/**
+	 * 把几个表达式组织成一个表达式来执行
+	 * @param setsNames
+	 * @param context
+	 * @param errorList
+	 * @param isTrace
+	 * @param isCatchException
+	 * @param aLog
+	 * @return
+	 * @throws Exception
+	 */
+	public Object executeByExpressName(String[] setsNames,IExpressContext<String,Object> context, List<String> errorList,
+			boolean isTrace,boolean isCatchException, Log aLog) throws Exception {
+		InstructionSet[] instructionSets = new InstructionSet[setsNames.length];
+		for(int i=0;i< setsNames.length;i++){
+			instructionSets[i] = this.loader.getInstructionSet(setsNames[i]);
+		}
+		return this.execute(instructionSets, context, errorList, isTrace, isCatchException, aLog);
+	}	
+    
+	/**
+	 * 执行指令集
+	 * @param instructionSets
+	 * @param context
+	 * @param errorList
+	 * @param isTrace
+	 * @param isCatchException
+	 * @param aLog
+	 * @return
+	 * @throws Exception
+	 */
+	public Object execute(InstructionSet[] instructionSets,IExpressContext<String,Object> context, List<String> errorList,
+			boolean isTrace,boolean isCatchException, Log aLog) throws Exception {
+		return  InstructionSetRunner.executeOuter(this,instructionSets,this.loader,context, errorList,
 				 	isTrace,isCatchException,aLog,false);
 	}
 /**
@@ -352,7 +427,7 @@ public class ExpressRunner {
 		} else {
 			parseResult = this.parseInstructionSet(expressString);
 		}
-		return this.execute(new InstructionSet[] { parseResult }, null,
+		return this.execute(new InstructionSet[] { parseResult },
 				context, errorList, isTrace, false,aLog);
 	}
 
@@ -372,7 +447,13 @@ public class ExpressRunner {
 		}
 		return result;
 	}
-
+	/**
+	 * 输出全局定义信息
+	 * @return
+	 */
+	public ExportItem[] getExportInfo(){
+		return this.loader.getExportInfo();
+	}
 /**
  * 检查语法树是否正确
  * @param aRoot

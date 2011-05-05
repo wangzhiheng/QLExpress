@@ -5,32 +5,27 @@ import org.junit.Test;
 
 import com.ql.util.express.DefaultContext;
 import com.ql.util.express.ExportItem;
-import com.ql.util.express.ExpressLoader;
 import com.ql.util.express.ExpressRunner;
-import com.ql.util.express.InstructionSet;
 
 public class LoadExpressFromFileTest {
 	@Test
 	public void testLoadFromFile() throws Exception {
-		ExpressRunner runner = new ExpressRunner(false,true);
-		ExpressLoader loader = new ExpressLoader(runner);
-		loader.loadExpressFromFile("functiondef");
-		loader.loadExpressFromFile("main");
-		ExportItem[] exports = loader.getExportInfo();
+		ExpressRunner runner = new ExpressRunner(false,false);
+		runner.loadExpressFromFile("functiondef");
+		runner.loadExpressFromFile("main");
+		ExportItem[] exports = runner.getExportInfo();
 		for (ExportItem item : exports) {
-			System.out.println(item);
+			System.out.println(item.getGlobeName());
 		}
 		DefaultContext<String, Object> context = new DefaultContext<String, Object>();
 		Log log = new MyLog("玄难测试");
-		Object r = runner.execute(new InstructionSet[] { loader
-				.getInstructionSet("main") }, loader, context, null,
-				true, false, log);
+		Object r = runner.executeByExpressName("main", context, null,
+				false, false, log);
 		System.out.println("运行结果" + r);
 		System.out.println("context:" + context);
 
 		context = new DefaultContext<String, Object>();
-		r = runner.execute(new InstructionSet[] { runner
-				.parseInstructionSet("initial;累加;累加;return qh;") }, loader,
+		r = runner.execute("initial;累加;累加;return qh;",
 				context, null, true, false, log);
 
 		System.out.println("运行结果" + r);
