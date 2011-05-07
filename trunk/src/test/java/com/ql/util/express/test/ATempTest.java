@@ -5,7 +5,6 @@ import org.junit.Test;
 import com.ql.util.express.DefaultContext;
 import com.ql.util.express.ExpressLoader;
 import com.ql.util.express.ExpressRunner;
-import com.ql.util.express.InstructionSet;
 
 public class ATempTest {
 	@Test
@@ -15,7 +14,6 @@ public class ATempTest {
 		runner.addFunctionOfClassMethod("abc", BeanExample.class.getName(),
 				"testLong", new String[] { "long" }, null);	
 		DefaultContext<String, Object> context = new DefaultContext<String, Object>();
-		InstructionSet.IS_COMPILE2JAVACODE = true;
 		Object r =   runner.execute(express, context, null, false,true);
 		System.out.println(r);		
 	}
