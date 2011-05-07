@@ -45,6 +45,10 @@ public class InstructionReturn extends Instruction{
 		executeMethod.returnValue();
 	}
 	public String toString(){
-	  return "return ";	
+		if(this.haveReturnValue){
+	         return "return [value]";	
+		}else{
+			return "return";
+		}
 	}	
 }
