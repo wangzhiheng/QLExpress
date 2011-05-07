@@ -14,20 +14,13 @@ import org.objectweb.asm.commons.Method;
 import com.ql.util.express.AsmUtil;
 import com.ql.util.express.OperateData;
 import com.ql.util.express.RunEnvironment;
-import com.ql.util.express.instruction.opdata.OperateClass;
 import com.ql.util.express.instruction.opdata.OperateDataAttr;
-import com.ql.util.express.parse.ExpressNode;
 
 public class InstructionConstData extends Instruction {
 	OperateData operateData;
 
-	public InstructionConstData(ExpressNode node) {
-		if(node.isTypeEqualsOrChild("CONST_CLASS")){
-			this.operateData = new OperateClass(node.getValue(),(Class<?>)node.getObjectValue());
-		}else{
-			this.operateData = new OperateData(node.getObjectValue(), node
-				.getObjectValue().getClass());
-		}
+	public InstructionConstData(OperateData data) {
+       this.operateData = data;
 	}
     public OperateData getOperateData(){
     	return this.operateData;
