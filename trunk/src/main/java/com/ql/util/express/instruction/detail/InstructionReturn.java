@@ -1,16 +1,7 @@
 package com.ql.util.express.instruction.detail;
 
 import java.util.List;
-import java.util.Map;
 
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.Label;
-import org.objectweb.asm.Type;
-import org.objectweb.asm.commons.GeneratorAdapter;
-import org.objectweb.asm.commons.Method;
-
-import com.ql.util.express.InstructionSetContext;
-import com.ql.util.express.OperateData;
 import com.ql.util.express.RunEnvironment;
 
 public class InstructionReturn extends Instruction{
@@ -29,20 +20,6 @@ public class InstructionReturn extends Instruction{
 		   environment.quitExpress();
 		}
 		environment.programPointAddOne();
-	}
-	public void toJavaCode(Type classType,ClassWriter cw,GeneratorAdapter staticInitialMethod,GeneratorAdapter executeMethod,int index, Map<Integer,Label>  lables){
-		if(this.haveReturnValue == true){
-			executeMethod.loadArg(0);
-			executeMethod.loadArg(0);
-			executeMethod.invokeVirtual(Type.getType(RunEnvironment.class),Method.getMethod(OperateData.class.getName() + " pop()"));
-			executeMethod.loadLocal(3);
-			executeMethod.invokeVirtual(Type.getType(OperateData.class),Method.getMethod("Object getObject(" + InstructionSetContext.class.getName()+")"));
-			executeMethod.invokeVirtual(Type.getType(RunEnvironment.class),Method.getMethod("void quitExpress(Object)"));			
-		}else{
-			executeMethod.loadArg(0);
-			executeMethod.invokeVirtual(Type.getType(RunEnvironment.class),Method.getMethod("void quitExpress()"));
-		}
-		executeMethod.returnValue();
 	}
 	public String toString(){
 		if(this.haveReturnValue){

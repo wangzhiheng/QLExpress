@@ -1,17 +1,7 @@
 package com.ql.util.express.instruction.detail;
 
 import java.util.List;
-import java.util.Map;
 
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.FieldVisitor;
-import org.objectweb.asm.Label;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.Type;
-import org.objectweb.asm.commons.GeneratorAdapter;
-import org.objectweb.asm.commons.Method;
-
-import com.ql.util.express.AsmUtil;
 import com.ql.util.express.OperateData;
 import com.ql.util.express.RunEnvironment;
 import com.ql.util.express.instruction.opdata.OperateDataAttr;
@@ -38,42 +28,6 @@ public class InstructionConstData extends Instruction {
 		environment.push(this.operateData);
 		environment.programPointAddOne();
 	}
-
-	public void toJavaCodeNew(Type classType,ClassWriter cw,GeneratorAdapter staticInitialMethod,GeneratorAdapter executeMethod,int index, Map<Integer,Label>  lables){
-		Class<?> realDataClass = this.operateData.getClass();
-		String constFieldName = "const_" + index;
-		//定义静态变量
-		FieldVisitor fv = cw.visitField(Opcodes.ACC_PRIVATE + Opcodes.ACC_STATIC,
-				constFieldName,AsmUtil.getInnerClassDesc(realDataClass),null,null);  
-        fv.visitEnd();   
-        
-        //定义静态变量的初始化
-        AsmUtil.transferOperatorData(staticInitialMethod,this.operateData);
-        staticInitialMethod.putStatic(classType,constFieldName, Type.getType(realDataClass));
-
-	    //定义运行期代码
-        //executeMethod.loadArg(0);   
-        executeMethod.getStatic(classType, constFieldName, Type.getType(realDataClass));
-        //executeMethod.invokeVirtual(Type.getType(RunEnvironment.class),Method.getMethod("void push(" + OperateData.class.getName() + ")"));
-    }
-	public void toJavaCode(Type classType,ClassWriter cw,GeneratorAdapter staticInitialMethod,GeneratorAdapter executeMethod,int index, Map<Integer,Label>  lables){
-		Class<?> realDataClass = this.operateData.getClass();
-		String constFieldName = "const_" + index;
-		//定义静态变量
-		FieldVisitor fv = cw.visitField(Opcodes.ACC_PRIVATE + Opcodes.ACC_STATIC,
-				constFieldName,AsmUtil.getInnerClassDesc(realDataClass),null,null);  
-        fv.visitEnd();   
-        
-        //定义静态变量的初始化
-        AsmUtil.transferOperatorData(staticInitialMethod,this.operateData);
-        staticInitialMethod.putStatic(classType,constFieldName, Type.getType(realDataClass));
-
-	    //定义运行期代码
-        executeMethod.loadArg(0);   
-        executeMethod.getStatic(classType, constFieldName, Type.getType(realDataClass));
-        executeMethod.invokeVirtual(Type.getType(RunEnvironment.class),Method.getMethod("void push(" + OperateData.class.getName() + ")"));
-    }	
-	
 	public String toString() {
 		if (this.operateData instanceof OperateDataAttr) {
 			return "LoadData attr:" + this.operateData.toString();

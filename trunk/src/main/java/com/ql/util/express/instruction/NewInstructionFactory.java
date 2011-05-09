@@ -11,44 +11,38 @@ import com.ql.util.express.parse.ExpressNode;
 
 
 public class NewInstructionFactory  extends InstructionFactory{
-	public boolean createInstruction(ExpressRunner aCompile,InstructionSet result,Stack<ForRelBreakContinue> forStack, ExpressNode node,boolean isRoot)
-			throws Exception {
-		boolean returnVal = false;		
-		OperatorBase op = aCompile.getOperatorFactory().newInstance(node);
-		int len = -1;
+	public boolean createInstruction(ExpressRunner aCompile,
+			InstructionSet result, Stack<ForRelBreakContinue> forStack,
+			ExpressNode node, boolean isRoot) throws Exception {
 		ExpressNode[] children = node.getChildren();
-		if(node.isTypeEqualsOrChild("NEW_ARRAY")){
+		if (node.isTypeEqualsOrChild("NEW_ARRAY")) {
 			String tempStr = children[0].getValue();
-			for(int i=0;i<children.length - 1;i++){
-			  tempStr = tempStr +"[]";	
+			for (int i = 0; i < children.length - 1; i++) {
+				tempStr = tempStr + "[]";
 			}
 			children[0].setValue(tempStr);
 			children[0].setOrgiValue(tempStr);
 			children[0].setObjectValue(ExpressUtil.getJavaClass(tempStr));
-		}
-		
-		
-		int [] finishPoint = new int[children.length];
-		
-		for(int i =0;i < children.length;i++){
-			ExpressNode tmpNode = children[i];
-			boolean tmpHas =    aCompile.createInstructionSetPrivate(result,forStack,tmpNode,false);
-			returnVal = returnVal || tmpHas;
-			finishPoint[i] = result.getCurrentPoint();
-		}
-	
-		if (node.isTypeEqualsOrChild("NEW_OBJECT")) {
-			len = children[1].getChildren().length;
-			if (len > 0) {
-				len = (len + 1) / 2;
+		} else if (node.isTypeEqualsOrChild("NEW_OBJECT")) {
+			node.getLeftChildren().remove(1);
+			ExpressNode[] parameterList = children[1].getChildren();
+			for (int i = 0; i < parameterList.length; i++) {
+				if (parameterList[i].isTypeEqualsOrChild(",") == false) {
+					node.getLeftChildren().add(parameterList[i]);
+				}
 			}
-			len = len + 1;
-		}else if(node.isTypeEqualsOrChild("NEW_ARRAY")){		
-			len = children.length; 
-		}else{
+		} else {
 			throw new Exception("不支持的类型：" + node.getTreeType().getTag());
 		}
-		result.addInstruction(new InstructionOperator(op, len));
+
+		boolean returnVal = false;
+		children = node.getChildren();// 需要重新获取数据
+		for (int i = 0; i < children.length; i++) {
+			boolean tmpHas = aCompile.createInstructionSetPrivate(result,forStack, children[i], false);
+			returnVal = returnVal || tmpHas;
+		}
+		OperatorBase op = aCompile.getOperatorFactory().newInstance(node);
+		result.addInstruction(new InstructionOperator(op, children.length));
 		return returnVal;
 	}
 }
