@@ -1,12 +1,6 @@
 package com.ql.util.express.instruction.detail;
 
 import java.util.List;
-import java.util.Map;
-
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.Label;
-import org.objectweb.asm.Type;
-import org.objectweb.asm.commons.GeneratorAdapter;
 
 import com.ql.util.express.RunEnvironment;
 
@@ -44,10 +38,4 @@ public class InstructionGoTo extends Instruction{
 		this.offset = offset;
 	}
 
-	public void toJavaCode(Type classType,ClassWriter cw,GeneratorAdapter staticInitialMethod,GeneratorAdapter executeMethod,int index,
-			Map<Integer,Label> lables){
-		Label label = lables.get(index + this.offset);
-		executeMethod.goTo(label);
-	}	
-	
 }

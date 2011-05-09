@@ -25,8 +25,7 @@ public class CastInstructionFactory  extends InstructionFactory{
 		}
 		
 		for(int i =0;i < children.length;i++){
-			ExpressNode tmpNode = children[i];
-			boolean tmpHas =    aCompile.createInstructionSetPrivate(result,forStack,tmpNode,false);
+			boolean tmpHas =    aCompile.createInstructionSetPrivate(result,forStack,children[i],false);
 			returnVal = returnVal || tmpHas;
 		}	
 		result.addInstruction(new InstructionOperator(op,children.length));
