@@ -14,7 +14,7 @@ public class NodeTypeManager {
 			 "!","<", ">", "<=", ">=", "==","!=","&&","||",//BooleanÔËËã·ûºÅ
 			 "for", "if", "then", "else", "exportAlias", "alias",
 			 "break", "continue", "return", "macro", "function" ,
-			 "def","exportDef", "new","array",
+			 "def","exportDef", "new","array","anonymousNewArray",
 			 "like",
 			 "=","cast","/**","**/"
 	};
@@ -82,6 +82,7 @@ public class NodeTypeManager {
 				"FUNCTION_CALL:TYPE=TREETYPE,DEFINE=ID$()#FUNCTION_CALL,FACTORY=com.ql.util.express.instruction.CallFunctionInstructionFactory",
 				"CAST_CALL:TYPE=TREETYPE,DEFINE=()$OPDATA#cast,FACTORY=com.ql.util.express.instruction.CastInstructionFactory",
 				"ARRAY_CALL:TYPE=TREETYPE,DEFINE=OPDATA$[]#ARRAY_CALL,FACTORY=com.ql.util.express.instruction.OperatorInstructionFactory",
+				"ANONY_NEW_ARRAY:TYPE=TREETYPE,DEFINE=[]#anonymousNewArray,FACTORY=com.ql.util.express.instruction.NewInstructionFactory",
 				
 				"EXPRESS_LEVEL1:TYPE=TREETYPE,DEFINE=       (OP_LEVEL1^)$OPDATA,FACTORY=com.ql.util.express.instruction.OperatorInstructionFactory",
 				"EXPRESS_LEVEL2:TYPE=TREETYPE,DEFINE=OPDATA$(OP_LEVEL2^),       FACTORY=com.ql.util.express.instruction.OperatorInstructionFactory",
@@ -105,12 +106,13 @@ public class NodeTypeManager {
 				"ALIAS_CALL:TYPE=TREETYPE,DEFINE=(alias^)$ID->CONST_STRING$OPDATA,FACTORY=com.ql.util.express.instruction.OperatorInstructionFactory",
 				"EXPORT_ALIAS_CALL:TYPE=TREETYPE,DEFINE=(exportAlias^)$ID->CONST_STRING$OPDATA,FACTORY=com.ql.util.express.instruction.OperatorInstructionFactory",
 
-				"EXPRESS:TYPE=TREETYPE,CHILDREN=EXPORT_VAR_DEFINE|VAR_DEFINE|NEW_OBJECT|NEW_ARRAY|CAST_CALL|ARRAY_CALL|METHOD_CALL|FIELD_CALL|FUNCTION_CALL|EXPRESS_JUDGEANDSET|EXPRESS_ASSIGN|EXPRESS_LEVEL1|EXPRESS_LEVEL2|EXPRESS_LEVEL3|EXPRESS_LEVEL4|EXPRESS_LEVEL5|EXPRESS_LEVEL6|EXPRESS_LEVEL7|EXPRESS_LEVEL8|EXPRESS_LEVEL9|EXPRESS_RETURN_DATA|EXPRESS_RETURN_NULL|BREAK_CALL|CONTINUE_CALL|ALIAS_CALL|EXPORT_ALIAS_CALL",
+				"EXPRESS:TYPE=TREETYPE,CHILDREN=EXPORT_VAR_DEFINE|VAR_DEFINE|NEW_OBJECT|NEW_ARRAY|ANONY_NEW_ARRAY|CAST_CALL|ARRAY_CALL|METHOD_CALL|FIELD_CALL|FUNCTION_CALL|EXPRESS_JUDGEANDSET|EXPRESS_ASSIGN|EXPRESS_LEVEL1|EXPRESS_LEVEL2|EXPRESS_LEVEL3|EXPRESS_LEVEL4|EXPRESS_LEVEL5|EXPRESS_LEVEL6|EXPRESS_LEVEL7|EXPRESS_LEVEL8|EXPRESS_LEVEL9|EXPRESS_RETURN_DATA|EXPRESS_RETURN_NULL|BREAK_CALL|CONTINUE_CALL|ALIAS_CALL|EXPORT_ALIAS_CALL",
 				"OPDATA:TYPE=TREETYPE,CHILDREN=CONST|ID|()|EXPRESS"
 		};
 		protected String statementDefineStrs = "STAT_FUNCTION,STAT_MACRO,STAT_FOR,STAT_IFELSE,STAT_IF,STAT_IFELSE_JAVA,STAT_IF_JAVA";
 		protected String[] expressDefineStrs = {
 				"EXPORT_VAR_DEFINE,VAR_DEFINE,NEW_OBJECT,NEW_ARRAY,ARRAY_CALL,METHOD_CALL,FIELD_CALL,FUNCTION_CALL",
+				"ANONY_NEW_ARRAY",
 				"CAST_CALL",
 				"EXPRESS_LEVEL1", "EXPRESS_LEVEL2", "EXPRESS_LEVEL3",
 				"EXPRESS_LEVEL4", "EXPRESS_LEVEL5", "EXPRESS_LEVEL6",

@@ -23,6 +23,14 @@ public class NewInstructionFactory  extends InstructionFactory{
 			children[0].setValue(tempStr);
 			children[0].setOrgiValue(tempStr);
 			children[0].setObjectValue(ExpressUtil.getJavaClass(tempStr));
+		}else if (node.isTypeEqualsOrChild("ANONY_NEW_ARRAY")) {
+				node.getLeftChildren().clear();
+				ExpressNode[] tempChildren = children[0].getChildren();
+				for (int i = 0; i < tempChildren.length; i++) {
+					if (tempChildren[i].isTypeEqualsOrChild(",") == false) {
+						node.getLeftChildren().add(tempChildren[i]);
+					}
+				}
 		} else if (node.isTypeEqualsOrChild("NEW_OBJECT")) {
 			node.getLeftChildren().remove(1);
 			ExpressNode[] parameterList = children[1].getChildren();
