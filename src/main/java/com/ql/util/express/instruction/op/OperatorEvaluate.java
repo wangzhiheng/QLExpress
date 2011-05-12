@@ -23,22 +23,9 @@ public class OperatorEvaluate extends OperatorBase {
 		Class<?> sourceType = op2.getType(parent);
 		if (targetType != null) {
 			if (ExpressUtil.isAssignable(targetType, sourceType) == false) {
-				if (targetType.isArray()) {
-					if (ExpressUtil.isAssignable(targetType.getComponentType(),
-							sourceType) == false) {
-						throw new Exception("赋值时候，类型转换错误："
-								+ ExpressUtil.getClassName(sourceType)
-								+ " 不能转换为 "
-								+ ExpressUtil.getClassName(targetType
-										.getComponentType()));
-					} else {
-						// 什么都不做
-					}
-				} else {
 					throw new Exception("赋值时候，类型转换错误："
 							+ ExpressUtil.getClassName(sourceType) + " 不能转换为 "
 							+ ExpressUtil.getClassName(targetType));
-				}
 			}
 
 		}
