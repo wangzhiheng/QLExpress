@@ -81,8 +81,15 @@ public class ExpressUtil {
 			return Boolean.TYPE;
 		return aClass;
 	}
-
-	public static boolean isAssignable(Class<?> target, Class<?> source) {
+    public static boolean isAssignable(Class<?> target, Class<?> source) {
+    	if (target == source)
+			return true;
+    	if(target.isArray() &&  source.isArray()){
+    		return isAssignable(target.getComponentType(),source.getComponentType());
+    	}
+    	return isAssignablePrivate(target,source);
+    }
+	public static boolean isAssignablePrivate(Class<?> target, Class<?> source) {
 		if (target == source)
 			return true;
 

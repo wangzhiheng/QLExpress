@@ -17,6 +17,7 @@ public class OperatorFactory {
 	  public OperatorFactory(boolean aIsPrecise){
 		  this.isPrecise = aIsPrecise;
 		  addOperator("new",new OperatorNew("new"));
+		  addOperator("anonymousNewArray",new OperatorAnonymousNewArray("anonymousNewArray"));
 		  addOperator("def",  new OperatorDef("def"));
 		  addOperator("exportDef",  new OperatorExportDef("exportDef"));
 		  addOperator("!",new OperatorNot("!"));
