@@ -61,12 +61,8 @@ public class ExpressRunner {
 	 */
 	ExpressPackage rootExpressPackage = new ExpressPackage(null);
 	
-	/**
-	 * 
-	 * @param aIstrace 是否跟踪执行指令的过程
-	 */
-	public ExpressRunner(boolean aIsPrecise){
-		this(aIsPrecise,false);
+	public ExpressRunner(){
+		this(false,false);
 	}
 	/**
 	 * 
@@ -82,9 +78,7 @@ public class ExpressRunner {
 		rootExpressPackage.addPackage("java.lang");
 		rootExpressPackage.addPackage("java.util");
 	}
-	public ExpressRunner(){
-		this(false,false);
-	}
+
 	/**
 	 * 获取语法定义的管理器
 	 * @return
