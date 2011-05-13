@@ -10,7 +10,7 @@ public class NodeTypeManager {
 	private String[] keyWords = new String[] {
 			 "~","&","|","<<", ">>",//位操作 
 			 "+", "-","*", "/", "%","mod","++", "--",//四则运算：
-			 ".",";","(", ")", "{", "}", "[", "]",":","?",//分隔符号
+			 ".",";","(", ")", "{", "}", "[", "]","?",//分隔符号
 			 "!","<", ">", "<=", ">=", "==","!=","&&","||",//Boolean运算符号
 			 "for", "if", "then", "else", "exportAlias", "alias",
 			 "break", "continue", "return", "macro", "function" ,
@@ -36,7 +36,7 @@ public class NodeTypeManager {
 				"CONST:TYPE=CONST,CHILDREN=CONST_NUMBER|CONST_CHAR|CONST_STRING|CONST_BOOLEAN|CONST_CLASS,FACTORY=com.ql.util.express.instruction.ConstDataInstructionFactory",
 
 				",:TYPE=KEYWORD,FACTORY=com.ql.util.express.instruction.NullInstructionFactory",
-				
+				"::TYPE=KEYWORD,FACTORY=com.ql.util.express.instruction.OperatorInstructionFactory",
 				"COMMENT:TYPE=BLOCK,STARTTAG=/**,ENDTAG=**/,FACTORY=com.ql.util.express.instruction.NullInstructionFactory",
 				
 				"():TYPE=BLOCK,STARTTAG=(,ENDTAG=),FACTORY=com.ql.util.express.instruction.BlockInstructionFactory",
@@ -94,6 +94,7 @@ public class NodeTypeManager {
 				"EXPRESS_LEVEL8:TYPE=TREETYPE,DEFINE=OPDATA$(OP_LEVEL8^)$OPDATA,FACTORY=com.ql.util.express.instruction.OperatorInstructionFactory",			
 				"EXPRESS_LEVEL9:TYPE=TREETYPE,DEFINE=OPDATA$(OP_LEVEL9^)$OPDATA,FACTORY=com.ql.util.express.instruction.OperatorInstructionFactory",			
 				"EXPRESS_JUDGEANDSET:TYPE=TREETYPE,DEFINE=OPDATA$?$OPDATA$:$OPDATA#EXPRESS_JUDGEANDSET,FACTORY=com.ql.util.express.instruction.IfInstructionFactory",
+				"EXPRESS_KEY_VALUE:TYPE=TREETYPE,DEFINE=OPDATA$(:^)$OPDATA,FACTORY=com.ql.util.express.instruction.OperatorInstructionFactory",
 				"EXPRESS_ASSIGN:TYPE=TREETYPE,DEFINE=OPDATA$(=^)$OPDATA,FACTORY=com.ql.util.express.instruction.OperatorInstructionFactory",
 				
 				"EXPRESS_RETURN_DATA:TYPE=TREETYPE,DEFINE=(return^)$OPDATA,FACTORY=com.ql.util.express.instruction.OperatorInstructionFactory",
@@ -106,7 +107,7 @@ public class NodeTypeManager {
 				"ALIAS_CALL:TYPE=TREETYPE,DEFINE=(alias^)$ID->CONST_STRING$OPDATA,FACTORY=com.ql.util.express.instruction.OperatorInstructionFactory",
 				"EXPORT_ALIAS_CALL:TYPE=TREETYPE,DEFINE=(exportAlias^)$ID->CONST_STRING$OPDATA,FACTORY=com.ql.util.express.instruction.OperatorInstructionFactory",
 
-				"EXPRESS:TYPE=TREETYPE,CHILDREN=EXPORT_VAR_DEFINE|VAR_DEFINE|NEW_OBJECT|NEW_ARRAY|ANONY_NEW_ARRAY|CAST_CALL|ARRAY_CALL|METHOD_CALL|FIELD_CALL|FUNCTION_CALL|EXPRESS_JUDGEANDSET|EXPRESS_ASSIGN|EXPRESS_LEVEL1|EXPRESS_LEVEL2|EXPRESS_LEVEL3|EXPRESS_LEVEL4|EXPRESS_LEVEL5|EXPRESS_LEVEL6|EXPRESS_LEVEL7|EXPRESS_LEVEL8|EXPRESS_LEVEL9|EXPRESS_RETURN_DATA|EXPRESS_RETURN_NULL|BREAK_CALL|CONTINUE_CALL|ALIAS_CALL|EXPORT_ALIAS_CALL",
+				"EXPRESS:TYPE=TREETYPE,CHILDREN=EXPORT_VAR_DEFINE|VAR_DEFINE|NEW_OBJECT|NEW_ARRAY|ANONY_NEW_ARRAY|CAST_CALL|ARRAY_CALL|METHOD_CALL|FIELD_CALL|FUNCTION_CALL|EXPRESS_JUDGEANDSET|EXPRESS_KEY_VALUE|EXPRESS_ASSIGN|EXPRESS_LEVEL1|EXPRESS_LEVEL2|EXPRESS_LEVEL3|EXPRESS_LEVEL4|EXPRESS_LEVEL5|EXPRESS_LEVEL6|EXPRESS_LEVEL7|EXPRESS_LEVEL8|EXPRESS_LEVEL9|EXPRESS_RETURN_DATA|EXPRESS_RETURN_NULL|BREAK_CALL|CONTINUE_CALL|ALIAS_CALL|EXPORT_ALIAS_CALL",
 				"OPDATA:TYPE=TREETYPE,CHILDREN=CONST|ID|()|EXPRESS"
 		};
 		protected String statementDefineStrs = "STAT_FUNCTION,STAT_MACRO,STAT_FOR,STAT_IFELSE,STAT_IF,STAT_IFELSE_JAVA,STAT_IF_JAVA";
@@ -116,7 +117,10 @@ public class NodeTypeManager {
 				"CAST_CALL",
 				"EXPRESS_LEVEL1", "EXPRESS_LEVEL2", "EXPRESS_LEVEL3",
 				"EXPRESS_LEVEL4", "EXPRESS_LEVEL5", "EXPRESS_LEVEL6",
-				"EXPRESS_LEVEL7", "EXPRESS_LEVEL8","EXPRESS_LEVEL9","EXPRESS_JUDGEANDSET","EXPRESS_ASSIGN", "BREAK_CALL,CONTINUE_CALL",
+				"EXPRESS_LEVEL7", "EXPRESS_LEVEL8","EXPRESS_LEVEL9",
+				"EXPRESS_JUDGEANDSET",
+				"EXPRESS_KEY_VALUE",
+				"EXPRESS_ASSIGN", "BREAK_CALL,CONTINUE_CALL",
 				"EXPRESS_RETURN_DATA", "EXPRESS_RETURN_NULL",
 				"ALIAS_CALL,EXPORT_ALIAS_CALL" };
 		

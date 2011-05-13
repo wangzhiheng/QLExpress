@@ -26,7 +26,7 @@ public class ArrayTest {
 	}
 
 	@Test
-	public void testAnonyNewArray() throws Exception {
+	public void testAnonyNewArrayOrMapOrList() throws Exception {
 		ExpressRunner runner = new ExpressRunner(false, false);
 		String[][] expressTest = new String[][] {
 				{"int[] abc = [1,2,3];return abc[2]","3"},
@@ -34,6 +34,11 @@ public class ArrayTest {
 				{"String[] abc = [\"xuannan\",\"qianghui\"];return abc[1]","qianghui"},
 				{"String[] abc = [\"xuannan\"+100,\"qianghui\"+100];return abc[1]","qianghui100"},
 				{"Object[] abc = [];return abc.length","0"},
+				{"Map abc = NewMap(1:1,2:2); return abc.get(1) + abc.get(2)","3"},
+				{"Map abc = NewMap(\"a\":1,\"b\":2); return abc.a + abc.b","3"},
+				{"int o1 =10; int o2=20;String k1 =\"a\";String k2 =\"b\";  Map abc = NewMap(k1:o1,k2:o2); return abc.a + abc.b","30"},				
+				{"Map abc = NewMap(1:\"xuannan\",2:\"qianghui\"); return abc.get(1) +\"-\"+ abc.get(2)","xuannan-qianghui"},
+				{"List abc = NewList(1,2,3); return abc.get(1)","2"},
 				};
 		IExpressContext<String, Object> expressContext = new ExpressContextExample(
 				null);
@@ -61,5 +66,4 @@ public class ArrayTest {
 		}
 		System.out.println(expressContext);
 	}
-
 }
