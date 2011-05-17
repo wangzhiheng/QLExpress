@@ -131,12 +131,16 @@ public class ExpressParse {
 				  throw new Exception("没有关闭的字符：" + tempWord);
 			  }
 			  tempWord = tempWord.substring(1,tempWord.length() -1);
-			  tempType =nodeTypeManager.findNodeType("CONST_CHAR");
+			  
 			  treeNodeType = nodeTypeManager.findNodeType("CONST");
-			  if(tempWord.length() >1){
-				  throw new Exception("字符定义的长度大于1：\"" + tempWord +  "\"");
+			  if(tempWord.length() >1){ //转换为字符串
+				  tempType =nodeTypeManager.findNodeType("CONST_STRING");
+				  objectValue = tempWord;
+			  }else{
+				  tempType =nodeTypeManager.findNodeType("CONST_CHAR");
+				  objectValue = tempWord.charAt(0);
 			  }
-			  objectValue = tempWord.charAt(0);
+			  
 			  point = point + 1;
 		  }else if(tempWord.equals("true") || tempWord.equals("false")){
 			  tempType = nodeTypeManager.findNodeType("CONST_BOOLEAN");

@@ -63,7 +63,7 @@ public class ExpressTest {
 				{"int a=0; if false then a = 5 else  a=10+1 ; return a ","11"},
 				{ " 3+ (如果 1==2 则 4 否则 3) +8","14"},
 				{ " 如果  (如果 1==2 则 false 否则 true) 则 {2+2;} 否则 {20 + 20;} ","4"},
-				
+				{"'AAAAAAA' +'-' + \"B\"","AAAAAAA-B"},
 				{ "System.out.println(\"ss\")", "null" },
 				{"unionName = new com.ql.util.express.test.BeanExample(\"张三\").unionName(\"李四\")",
 						"张三-李四" }, 
