@@ -133,12 +133,12 @@ public class ExpressParse {
 			  tempWord = tempWord.substring(1,tempWord.length() -1);
 			  
 			  treeNodeType = nodeTypeManager.findNodeType("CONST");
-			  if(tempWord.length() >1){ //×ª»»Îª×Ö·û´®
-				  tempType =nodeTypeManager.findNodeType("CONST_STRING");
-				  objectValue = tempWord;
-			  }else{
+			  if(tempWord.length() == 1){ //×ª»»Îª×Ö·û´®
 				  tempType =nodeTypeManager.findNodeType("CONST_CHAR");
 				  objectValue = tempWord.charAt(0);
+			  }else{
+				  tempType =nodeTypeManager.findNodeType("CONST_STRING");
+				  objectValue = tempWord;
 			  }
 			  
 			  point = point + 1;
