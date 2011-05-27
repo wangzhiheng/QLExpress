@@ -420,26 +420,26 @@ public class ExpressParse {
 	}
 	public ExpressNode parse(ExpressPackage rootExpressPackage,String express,boolean isTrace) throws Exception{
 		Word[] words = WordSplit.parse(this.nodeTypeManager,express);
-		if(isTrace == true){
+		if(isTrace == true && log.isDebugEnabled()){
 			log.debug("执行的表达式:" + express);	
 			log.debug("单词分解结果:" + WordSplit.getPrintInfo(words,","));  
 		}
     	List<ExpressNode> tempList = this.transferWord2ExpressNode(rootExpressPackage,words);
-    	if(isTrace == true){
+    	if(isTrace == true && log.isDebugEnabled()){
     		log.debug("单词分析结果:" + printInfo(tempList,","));
     	}
     	ExpressNode root = splitExpressBlock(tempList);
-    	if(isTrace == true){
+    	if(isTrace == true && log.isDebugEnabled()){
     		log.debug("Block拆分后的结果:");
     		printTreeNode(root,1);
     	}
     	splitStatement(root);    	
-    	if(isTrace == true){
+    	if(isTrace == true && log.isDebugEnabled()){
     		log.debug("语句拆分后的结果:");
     		printTreeNode(root,1);
     	}
 		buildExpressTree(root);
-    	if(isTrace == true){
+    	if(isTrace == true && log.isDebugEnabled()){
     		log.debug("最后的语法树:" );
     		printTreeNode(root,1);
     	}
