@@ -436,7 +436,7 @@ public class ExpressRunner {
 		ExpressNode root = this.parse.parse(this.rootExpressPackage,text, isTrace);
 		checkExpressNode(root);
 		InstructionSet result = createInstructionSet(root, "main");
-		if (this.isTrace) {
+		if (this.isTrace && log.isDebugEnabled()) {
 			log.debug(result);
 		}
 		return result;
