@@ -17,7 +17,7 @@ public class InstructionLoadAttr extends Instruction{
 	public void execute(RunEnvironment environment,List<String> errorList)throws Exception{
 		Object o = environment.getContext().getSymbol(this.attrName);
 		if(o != null && o instanceof InstructionSet){//是函数，则执行
-			if(environment.isTrace()){
+			if(environment.isTrace() && log.isDebugEnabled()){
 				log.debug("指令转换： LoadAttr -- >CallMacro ");						
 			}
 			InstructionCallMacro macro = new InstructionCallMacro(this.attrName);
@@ -25,7 +25,7 @@ public class InstructionLoadAttr extends Instruction{
 			macro.execute(environment, errorList);
 			//注意，此处不能在增加指令，因为在InstructionCallMacro已经调用 environment.programPointAddOne();
 		}else{
-			if(environment.isTrace()){
+			if(environment.isTrace() && log.isDebugEnabled()){
 				log.debug(this +":" + ((OperateDataAttr)o).getObject(environment.getContext()));						
 			}
 		    environment.push((OperateDataAttr)o);

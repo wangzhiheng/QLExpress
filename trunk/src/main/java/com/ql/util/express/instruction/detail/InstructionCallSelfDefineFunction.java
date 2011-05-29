@@ -24,7 +24,7 @@ public class InstructionCallSelfDefineFunction extends Instruction{
 			throws Exception {
 			OperateData[] parameters = environment.popArray(
 					environment.getContext(), this.opDataNumber);
-			if (environment.isTrace()) {
+			if (environment.isTrace() && log.isDebugEnabled()) {
 				String str = this.functionName + "(";
 				for (int i = 0; i < parameters.length; i++) {
 					if (i > 0) {

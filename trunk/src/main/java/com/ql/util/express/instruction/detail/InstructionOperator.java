@@ -24,7 +24,7 @@ public class InstructionOperator extends Instruction{
 	}
 	public static void execute(OperatorBase aOperator,int aOpNum,RunEnvironment environment,List<String> errorList,Log log) throws Exception{		
 		OperateData[] parameters = environment.popArray(environment.getContext(),aOpNum);		
-		if(environment.isTrace()){
+		if(environment.isTrace() && log.isDebugEnabled()){
 			String str = aOperator.toString() + "(";
 			for(int i=0;i<parameters.length;i++){
 				if(i > 0){
