@@ -26,12 +26,12 @@ public class InstructionGoToWithCondition extends Instruction{
 		}
 		if(o != null && o instanceof Boolean){
 			if(((Boolean)o).booleanValue() == this.condition){
-				if(environment.isTrace()){
+				if(environment.isTrace() && log.isDebugEnabled()){
 					log.debug("goto +" + this.offset);
 				}
 				environment.gotoWithOffset(this.offset);
 			}else{
-				if(environment.isTrace()){
+				if(environment.isTrace() && log.isDebugEnabled()){
 					log.debug("programPoint ++ ");
 				}
 				environment.programPointAddOne();

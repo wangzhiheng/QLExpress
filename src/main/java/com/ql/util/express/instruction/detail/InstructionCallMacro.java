@@ -15,7 +15,7 @@ public class InstructionCallMacro extends Instruction{
 	    }
 		
 		public void execute(RunEnvironment environment,List<String> errorList)throws Exception{
-			if(environment.isTrace()){
+			if(environment.isTrace()&&log.isDebugEnabled()){
 				log.debug(this);
 			}
 			Object functionSet = environment.getContext().getSymbol(this.name);
