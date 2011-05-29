@@ -30,8 +30,11 @@ public class ForInstructionFactory extends  InstructionFactory {
     	ExpressNode conditionNode = node.getChildren()[0];
     	int nodePoint = 0;
     	if (conditionNode.getChildren() != null && conditionNode.getChildren().length == 3){//变量定义，判断，自增都存在
+    		int tempPoint = result.getCurrentPoint();
     		aCompile.createInstructionSetPrivate(result,forStack,conditionNode.getChildren()[0],false);
-    		nodePoint = nodePoint + 1;
+    		if(result.getCurrentPoint() > tempPoint){
+    		   nodePoint = nodePoint + 1;
+    		}
     	}
     	//循环的开始的位置
     	int loopStartPoint = result.getCurrentPoint()+ 1;
