@@ -12,15 +12,15 @@ import com.ql.util.express.Operator;
 public class OpCallTest {
 		@Test
 		public void testList() throws Exception {
-			ExpressRunner runner = new ExpressRunner(false, false);
+			ExpressRunner runner = new ExpressRunner(false, true);
 			runner.addOperator("@love", new LoveOperator("@love"));	
-			runner.addOperator("println", new PrintOperator("println"));	
-			
+			runner.loadMutilExpress(null, "function abc(String s){println(s)}");
 			String[][] expressTest = new String[][] {
 					{"+ 1 2","3"},
 					{"@love 'a' 'b'","b{a}b"},
 					{"println \"ssssss\"","null"},
-					
+					{"println (\"ssssss\")","null"},
+					{"abc (\"bbbbbbbb\")","null"},
 					};
 			IExpressContext<String, Object> expressContext = new ExpressContextExample(
 					null);
@@ -29,7 +29,7 @@ public class OpCallTest {
 				String expressStr = expressTest[point][0];
 				List<String> errorList = new ArrayList<String>();
 				Object result = runner.execute(expressStr, expressContext, null,
-						false, false);
+						false, true);
 				if (result == null
 						&& expressTest[point][1].equalsIgnoreCase("null") == false
 						|| expressTest[point][1].equalsIgnoreCase("null")
