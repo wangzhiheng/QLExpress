@@ -65,14 +65,13 @@ public class ConsoleFrame
   BorderLayout borderLayout4 = new BorderLayout();
   JPanel jPanelContext = new JPanel();
   BorderLayout borderLayout5 = new BorderLayout();
-
+  StringBufferOutputStream output = new StringBufferOutputStream(jTextAreaResult);
 	public ConsoleFrame() {
 		try {
 			setDefaultCloseOperation(EXIT_ON_CLOSE);
 			jbInit();
 
-			PrintStream ps = new PrintStream(new StringBufferOutputStream(
-					jTextAreaResult),true);
+			PrintStream ps = new PrintStream(output,true);
 			System.setOut(ps);
 		} catch (Exception exception) {
 			exception.printStackTrace();
@@ -164,8 +163,8 @@ public class ConsoleFrame
       }
       Object r = null;
 	try {
-		 this.jTextAreaResult.setText("");
-		 ExpressRunner runner = new ExpressRunner(false,true);
+		 output.clear();
+		 ExpressRunner runner = new ExpressRunner(false,false);
 		  contextText = "NewMap(" + contextText + ")";
 	      @SuppressWarnings("unchecked")
 		  Map<String,Object> tempMap =  (Map<String,Object>)runner.execute(contextText,null,null,false,false);
@@ -238,9 +237,10 @@ class StringBufferOutputStream extends OutputStream
   {
 	  jTextArea = aJTextAreaResult;
 	  buffer = new ByteArrayOutputStream();
-	  
   }
-
+  public void clear(){
+	  this.buffer.reset();
+  }
   public void write(int ch)
     throws IOException
   {
