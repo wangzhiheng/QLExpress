@@ -13,7 +13,7 @@ public class OperatorFactory {
 	 */
 	protected boolean isPrecise = false;
 	private Map<String, OperatorBase> operator = new HashMap<String, OperatorBase>();
-	  
+	
 	  public OperatorFactory(boolean aIsPrecise){
 		  this.isPrecise = aIsPrecise;
 		  addOperator("new",new OperatorNew("new"));
@@ -28,7 +28,6 @@ public class OperatorFactory {
 		  addOperator("/", new OperatorMultiDiv("/"));
 		  addOperator("%", new OperatorMultiDiv("%"));
 		  addOperator("mod", new OperatorMultiDiv("mod"));
-		  addOperator("like", new OperatorLike("like"));
 		  addOperator("+",new OperatorAddReduce("+"));
 		  addOperator("-",new OperatorAddReduce("-"));
 		  addOperator("<",new OperatorEqualsLessMore("<"));
@@ -54,11 +53,9 @@ public class OperatorFactory {
 		  addOperator("cast", new OperatorCast("cast"));
 		  addOperator("macro",new OperatorMacro("macro"));
 		  addOperator("function",new OperatorFunction("function"));
-		  addOperator("in", new OperatorIn("in"));		
-		  addOperator("max", new OperatorMinMax("max"));	
-		  addOperator("round", new OperatorRound("round"));
-	  }
-	  
+		  addOperator("in", new OperatorIn("in"));	
+		  addOperator("like", new OperatorLike("like"));
+		}
 	public void addOperator(String name, OperatorBase op) {
 		OperatorBase oldOp = this.operator.get(name);
 		if (oldOp != null) {
@@ -74,54 +71,8 @@ public class OperatorFactory {
 		this.addOperator(name, op);
 		return old;
 	}
-	public void addFunctionOfClassMethod(String name, String aClassName,
-			String aFunctionName, Class<?>[] aParameterClassTypes,
-			String[] aParameterDesc,String[] aParameterAnnotation,
-			String errorInfo) throws Exception {
-		if (errorInfo != null && errorInfo.trim().length() == 0) {
-			errorInfo = null;
-		}
-		this.addOperator(name, new OperatorSelfDefineClassFunction(name,
-				aClassName, aFunctionName, aParameterClassTypes,aParameterDesc,aParameterAnnotation, errorInfo));
 
-	}
-
-	public void addFunctionOfClassMethod(String name, String aClassName,
-			String aFunctionName, String[] aParameterClassTypes,
-			String[] aParameterDesc,String[] aParameterAnnotation,
-			String errorInfo) throws Exception {
-		if (errorInfo != null && errorInfo.trim().length() == 0) {
-			errorInfo = null;
-		}
-		this.addOperator(name, new OperatorSelfDefineClassFunction(name,
-				aClassName, aFunctionName, aParameterClassTypes, aParameterDesc,aParameterAnnotation,errorInfo));
-
-	}
-
-	public void addFunctionOfServiceMethod(String name, Object aServiceObject,
-			String aFunctionName, Class<?>[] aParameterTypes,
-			String[] aParameterDesc,String[] aParameterAnnotation,
-			String errorInfo)
-			throws Exception {
-		if (errorInfo != null && errorInfo.trim().length() == 0) {
-			errorInfo = null;
-		}
-		this.addOperator(name, new OperatorSelfDefineServiceFunction(name,
-				aServiceObject, aFunctionName, aParameterTypes,aParameterDesc,aParameterAnnotation, errorInfo));
-	}
-
-	public void addFunctionOfServiceMethod(String name, Object aServiceObject,
-			String aFunctionName, String[] aParameterTypeNames,
-			String[] aParameterDesc,String[] aParameterAnnotation,
-			String errorInfo)
-			throws Exception {
-		if (errorInfo != null && errorInfo.trim().length() == 0) {
-			errorInfo = null;
-		}
-		this.addOperator(name, new OperatorSelfDefineServiceFunction(name,
-				aServiceObject, aFunctionName, aParameterTypeNames,aParameterDesc,aParameterAnnotation, errorInfo));
-	}
-	 @SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked")
 	public void addOperatorWithAlias(String aAliasName,String name,String errorInfo) throws Exception{
 		 if (this.operator.containsKey(name) == false){
 			 throw new Exception(name + " 不是系统级别的操作符号，不能设置别名");
@@ -163,6 +114,9 @@ public class OperatorFactory {
 		OperatorBase op = operator.get(opItem.getNodeType().getTag());
 		if (op == null) {
 			op = operator.get(opItem.getTreeType().getTag());
+		}
+		if(op == null){
+			op = operator.get(opItem.getValue());
 		}
 		if (op == null)
 			throw new Exception("没有为\"" + opItem.getValue() + "\"定义操作符处理对象");

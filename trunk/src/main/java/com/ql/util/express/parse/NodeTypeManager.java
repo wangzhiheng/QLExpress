@@ -20,6 +20,7 @@ public class NodeTypeManager {
 	};
 		private String[] nodeTypeDefines = new String[] {
 				"EOF:TYPE=KEYWORD,FACTORY=com.ql.util.express.instruction.NullInstructionFactory",
+				"FUNCTION_NAME:TYPE=KEYWORD",
 				"in:TYPE=KEYWORD,FACTORY=com.ql.util.express.instruction.InInstructionFactory",
 				"CONST_BYTE:TYPE=CONST",
 				"CONST_SHORT:TYPE=CONST",
@@ -78,8 +79,8 @@ public class NodeTypeManager {
 				"NEW_OBJECT:TYPE=TREETYPE,DEFINE=(new^)$CONST_CLASS$(),FACTORY=com.ql.util.express.instruction.NewInstructionFactory",
 				"NEW_ARRAY:TYPE=TREETYPE,DEFINE=(new^)$CONST_CLASS$([]*),FACTORY=com.ql.util.express.instruction.NewInstructionFactory",
 				"FIELD_CALL:TYPE=TREETYPE,DEFINE=OPDATA$(.^)$ID->CONST_STRING,FACTORY=com.ql.util.express.instruction.OperatorInstructionFactory",
-				"METHOD_CALL:TYPE=TREETYPE,DEFINE=OPDATA$(.^)$ID->CONST_STRING$(),FACTORY=com.ql.util.express.instruction.MethodCallInstructionFactory",
-				"FUNCTION_CALL:TYPE=TREETYPE,DEFINE=ID$()#FUNCTION_CALL,FACTORY=com.ql.util.express.instruction.CallFunctionInstructionFactory",
+				"METHOD_CALL:TYPE=TREETYPE,DEFINE=OPDATA$(.^)$(ID->CONST_STRING|FUNCTION_NAME->CONST_STRING)$(),FACTORY=com.ql.util.express.instruction.MethodCallInstructionFactory",
+				"FUNCTION_CALL:TYPE=TREETYPE,DEFINE=(ID->FUNCTION_NAME|FUNCTION_NAME)$()#FUNCTION_CALL,FACTORY=com.ql.util.express.instruction.CallFunctionInstructionFactory",
 				"CAST_CALL:TYPE=TREETYPE,DEFINE=()$OPDATA#cast,FACTORY=com.ql.util.express.instruction.CastInstructionFactory",
 				"ARRAY_CALL:TYPE=TREETYPE,DEFINE=OPDATA$[]#ARRAY_CALL,FACTORY=com.ql.util.express.instruction.OperatorInstructionFactory",
 				"ANONY_NEW_ARRAY:TYPE=TREETYPE,DEFINE=[]#anonymousNewArray,FACTORY=com.ql.util.express.instruction.NewInstructionFactory",
@@ -106,7 +107,7 @@ public class NodeTypeManager {
 				"CONTINUE_CALL:TYPE=TREETYPE,DEFINE=continue^,FACTORY=com.ql.util.express.instruction.ContinueInstructionFactory",
 				"ALIAS_CALL:TYPE=TREETYPE,DEFINE=(alias^)$ID->CONST_STRING$OPDATA,FACTORY=com.ql.util.express.instruction.OperatorInstructionFactory",
 				"EXPORT_ALIAS_CALL:TYPE=TREETYPE,DEFINE=(exportAlias^)$ID->CONST_STRING$OPDATA,FACTORY=com.ql.util.express.instruction.OperatorInstructionFactory",
-				"OP_CALL:TYPE=TREETYPE,DEFINE=(OP_LIST^)$(OPDATA*),FACTORY=com.ql.util.express.instruction.OperatorInstructionFactory",
+				"OP_CALL:TYPE=TREETYPE,DEFINE=((FUNCTION_NAME|OP_LIST)^)$(OPDATA*),FACTORY=com.ql.util.express.instruction.OperatorInstructionFactory",
 				
 				"EXPRESS:TYPE=TREETYPE,CHILDREN=EXPORT_VAR_DEFINE|VAR_DEFINE|NEW_OBJECT|NEW_ARRAY|ANONY_NEW_ARRAY|CAST_CALL|ARRAY_CALL|METHOD_CALL|FIELD_CALL|FUNCTION_CALL|EXPRESS_JUDGEANDSET|EXPRESS_KEY_VALUE|EXPRESS_ASSIGN|EXPRESS_LEVEL1|EXPRESS_LEVEL2|EXPRESS_LEVEL3|EXPRESS_LEVEL4|EXPRESS_LEVEL5|EXPRESS_LEVEL6|EXPRESS_LEVEL7|EXPRESS_LEVEL8|EXPRESS_LEVEL9|EXPRESS_RETURN_DATA|EXPRESS_RETURN_NULL|BREAK_CALL|CONTINUE_CALL|ALIAS_CALL|EXPORT_ALIAS_CALL|OP_CALL",
 				"OPDATA:TYPE=TREETYPE,CHILDREN=CONST|ID|()|EXPRESS"
@@ -131,6 +132,9 @@ public class NodeTypeManager {
 	    public NodeType S_ID = null;
 	    
 	    protected Map<String,NodeType> nodeTypes = new HashMap<String,NodeType>();	
+	    
+	    //所有的函数定义
+	    protected Map<String,String> functions = new HashMap<String,String>();
 	    
 		public NodeTypeManager() {
 			//创建所有的关键字
@@ -287,7 +291,12 @@ public class NodeTypeManager {
 		Arrays.sort(list,new NodeTypeComparator());
 		return list;
 	}
-
+	public boolean isFunction(String name){
+		return this.functions.containsKey(name);
+	}
+	public void addFunctionName(String name){
+		this.functions.put(name, name);
+	}
 	public static String[] splist(String str,char splitChar,boolean isIncludeSplitChar){
 		List<String> result = new ArrayList<String>();
 		String tempStr ="";

@@ -21,6 +21,9 @@ public class OperatorSelfDefineServiceFunction extends OperatorBase{
 	public OperatorSelfDefineServiceFunction(String aOperName,
 			Object aServiceObject, String aFunctionName,
 			Class<?>[] aParameterClassTypes,String[] aParameterDesc,String[] aParameterAnnotation, String aErrorInfo) throws Exception {
+		if (errorInfo != null && errorInfo.trim().length() == 0) {
+			errorInfo = null;
+		} 
 		this.name = aOperName;
 		this.errorInfo = aErrorInfo;
 		this.serviceObject = aServiceObject;
@@ -39,7 +42,11 @@ public class OperatorSelfDefineServiceFunction extends OperatorBase{
   
   public OperatorSelfDefineServiceFunction(String aOperName,Object aServiceObject, String aFunctionName,
                          String[] aParameterTypes,String[] aParameterDesc,String[] aParameterAnnotation,String aErrorInfo) throws Exception {
-    this.name = aOperName;
+    
+	if (errorInfo != null && errorInfo.trim().length() == 0) {
+			errorInfo = null;
+	}  
+	this.name = aOperName;
     this.errorInfo = aErrorInfo;
     this.serviceObject = aServiceObject;
     this.functionName = aFunctionName;

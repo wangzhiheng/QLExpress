@@ -5,6 +5,10 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Map;
@@ -61,15 +65,19 @@ public class ConsoleFrame
   BorderLayout borderLayout4 = new BorderLayout();
   JPanel jPanelContext = new JPanel();
   BorderLayout borderLayout5 = new BorderLayout();
-  public ConsoleFrame() {
-    try {
-      setDefaultCloseOperation(EXIT_ON_CLOSE);
-      jbInit();
-    }
-    catch (Exception exception) {
-      exception.printStackTrace();
-    }
-  }
+
+	public ConsoleFrame() {
+		try {
+			setDefaultCloseOperation(EXIT_ON_CLOSE);
+			jbInit();
+
+			PrintStream ps = new PrintStream(new StringBufferOutputStream(
+					jTextAreaResult),true);
+			System.setOut(ps);
+		} catch (Exception exception) {
+			exception.printStackTrace();
+		}
+	}
 
   /**
    * Component initialization.
@@ -155,16 +163,16 @@ public class ConsoleFrame
     	  }
       }
       Object r = null;
-      StringWriter writer = new StringWriter();
 	try {
-		  ExpressRunner runner = new ExpressRunner(false,true);
+		 this.jTextAreaResult.setText("");
+		 ExpressRunner runner = new ExpressRunner(false,true);
 		  contextText = "NewMap(" + contextText + ")";
 	      @SuppressWarnings("unchecked")
 		  Map<String,Object> tempMap =  (Map<String,Object>)runner.execute(contextText,null,null,false,false);
 	      DefaultContext<String, Object> context = new DefaultContext<String, Object>();
 	      context.putAll(tempMap);
-	      r = runner.execute(script, context, null,false,true);
-	      writer.write("QL>\n" +
+	      r = runner.execute(script, context, null,false,false);
+	      System.out.print("QL>\n" +
 				"-------------------原始执行脚本--------------------------------\n" +
 				script +  "\n" +
 				"-------------------脚本运行结果--------------------------------\n" +
@@ -173,11 +181,8 @@ public class ConsoleFrame
 				context
 				+ "\nQL>");
 	} catch (Exception e1) {
-	    e1.printStackTrace(new PrintWriter(writer));
-
+	    e1.printStackTrace(System.out);
 	}
-    jTextAreaResult.setText(writer.toString());
-
   }
 
   public void jTreeFileSelect_mouseClicked(MouseEvent me) {
@@ -222,5 +227,27 @@ class ConsoleFrame_jMenuFileExit_ActionAdapter
 
   public void actionPerformed(ActionEvent actionEvent) {
     adaptee.jMenuFileExit_actionPerformed(actionEvent);
+  }
+}
+
+class StringBufferOutputStream extends OutputStream
+{
+  protected ByteArrayOutputStream buffer;
+  JTextArea jTextArea;
+  public StringBufferOutputStream(JTextArea aJTextAreaResult)
+  {
+	  jTextArea = aJTextAreaResult;
+	  buffer = new ByteArrayOutputStream();
+	  
+  }
+
+  public void write(int ch)
+    throws IOException
+  {
+    this.buffer.write(ch);
+   
+  }
+  public void flush() throws IOException {
+	  jTextArea.setText(this.buffer.toString());
   }
 }

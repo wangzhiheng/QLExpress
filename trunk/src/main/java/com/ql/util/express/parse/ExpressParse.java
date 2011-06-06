@@ -191,7 +191,10 @@ public class ExpressParse {
 						orgiValue = tmpStr;
 						tempType = nodeTypeManager.findNodeType("CONST_CLASS");
 						objectValue = tmpClass;
-					}else{
+					}else if(this.nodeTypeManager.isFunction(tempWord)){
+						tempType = nodeTypeManager.findNodeType("FUNCTION_NAME");
+						point = point + 1;
+				    }else{
 						tempType = nodeTypeManager.findNodeType("ID");
 						point = point + 1;
 					}

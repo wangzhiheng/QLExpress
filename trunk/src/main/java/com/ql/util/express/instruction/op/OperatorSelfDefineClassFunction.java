@@ -21,7 +21,10 @@ public class OperatorSelfDefineClassFunction extends OperatorBase{
   
   public OperatorSelfDefineClassFunction(String aOperName,String aClassName, String aFunctionName,
           Class<?>[] aParameterClassTypes,String[] aParameterDesc,String[] aParameterAnnotation,String aErrorInfo) throws Exception {
-	    this.name = aOperName;
+		if (errorInfo != null && errorInfo.trim().length() == 0) {
+			errorInfo = null;
+		} 
+		this.name = aOperName;
 	    this.errorInfo = aErrorInfo;
 	    this.functionName = aFunctionName;
 	    this.parameterClasses = aParameterClassTypes;
@@ -37,7 +40,10 @@ public class OperatorSelfDefineClassFunction extends OperatorBase{
 
   public OperatorSelfDefineClassFunction(String aOperName,String aClassName, String aFunctionName,
                          String[] aParameterTypes,String[] aParameterDesc,String[] aParameterAnnotation,String aErrorInfo) throws Exception {
-    this.name = aOperName;
+	if (errorInfo != null && errorInfo.trim().length() == 0) {
+			errorInfo = null;
+	} 
+	this.name = aOperName;
     this.errorInfo = aErrorInfo;
     this.functionName = aFunctionName;
     this.parameterTypes = aParameterTypes;

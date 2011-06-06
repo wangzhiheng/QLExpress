@@ -12,6 +12,12 @@ import com.ql.util.express.instruction.ForRelBreakContinue;
 import com.ql.util.express.instruction.InstructionFactory;
 import com.ql.util.express.instruction.op.OperatorBase;
 import com.ql.util.express.instruction.op.OperatorFactory;
+import com.ql.util.express.instruction.op.OperatorMinMax;
+import com.ql.util.express.instruction.op.OperatorPrint;
+import com.ql.util.express.instruction.op.OperatorPrintln;
+import com.ql.util.express.instruction.op.OperatorRound;
+import com.ql.util.express.instruction.op.OperatorSelfDefineClassFunction;
+import com.ql.util.express.instruction.op.OperatorSelfDefineServiceFunction;
 import com.ql.util.express.parse.ExpressNode;
 import com.ql.util.express.parse.ExpressPackage;
 import com.ql.util.express.parse.ExpressParse;
@@ -77,6 +83,13 @@ public class ExpressRunner {
 		this.parse =  new ExpressParse(manager,this.isPrecise);
 		rootExpressPackage.addPackage("java.lang");
 		rootExpressPackage.addPackage("java.util");
+		this.addSystemFunctions();
+	}
+	public void addSystemFunctions(){	
+		  this.addFunction("max", new OperatorMinMax("max"));	
+		  this.addFunction("round", new OperatorRound("round"));
+		  this.addFunction("print", new OperatorPrint("print"));
+		  this.addFunction("println", new OperatorPrintln("println"));
 	}
 
 	/**
@@ -128,6 +141,7 @@ public class ExpressRunner {
 	 */
 	public void addFunction(String name, OperatorBase op) {
 		this.operatorManager.addOperator(name, op);
+		this.manager.addFunctionName(name);
 	};
 	/**
 	 * 获取函数定义，通过函数定义可以拿到参数的说明信息
@@ -149,8 +163,9 @@ public class ExpressRunner {
 	public void addFunctionOfClassMethod(String name, String aClassName,
 			String aFunctionName, Class<?>[] aParameterClassTypes,
 			String errorInfo) throws Exception {
-		this.operatorManager.addFunctionOfClassMethod(name, aClassName,
-				aFunctionName, aParameterClassTypes,null,null,errorInfo);
+		this.addFunction(name, new OperatorSelfDefineClassFunction(name,
+				aClassName, aFunctionName, aParameterClassTypes,null,null, errorInfo));
+		
 	}
     /**
      * 添加一个类的函数定义，例如：Math.abs(double) 映射为表达式中的 "取绝对值(-5.0)"
@@ -167,8 +182,9 @@ public class ExpressRunner {
 			String aFunctionName, Class<?>[] aParameterClassTypes,
 			String[] aParameterDesc,String[] aParameterAnnotation,
 			String errorInfo) throws Exception {
-		this.operatorManager.addFunctionOfClassMethod(name, aClassName,
-				aFunctionName, aParameterClassTypes,aParameterDesc,aParameterAnnotation,errorInfo);
+		this.addFunction(name, new OperatorSelfDefineClassFunction(name,
+				aClassName, aFunctionName, aParameterClassTypes,aParameterDesc,aParameterAnnotation, errorInfo));
+
 	}
     /**
      * 添加一个类的函数定义，例如：Math.abs(double) 映射为表达式中的 "取绝对值(-5.0)"
@@ -182,8 +198,8 @@ public class ExpressRunner {
 	public void addFunctionOfClassMethod(String name, String aClassName,
 			String aFunctionName, String[] aParameterTypes, String errorInfo)
 			throws Exception {
-		this.operatorManager.addFunctionOfClassMethod(name, aClassName,
-				aFunctionName, aParameterTypes,null,null, errorInfo);
+		this.addFunction(name, new OperatorSelfDefineClassFunction(name,
+				aClassName, aFunctionName, aParameterTypes, null,null,errorInfo));		
 	}
     /**
      * 添加一个类的函数定义，例如：Math.abs(double) 映射为表达式中的 "取绝对值(-5.0)"
@@ -201,8 +217,9 @@ public class ExpressRunner {
 			String[] aParameterDesc,String[] aParameterAnnotation,
 			String errorInfo)
 			throws Exception {
-		this.operatorManager.addFunctionOfClassMethod(name, aClassName,
-				aFunctionName, aParameterTypes,aParameterDesc,aParameterAnnotation, errorInfo);
+		this.addFunction(name, new OperatorSelfDefineClassFunction(name,
+				aClassName, aFunctionName, aParameterTypes, aParameterDesc,aParameterAnnotation,errorInfo));		
+	
 	}
     /**
      * 用于将一个用户自己定义的对象(例如Spring对象)方法转换为一个表达式计算的函数
@@ -216,8 +233,9 @@ public class ExpressRunner {
 	public void addFunctionOfServiceMethod(String name, Object aServiceObject,
 			String aFunctionName, Class<?>[] aParameterClassTypes,
 			String errorInfo) throws Exception {
-		this.operatorManager.addFunctionOfServiceMethod(name, aServiceObject,
-				aFunctionName, aParameterClassTypes,null,null,errorInfo);
+		this.addFunction(name, new OperatorSelfDefineServiceFunction(name,
+				aServiceObject, aFunctionName, aParameterClassTypes,null,null, errorInfo));
+		
 	}
     /**
      * 用于将一个用户自己定义的对象(例如Spring对象)方法转换为一个表达式计算的函数
@@ -234,8 +252,8 @@ public class ExpressRunner {
 			String aFunctionName, Class<?>[] aParameterClassTypes,
 			String[] aParameterDesc,String[] aParameterAnnotation,
 			String errorInfo) throws Exception {
-		this.operatorManager.addFunctionOfServiceMethod(name, aServiceObject,
-				aFunctionName, aParameterClassTypes,aParameterDesc,aParameterAnnotation, errorInfo);
+		this.addFunction(name, new OperatorSelfDefineServiceFunction(name,
+				aServiceObject, aFunctionName, aParameterClassTypes,aParameterDesc,aParameterAnnotation, errorInfo));
 
 	}
     /**
@@ -249,17 +267,19 @@ public class ExpressRunner {
      */
 	public void addFunctionOfServiceMethod(String name, Object aServiceObject,
 			String aFunctionName, String[] aParameterTypes, String errorInfo)
-			throws Exception {
-		this.operatorManager.addFunctionOfServiceMethod(name, aServiceObject,
-				aFunctionName, aParameterTypes,null,null,errorInfo);
+			throws Exception {		
+		this.addFunction(name, new OperatorSelfDefineServiceFunction(name,
+				aServiceObject, aFunctionName, aParameterTypes,null,null, errorInfo));
+
 	}
 	public void addFunctionOfServiceMethod(String name, Object aServiceObject,
 			String aFunctionName, String[] aParameterTypes,
 			String[] aParameterDesc,String[] aParameterAnnotation,
 			String errorInfo)
 			throws Exception {
-		this.operatorManager.addFunctionOfServiceMethod(name, aServiceObject,
-				aFunctionName, aParameterTypes,aParameterDesc,aParameterAnnotation, errorInfo);
+		this.addFunction(name, new OperatorSelfDefineServiceFunction(name,
+				aServiceObject, aFunctionName, aParameterTypes,aParameterDesc,aParameterAnnotation, errorInfo));
+
 	}
 	/**
 	 * 添加操作符号，此操作符号的优先级与 "*"相同，语法形式也是  data name data
