@@ -30,9 +30,6 @@ public class OperatorMethod extends OperatorBase {
 			for (int i = 0; i < types.length; i++) {
 				tmpObj = list[i + 2].getObject(parent);
 				types[i] = list[i + 2].getType(parent);
-				if(types[i] == null) {
-					types[i] = Object.class;
-				}
 				orgiTypes[i] = list[i + 2].getType(parent);
 				objs[i] = tmpObj;
 			}
@@ -62,7 +59,11 @@ public class OperatorMethod extends OperatorBase {
 				for (int i = 0; i < orgiTypes.length; i++) {
 					if (i > 0)
 						s.append(",");
-					s.append(orgiTypes[i].getName());
+					if(orgiTypes[i] == null){
+						s.append("null");
+					}else{
+					    s.append(orgiTypes[i].getName());
+					}
 				}
 				s.append(")");
 				throw new Exception(s.toString());

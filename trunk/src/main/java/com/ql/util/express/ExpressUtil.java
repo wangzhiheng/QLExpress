@@ -228,7 +228,11 @@ public class ExpressUtil {
 				if (i > 0) {
 					builder.append(",");
 				}
-				builder.append(aTypes[i].getName());
+				if(aTypes[i]== null){
+					builder.append("null");
+				}else{
+				   builder.append(aTypes[i].getName());
+				}
 			}
 		}
 		builder.append(")");
