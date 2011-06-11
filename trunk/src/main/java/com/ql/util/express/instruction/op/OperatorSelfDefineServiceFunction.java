@@ -11,7 +11,7 @@ import com.ql.util.express.OperateData;
  * @author qhlhl2010@gmail.com
  *
  */
-public class OperatorSelfDefineServiceFunction extends OperatorBase{
+public class OperatorSelfDefineServiceFunction extends OperatorBase implements CanClone{
   Object serviceObject;
   String functionName;
   String[] parameterTypes;
@@ -62,6 +62,13 @@ public class OperatorSelfDefineServiceFunction extends OperatorBase{
    
   }
 
+	public OperatorBase cloneMe(String opName, String errorInfo)
+			throws Exception {
+		OperatorBase result = new OperatorSelfDefineServiceFunction(opName,
+				this.serviceObject, this.functionName, this.parameterClasses,
+				this.operDataDesc, this.operDataAnnotation, errorInfo);
+		return result;
+	}
   public OperateData executeInner(InstructionSetContext<String,Object> context, OperateData[] list) throws
       Exception {
       if(this.parameterClasses.length != list.length){

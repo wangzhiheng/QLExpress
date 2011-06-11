@@ -81,19 +81,23 @@ public class OperatorFactory {
 			 if(orgiOperator == null){
 				 throw new Exception(name + " 不能被设置别名");
 			 }
-			Class<OperatorBase> opClass = (Class<OperatorBase>)orgiOperator.getClass();
-			 Constructor<OperatorBase> constructor = null;
-			 try{
-			   constructor =  (Constructor<OperatorBase>)opClass.getConstructor(String.class,String.class,String.class);
-			 }catch(Exception e ){
-				 throw new Exception(name + " 不能被设置别名:" + e.getMessage());
-			 }
-			 if(constructor == null){
-				 throw new Exception(name + " 不能被设置别名");
-			 }
-			 
-			 OperatorBase destOperator = constructor.newInstance(aAliasName,name,errorInfo);
-			 
+			 OperatorBase destOperator = null;
+			if (orgiOperator instanceof CanClone) {
+				destOperator = ((CanClone)orgiOperator).cloneMe(aAliasName, errorInfo);
+			} else {
+				Class<OperatorBase> opClass = (Class<OperatorBase>) orgiOperator.getClass();
+				Constructor<OperatorBase> constructor = null;
+				try {
+					constructor = (Constructor<OperatorBase>) opClass
+							.getConstructor(String.class, String.class,String.class);
+				} catch (Exception e) {
+					throw new Exception(name + " 不能被设置别名:" + e.getMessage());
+				}
+				if (constructor == null) {
+					throw new Exception(name + " 不能被设置别名");
+				}
+				destOperator = constructor.newInstance(aAliasName, name,errorInfo);
+			}
 	    	 if(this.operator.containsKey(aAliasName)){
 	    		 throw new RuntimeException("操作符号：\"" + aAliasName + "\" 已经存在");
 	    	 }

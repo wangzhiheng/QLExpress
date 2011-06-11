@@ -12,13 +12,13 @@ import com.ql.util.express.OperateData;
  * @author qhlhl2010@gmail.com
  *
  */
-public class OperatorSelfDefineClassFunction extends OperatorBase{
+public class OperatorSelfDefineClassFunction extends OperatorBase implements CanClone{
   String functionName;
   String[] parameterTypes;
   Class<?>[] parameterClasses ;
   Class<?> operClass;
   Method method;
-  
+
   public OperatorSelfDefineClassFunction(String aOperName,String aClassName, String aFunctionName,
           Class<?>[] aParameterClassTypes,String[] aParameterDesc,String[] aParameterAnnotation,String aErrorInfo) throws Exception {
 		if (errorInfo != null && errorInfo.trim().length() == 0) {
@@ -57,6 +57,14 @@ public class OperatorSelfDefineClassFunction extends OperatorBase{
     method = operClass.getMethod(functionName,parameterClasses);
   }
 
+	public OperatorBase cloneMe(String opName, String errorInfo)
+			throws Exception {
+		OperatorBase result = new OperatorSelfDefineClassFunction(opName,
+				this.operClass.getName(), this.functionName,
+				this.parameterClasses, this.operDataDesc,
+				this.operDataAnnotation, errorInfo);
+		return result;
+	}
   public OperateData executeInner(InstructionSetContext<String,Object> context, OperateData[] list) throws
       Exception {
       if(this.parameterClasses.length != list.length){
@@ -78,4 +86,6 @@ public class OperatorSelfDefineClassFunction extends OperatorBase{
        }
        return null;
   }
+
+
 }

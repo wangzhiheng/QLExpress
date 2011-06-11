@@ -7,7 +7,6 @@ import org.junit.Test;
 
 import com.ql.util.express.ExpressRunner;
 import com.ql.util.express.IExpressContext;
-import com.ql.util.express.Operator;
 
 public class OpCallTest {
 		@Test
@@ -15,12 +14,20 @@ public class OpCallTest {
 			ExpressRunner runner = new ExpressRunner(false, true);
 			runner.addOperator("@love", new LoveOperator("@love"));	
 			runner.loadMutilExpress(null, "function abc(String s){println(s)}");
+			runner.addOperatorWithAlias("打印","println",null);
+			runner.addFunctionOfClassMethod("isVIP", BeanExample.class.getName(),
+					"isVIP", new Class[]{String.class},"");
+			runner.addOperatorWithAlias("是否VIP","isVIP","亲爱的$1,你还不是VIP用户");
+			
 			String[][] expressTest = new String[][] {
 					{"+ 1 2","3"},
 					{"@love 'a' 'b'","b{a}b"},
 					{"println \"ssssss\"","null"},
 					{"println (\"ssssss\")","null"},
 					{"abc (\"bbbbbbbb\")","null"},
+					{"打印 (\"函数别名测试\")","null"},
+					{"isVIP (\"玄难\")","false"},
+					{"是否VIP (\"玄难\")","false"},
 					};
 			IExpressContext<String, Object> expressContext = new ExpressContextExample(
 					null);
@@ -28,7 +35,7 @@ public class OpCallTest {
 			for (int point = 0; point < expressTest.length; point++) {
 				String expressStr = expressTest[point][0];
 				List<String> errorList = new ArrayList<String>();
-				Object result = runner.execute(expressStr, expressContext, null,
+				Object result = runner.execute(expressStr, expressContext, errorList,
 						false, true);
 				if (result == null
 						&& expressTest[point][1].equalsIgnoreCase("null") == false
@@ -47,14 +54,4 @@ public class OpCallTest {
 				}
 			}
 		}
-}
-class PrintOperator extends Operator {	
-	public PrintOperator(String aName) {
-		this.name= aName;
-	}
-	public Object executeInner(Object[] list)
-			throws Exception {
-		System.out.println(list[0]);
-		return null;
-	}
 }
