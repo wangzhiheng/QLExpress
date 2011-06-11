@@ -87,6 +87,7 @@ public class ExpressRunner {
 	}
 	public void addSystemFunctions(){	
 		  this.addFunction("max", new OperatorMinMax("max"));	
+		  this.addFunction("min", new OperatorMinMax("min"));	
 		  this.addFunction("round", new OperatorRound("round"));
 		  this.addFunction("print", new OperatorPrint("print"));
 		  this.addFunction("println", new OperatorPrintln("println"));
@@ -310,12 +311,18 @@ public class ExpressRunner {
 	 */
 	public void addOperatorWithAlias(String keyWordName, String realKeyWordName,
 			String errorInfo) throws Exception {
+		if(errorInfo != null && errorInfo.trim().length() == 0){
+			errorInfo = null;
+		}
+		//添加函数别名
+		if(this.manager.isFunction(realKeyWordName)){
+			this.manager.addFunctionName(keyWordName);
+			this.operatorManager.addOperatorWithAlias(keyWordName, realKeyWordName, errorInfo);
+			return;
+		}
 		NodeType realNodeType = this.manager.findNodeType(realKeyWordName);
 		if(realNodeType == null){
 			throw new Exception("关键字：" + realKeyWordName +"不存在");			
-		}
-		if(errorInfo != null && errorInfo.trim().length() == 0){
-			errorInfo = null;
 		}
 		boolean isExist = this.operatorManager.isExistOperator(realNodeType.getTag());
 		if(isExist == false &&  errorInfo != null){
