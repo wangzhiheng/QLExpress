@@ -11,6 +11,6 @@ public class Word {
 	   this.col = aCol - aWord.length() + 1;
    }
   public String toString(){
-	  return this.word + "[" + this.line + "," + this.col + "]";
+	  return this.word;// + "[" + this.line + "," + this.col + "]";
   }
 }
