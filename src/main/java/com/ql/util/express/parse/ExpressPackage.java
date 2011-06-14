@@ -67,7 +67,7 @@ public class ExpressPackage {
 			if (name.indexOf(".") >= 0) {
 				try {
 					result = Class.forName(name);
-				} catch (ClassNotFoundException ex) {
+				} catch (Throwable ex) {
 				}
 				return result;
 			}
