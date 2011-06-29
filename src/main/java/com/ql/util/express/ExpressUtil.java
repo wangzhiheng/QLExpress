@@ -526,7 +526,27 @@ public class ExpressUtil {
 			throw new RuntimeException(e);
 		}
 	}
-
+	public static Class<?> getPropertyClass(Object bean, Object name) {
+		try {
+			if(bean.getClass().isArray() && name.equals("length")){
+			   return int.class;
+			}else if (bean instanceof Class) {
+				Field f = ((Class<?>) bean).getDeclaredField(name.toString());
+				return f.getType();
+			}else if(bean instanceof Map ){
+				Object o = ((Map<?,?>)bean).get(name);
+				if(o == null){
+					return null;
+				}else{
+					return o.getClass();
+				}
+		    }else {
+				return PropertyUtils.getPropertyDescriptor(bean, name.toString()).getPropertyType();
+			}
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 	public static void setProperty(Object bean, Object name, Object value) {
 		try {
 			if (bean instanceof Class) {
@@ -540,14 +560,6 @@ public class ExpressUtil {
 			}
 		} catch (Exception e) {
 			throw new RuntimeException("不能访问" + bean + "的property:" + name,e);
-		}
-	}
-
-	public static Class<?> getPropertyType(Object bean, String name) {
-		try {
-			return PropertyUtils.getPropertyType(bean, name);
-		} catch (Exception e) {
-			throw new RuntimeException("不能访问" + bean + "的property:" + name, e);
 		}
 	}
 

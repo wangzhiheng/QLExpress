@@ -49,7 +49,7 @@ public class OperateDataField extends OperateDataAttr {
 	}
     
 	public Class<?> getType(InstructionSetContext<String,Object> context) throws Exception {
-		  return  this.type;
+		return ExpressUtil.getPropertyClass(this.fieldObject,transferFieldName(context,this.orgiFieldName));
 	}
 
 	public void setObject(InstructionSetContext<String,Object> context, Object value) {
