@@ -9,7 +9,9 @@ public class BeanExample {
 	public BeanExampleChild child = new BeanExampleChild();
 	public BeanExample() {
 	}
-
+    public static void printNumber(Number l,Number f){
+    	System.out.println("f-------:" + l +'-'+ f);
+    }
 	public BeanExampleChild getChild() {
 		return child;
 	}
@@ -22,6 +24,13 @@ public class BeanExample {
 		this.intValue = intValue;
 	}
 
+	public String getText(String a,String b){
+		return a +"-" + b;
+	}
+	public String getText(String a,Long b){
+		return a +"-" + b;
+	}
+	
 	public long getLongValue() {
 		return longValue;
 	}
