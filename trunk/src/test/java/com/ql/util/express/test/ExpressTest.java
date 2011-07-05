@@ -82,6 +82,8 @@ public class ExpressTest {
 				{" 1!=1 and isVIP(\"qhlhl2010@gmail.com\")","false"},
 				{" 1==1 or isVIP(\"qhlhl2010@gmail.com\") ","true"},
 				{ "abc == 1", "true" },
+				{ "2+2 in 2+2", "true" },
+			
 				{ "testLong(abc)", "toString-long:1" },
 				{ "bean.testLongObject(abc)", "toString-LongObject:1" },
 				
