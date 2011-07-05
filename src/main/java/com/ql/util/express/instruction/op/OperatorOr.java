@@ -17,17 +17,27 @@ public class OperatorOr extends Operator {
 
 	public Object executeInner(Object op1,
 			Object op2) throws Exception {
-		boolean result = false;
 		Object o1 = op1;
 		Object o2 = op2;
-
-		if ((o1 instanceof Boolean) && (o2 instanceof Boolean)) {
-			result = ((Boolean) o1).booleanValue()
-						|| ((Boolean) o2).booleanValue();
-		} else {
-			String msg = "没有定义类型" + o1 + "和" + o2 + " 的 " + this.name + "操作";
+        boolean r1 = false;
+        boolean r2= false;
+	    if(o1 == null){
+	    	r1 = false;
+	    }else if(o1 instanceof Boolean){
+        	r1 = ((Boolean) o1).booleanValue();
+        }else{
+        	String msg = "没有定义类型" + o1 + "和" + o2 + " 的 " + this.name + "操作";
 			throw new Exception(msg);
-		}
+        }
+        if(o2 == null){
+        	r2 = false;
+        }else  if(o2 instanceof Boolean){
+        	r2 = ((Boolean) o2).booleanValue();
+        }else{
+        	String msg = "没有定义类型" + o1 + "和" + o2 + " 的 " + this.name + "操作";
+			throw new Exception(msg);
+        }
+        boolean result = r1 || r2;
 		return  Boolean.valueOf(result);
 
 	}

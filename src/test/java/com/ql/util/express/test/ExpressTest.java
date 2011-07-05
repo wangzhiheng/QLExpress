@@ -83,7 +83,14 @@ public class ExpressTest {
 				{" 1==1 or isVIP(\"qhlhl2010@gmail.com\") ","true"},
 				{ "abc == 1", "true" },
 				{ "2+2 in 2+2", "true" },
-			
+				{ "true or null", "true" },
+				{ "null or true", "true" },
+				{ "null or null", "false" },
+				
+				{ "true and null", "false" },
+				{ "null and true", "false" },
+				{ "null and null", "false" },
+				
 				{ "testLong(abc)", "toString-long:1" },
 				{ "bean.testLongObject(abc)", "toString-LongObject:1" },
 				

@@ -2,6 +2,7 @@ package com.ql.util.express.instruction.detail;
 
 import java.util.List;
 
+import com.ql.util.express.OperateData;
 import com.ql.util.express.RunEnvironment;
 
 public class InstructionGoToWithCondition extends Instruction{
@@ -21,23 +22,31 @@ public class InstructionGoToWithCondition extends Instruction{
 		Object o = null;
 		if(this.isPopStackData == false){
 		    o = environment.peek().getObject(environment.getContext());	
+			if(o == null){
+				environment.pop();
+				environment.push(new OperateData(false,boolean.class));
+			}
 		}else{
 			o = environment.pop().getObject(environment.getContext());	
 		}
-		if(o != null && o instanceof Boolean){
-			if(((Boolean)o).booleanValue() == this.condition){
-				if(environment.isTrace() && log.isDebugEnabled()){
-					log.debug("goto +" + this.offset);
-				}
-				environment.gotoWithOffset(this.offset);
-			}else{
-				if(environment.isTrace() && log.isDebugEnabled()){
-					log.debug("programPoint ++ ");
-				}
-				environment.programPointAddOne();
-			}
+		boolean r = false;
+		if(o == null){
+			r = false;
+		}else if(o instanceof Boolean){
+			r = ((Boolean)o).booleanValue();
 		}else{
 			throw new Exception("÷∏¡Ó¥ÌŒÛ:" + o + " ≤ª «Boolean");
+		}
+		if (r == this.condition) {
+			if (environment.isTrace() && log.isDebugEnabled()) {
+				log.debug("goto +" + this.offset);
+			}
+			environment.gotoWithOffset(this.offset);
+		} else {
+			if (environment.isTrace() && log.isDebugEnabled()) {
+				log.debug("programPoint ++ ");
+			}
+			environment.programPointAddOne();
 		}
 	}
 
