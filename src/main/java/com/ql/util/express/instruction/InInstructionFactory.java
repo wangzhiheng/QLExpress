@@ -14,11 +14,13 @@ public class InInstructionFactory  extends InstructionFactory{
 			InstructionSet result, Stack<ForRelBreakContinue> forStack,
 			ExpressNode node, boolean isRoot) throws Exception {
 		ExpressNode[] children = node.getChildren();
-		node.getLeftChildren().remove(1);
-		ExpressNode[] parameterList = children[1].getChildren();
-		for (int i = 0; i < parameterList.length; i++) {
-			if (parameterList[i].isTypeEqualsOrChild(",") == false) {
-				node.getLeftChildren().add(parameterList[i]);
+		if (children[1].isTypeEqualsOrChild("()")) {
+			node.getLeftChildren().remove(1);
+			ExpressNode[] parameterList = children[1].getChildren();
+			for (int i = 0; i < parameterList.length; i++) {
+				if (parameterList[i].isTypeEqualsOrChild(",") == false) {
+					node.getLeftChildren().add(parameterList[i]);
+				}
 			}
 		}
 
