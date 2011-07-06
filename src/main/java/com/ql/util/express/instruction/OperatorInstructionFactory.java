@@ -6,6 +6,7 @@ import com.ql.util.express.ExportItem;
 import com.ql.util.express.ExpressRunner;
 import com.ql.util.express.InstructionSet;
 import com.ql.util.express.instruction.detail.InstructionGoToWithCondition;
+import com.ql.util.express.instruction.detail.InstructionGoToWithNotNull;
 import com.ql.util.express.instruction.detail.InstructionOperator;
 import com.ql.util.express.instruction.detail.InstructionReturn;
 import com.ql.util.express.instruction.op.OperatorBase;
@@ -34,6 +35,8 @@ class OperatorInstructionFactory  extends InstructionFactory{
 				result.insertInstruction(finishPoint[0]+1,new InstructionGoToWithCondition(false,result.getCurrentPoint() - finishPoint[0] + 1,false));
 			}else if(node.isTypeEqualsOrChild("||")){
 				result.insertInstruction(finishPoint[0]+1,new InstructionGoToWithCondition(true,result.getCurrentPoint() - finishPoint[0] + 1,false));
+			}else if(node.isTypeEqualsOrChild("nor") ){
+				result.insertInstruction(finishPoint[0]+1,new InstructionGoToWithNotNull(result.getCurrentPoint() - finishPoint[0] + 1,false));
 			}else if(node.isTypeEqualsOrChild("def") || node.isTypeEqualsOrChild("alias")){
 				returnVal = true;
 			}else if(node.isTypeEqualsOrChild("exportDef")){
