@@ -91,6 +91,11 @@ public class ExpressTest {
 				{ "null and true", "false" },
 				{ "null and null", "false" },
 				
+				{ "'a' nor null", "a" },
+				{ "'a' nor 'b'", "a" },
+				{ " null nor null", "null" },
+				{ " null nor 'b'", "b" },
+				
 				{ "testLong(abc)", "toString-long:1" },
 				{ "bean.testLongObject(abc)", "toString-LongObject:1" },
 				

@@ -39,6 +39,7 @@ public class OperatorFactory {
 		  addOperator("<>",new OperatorEqualsLessMore("<>"));
 		  addOperator("&&",new OperatorAnd("&&"));
 		  addOperator("||",new OperatorOr("||"));
+		  addOperator("nor",new OperatorNor("nor"));
 		  addOperator("=",new OperatorEvaluate("="));
 		  addOperator("exportAlias",new OperatorExportAlias("exportAlias"));
 		  addOperator("alias",new OperatorAlias("alias"));

@@ -11,7 +11,7 @@ public class NodeTypeManager {
 			 "~","&","|","<<", ">>",//位操作 
 			 "+", "-","*", "/", "%","mod","++", "--",//四则运算：
 			 ".",";","(", ")", "{", "}", "[", "]","?",//分隔符号
-			 "!","<", ">", "<=", ">=", "==","!=","&&","||",//Boolean运算符号
+			 "!","<", ">", "<=", ">=", "==","!=","&&","||","nor",//Boolean运算符号
 			 "for", "if", "then", "else", "exportAlias", "alias",
 			 "break", "continue", "return", "macro", "function" ,
 			 "def","exportDef", "new","array","anonymousNewArray",
@@ -69,7 +69,7 @@ public class NodeTypeManager {
 				"OP_LEVEL6:TYPE=OPERATOR,CHILDREN=in|like",                     
 				"OP_LEVEL7:TYPE=OPERATOR,CHILDREN=>|>=|<|<=|==|!=",
 				"OP_LEVEL8:TYPE=OPERATOR,CHILDREN=&&",
-				"OP_LEVEL9:TYPE=OPERATOR,CHILDREN=\\|\\|",	
+				"OP_LEVEL9:TYPE=OPERATOR,CHILDREN=\\|\\||nor",	
 				
 				"OTHER_KEYWORD:TYPE=TREETYPE,CHILDREN=exportAlias|alias|break|continue|return|def|exportDef|new",
 				"OP_LIST:TYPE=TREETYPE,CHILDREN=OP_LEVEL1|OP_LEVEL2|OP_LEVEL3|OP_LEVEL4|OP_LEVEL5|OP_LEVEL6|OP_LEVEL7||OP_LEVEL8|OP_LEVEL9|=|OTHER_KEYWORD|(|)|[|]|{|}",
