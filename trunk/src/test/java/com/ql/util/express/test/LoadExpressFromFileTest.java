@@ -11,8 +11,8 @@ public class LoadExpressFromFileTest {
 	@Test
 	public void testLoadFromFile() throws Exception {
 		ExpressRunner runner = new ExpressRunner(false,false);
-		runner.loadExpressFromFile("functiondef");
-		runner.loadExpressFromFile("main");
+		runner.loadExpress("functiondef");
+		runner.loadExpress("main");
 		ExportItem[] exports = runner.getExportInfo();
 		for (ExportItem item : exports) {
 			System.out.println(item.getGlobeName());
@@ -31,5 +31,13 @@ public class LoadExpressFromFileTest {
 		System.out.println("运行结果" + r);
 		System.out.println("context:" + context);
 	}
-
+	@Test
+	public void testLoadInclude() throws Exception{	
+		ExpressRunner runner = new ExpressRunner(false,true);
+		runner.loadExpress("includeRoot");
+		DefaultContext<String, Object>  context = new DefaultContext<String, Object>();	
+		Object r = runner.executeByExpressName("includeRoot", context, null, false,false,null);
+		System.out.println(r );
+		System.out.println(context);
+	}	
 }

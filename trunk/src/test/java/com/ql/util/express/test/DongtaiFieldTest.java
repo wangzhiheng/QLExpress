@@ -37,7 +37,7 @@ public class DongtaiFieldTest {
 	@Test
 	public void testLoadFromFile() throws Exception{	
 		ExpressRunner runner = new ExpressRunner(true,true);
-		runner.loadExpressFromFile("TestFunctionParamerType");
+		runner.loadExpress("TestFunctionParamerType");
 		DefaultContext<String, Object>  context = new DefaultContext<String, Object>();	
 		context.put("auctionUtil",new com.ql.util.express.test.BeanExample());
 		context.put("log",log);
