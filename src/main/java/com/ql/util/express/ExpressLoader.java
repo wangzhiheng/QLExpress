@@ -1,8 +1,5 @@
 package com.ql.util.express;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
@@ -22,27 +19,9 @@ public class ExpressLoader {
 	public ExpressLoader(ExpressRunner aCreator){
 		this.creator = aCreator;
 	}
-	private String loadFromFile(String fileName) throws Exception{
-		fileName = fileName.replace('.', '/') +".ql";
-		InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream(fileName);
-		if(in  == null){
-			throw new Exception("不能找到表达式文件：" + fileName);
-		}
-		BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-		StringBuilder builder = new  StringBuilder();
-		String tmpStr = null;
-		while( ( tmpStr = reader.readLine()) != null){
-			builder.append(tmpStr).append("\n");
-		}
-		reader.close();
-		in.close();
-		return builder.toString();
-	}
-
-	public InstructionSet loadExpressFromFile(
-			String fileName)
+	public InstructionSet loadExpress(String expressName)
 			throws Exception {
-		return parseInstructionSet(fileName,loadFromFile(fileName));		
+		return parseInstructionSet(expressName,this.creator.getExpressResourceLoader().loadExpress(expressName));		
 	}
 
 	public void addInstructionSet(String expressName, InstructionSet set)
