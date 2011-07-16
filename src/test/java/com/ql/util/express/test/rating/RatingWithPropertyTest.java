@@ -29,7 +29,7 @@ public class RatingWithPropertyTest {
 		//增加自定义函数
 		runner.addFunction("费用科目",new SujectOperator("费用科目"));
         //装载分成规则rating.ql文件
-		runner.loadExpressFromFile("ratingWithProperty");
+		runner.loadExpress("ratingWithProperty");
 		//设置上下文
 		DefaultContext<String, Object> context = new DefaultContext<String, Object>();
 		context.put("物流订单", logisticsOrder);
