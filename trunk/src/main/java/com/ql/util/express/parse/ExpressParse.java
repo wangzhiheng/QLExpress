@@ -9,20 +9,51 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.ql.util.express.ExpressUtil;
+import com.ql.util.express.IExpressResourceLoader;
 
 public class ExpressParse {
 
 	private static final Log log = LogFactory.getLog(ExpressParse.class);
 	NodeTypeManager nodeTypeManager;
+	IExpressResourceLoader expressResourceLoader;
 	/**
 	 * 是否需要高精度计算
 	 */
 	private boolean isPrecise = false;
-	public ExpressParse(NodeTypeManager aNodeTypeManager,boolean aIsPrecise){
+	public ExpressParse(NodeTypeManager aNodeTypeManager,IExpressResourceLoader aLoader,boolean aIsPrecise){
 		this.nodeTypeManager = aNodeTypeManager;
+		this.expressResourceLoader = aLoader;
 		this.isPrecise = aIsPrecise;
 	}
-	
+	protected Word[] getExpressByName(String expressFileName) throws Exception{
+		String express = this.expressResourceLoader.loadExpress(expressFileName);
+		return WordSplit.parse(nodeTypeManager, express);
+	}
+	protected  Word[] dealInclude(Word[] wordObjects) throws Exception{
+	    boolean isInclude = false;
+	    StringBuffer includeFileName = new StringBuffer();
+	    int point = 0;
+	    List<Word> result = new ArrayList<Word>();
+	    while(point <wordObjects.length ){
+	      if(wordObjects[point].word.equals("include") ==true){
+	    	  isInclude = true;
+	    	  includeFileName.setLength(0);
+	      }else if(isInclude == true && wordObjects[point].word.equals(";") ==true) {
+	    	  isInclude = false;
+	    	  Word[] childExpressWord = this.getExpressByName(includeFileName.toString());
+	    	  childExpressWord = this.dealInclude(childExpressWord);
+	    	  for(int i=0;i< childExpressWord.length;i++){
+	    		  result.add(childExpressWord[i]);
+	    	  }
+	      }else if(isInclude == true){
+	    	  includeFileName.append(wordObjects[point].word);
+	      }else{
+	    	  result.add(wordObjects[point]);
+	      }
+	      point = point + 1;
+	    }
+	    return result.toArray(new Word[0]);
+	}
 	/**
 	 * 进行单词类型分析
 	 * @param words
@@ -35,7 +66,7 @@ public class ExpressParse {
 		NodeType tempType;
 		ExpressPackage  tmpImportPackage = new ExpressPackage(aRootExpressPackage);  
 
-	    //先处理import，import必须放在文件的最开始，必须以；结束
+	    //先处理import，import必须放在文件的最开始，必须以;结束
 	    boolean isImport = false;
 	    StringBuffer importName = new StringBuffer();
 	    int point = 0;
@@ -427,6 +458,10 @@ public class ExpressParse {
 			log.debug("执行的表达式:" + express);	
 			log.debug("单词分解结果:" + WordSplit.getPrintInfo(words,","));  
 		}
+		words = this.dealInclude(words);
+		if(isTrace == true && log.isDebugEnabled()){
+			log.debug("预处理后结果:" + WordSplit.getPrintInfo(words,","));  
+		}
     	List<ExpressNode> tempList = this.transferWord2ExpressNode(rootExpressPackage,words);
     	if(isTrace == true && log.isDebugEnabled()){
     		log.debug("单词分析结果:" + printInfo(tempList,","));
@@ -452,7 +487,7 @@ public class ExpressParse {
 	public static void main(String[] args) throws Exception {
 		String condition="/** a **/";
 		NodeTypeManager manager = new NodeTypeManager();
-		ExpressParse parse = new ExpressParse(manager,false);
+		ExpressParse parse = new ExpressParse(manager,null,false);
 		Word[] words = WordSplit.parse(manager,condition);
 			log.debug("执行的表达式:" + condition);	
 			log.debug("单词分解结果:" + WordSplit.getPrintInfo(words,","));  
@@ -471,7 +506,7 @@ public class ExpressParse {
 	public static void main2(String[] args) throws Exception {
 		String condition="if 1 == 1 then  true ;";
 		NodeTypeManager manager = new NodeTypeManager();
-		ExpressParse parse = new ExpressParse(manager,false);
+		ExpressParse parse = new ExpressParse(manager,null,false);
 		parse.parse(null,condition,true);
   }
 	   protected static String printInfo(List<ExpressNode> list,String splitOp){

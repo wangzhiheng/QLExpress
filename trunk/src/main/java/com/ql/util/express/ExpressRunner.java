@@ -49,6 +49,7 @@ public class ExpressRunner {
     private Map<String,InstructionSet> expressInstructionSetCache = new HashMap<String, InstructionSet>();
     
     private ExpressLoader loader;
+    private IExpressResourceLoader expressResourceLoader;
     /**
      * 语法定义的管理器
      */
@@ -76,15 +77,25 @@ public class ExpressRunner {
 	 * @param aIstrace 是否跟踪执行指令的过程
 	 */
 	public ExpressRunner(boolean aIsPrecise,boolean aIstrace){
+		this(aIsPrecise,aIstrace,new DefaultExpressResourceLoader());
+	}
+	/**
+	 * 
+	 * @param aIsPrecise 是否需要高精度计算支持
+	 * @param aIstrace 是否跟踪执行指令的过程
+	 * @param aExpressResourceLoader 表达式的资源装载器
+	 */
+	public ExpressRunner(boolean aIsPrecise,boolean aIstrace,IExpressResourceLoader aExpressResourceLoader){
 		this.isTrace = aIstrace;
 		this.isPrecise = aIsPrecise;
+		this.expressResourceLoader = aExpressResourceLoader;
 		this.operatorManager = new OperatorFactory(this.isPrecise);
 		this.loader = new ExpressLoader(this);
-		this.parse =  new ExpressParse(manager,this.isPrecise);
+		this.parse =  new ExpressParse(manager,this.expressResourceLoader,this.isPrecise);
 		rootExpressPackage.addPackage("java.lang");
 		rootExpressPackage.addPackage("java.util");
 		this.addSystemFunctions();
-	}
+	}	
 	public void addSystemFunctions(){	
 		  this.addFunction("max", new OperatorMinMax("max"));	
 		  this.addFunction("min", new OperatorMinMax("min"));	
@@ -106,6 +117,9 @@ public class ExpressRunner {
 	 */
 	public OperatorFactory getOperatorFactory(){
 		return this.operatorManager;
+	}
+	public IExpressResourceLoader getExpressResourceLoader(){
+		return this.expressResourceLoader;
 	}
 	/**
 	 * 添加宏定义 例如： macro 玄难 { abc(userinfo.userId);}
@@ -132,8 +146,8 @@ public class ExpressRunner {
      * @param fileName
      * @throws Exception
      */
-	public void loadExpressFromFile(String fileName) throws Exception {
-		this.loader.loadExpressFromFile(fileName);
+	public void loadExpress(String expressName) throws Exception {
+		this.loader.loadExpress(expressName);
 	}
 	/**
 	 * 添加函数定义
