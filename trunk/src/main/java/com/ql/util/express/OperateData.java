@@ -7,7 +7,10 @@ package com.ql.util.express;
  *
  */
 
-public class OperateData { // extends ExpressTreeNodeImple {
+public class OperateData {
+	public final static OperateData OperateData_TRUE = new OperateData(true,Boolean.TYPE);
+	public final static OperateData OperateData_FALSE = new OperateData(false,Boolean.TYPE);
+	
 	protected Object dataObject;
 	public Class<?> type;
 
