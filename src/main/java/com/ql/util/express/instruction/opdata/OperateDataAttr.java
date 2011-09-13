@@ -37,7 +37,7 @@ public class OperateDataAttr extends OperateData {
 				return ex.getMessage();
 			}
 		}
-		public Object getObjectInner(InstructionSetContext<String,Object> context) {
+		public Object getObjectInner(InstructionSetContext<String,Object> context) throws Exception {
 			if (this.name.equalsIgnoreCase("null")) {
 				return null;
 			}
@@ -63,7 +63,7 @@ public class OperateDataAttr extends OperateData {
 			     return obj.getClass();
 		}
 
-		public void setObject(InstructionSetContext<String,Object> parent, Object object) {
+		public void setObject(InstructionSetContext<String,Object> parent, Object object) throws Exception {
 			try {
 				  parent.put(this.name, object);
 			} catch (Exception e) {
