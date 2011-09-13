@@ -139,6 +139,9 @@ public class ExpressRunner {
 	 * @throws Exception
 	 */
 	public void loadMutilExpress(String groupName,String express) throws Exception{		
+		if(groupName == null || groupName.trim().length() ==0){
+			groupName = GLOBAL_DEFINE_NAME;
+		}	
 		this.loader.parseInstructionSet(groupName,express);
 	}
     /**
@@ -474,7 +477,14 @@ public class ExpressRunner {
 	 */
 	public InstructionSet parseInstructionSet(String text)
 			throws Exception {
-		ExpressNode root = this.parse.parse(this.rootExpressPackage,text, isTrace);
+		Map<String,String> selfDefineClass = new HashMap<String,String> ();
+		for(ExportItem  item : this.loader.getExportInfo()){
+			if(item.getType().equals(InstructionSet.TYPE_CLASS)){
+				selfDefineClass.put(item.getName(), item.getName());
+			}
+		}
+		
+		ExpressNode root = this.parse.parse(this.rootExpressPackage,text, isTrace,selfDefineClass);
 		checkExpressNode(root);
 		InstructionSet result = createInstructionSet(root, "main");
 		if (this.isTrace && log.isDebugEnabled()) {

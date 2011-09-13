@@ -35,10 +35,10 @@ public class OperateData {
 	public final Object getObject(InstructionSetContext<String,Object> context) throws Exception {
 		return getObjectInner(context);
 	}
-    public Object getObjectInner(InstructionSetContext<String,Object> context){
+    public Object getObjectInner(InstructionSetContext<String,Object> context) throws Exception{
     	return this.dataObject;
     }
-    public void setObject(InstructionSetContext<String,Object> parent, Object object) {
+    public void setObject(InstructionSetContext<String,Object> parent, Object object) throws Exception {
 		throw new RuntimeException("必须在子类中实现此方法");
 	}
 	public String toJavaCode(){		

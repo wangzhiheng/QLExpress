@@ -6,6 +6,11 @@ import java.util.Map;
 import com.ql.util.express.instruction.opdata.OperateDataAttr;
 
 public class InstructionSetContext<K,V>  implements IExpressContext<K,V> {
+	/*
+	 * 没有知道数据类型的变量定义是否传递到最外层的Context
+	 */
+	private boolean isExpandToParent = true;
+	
 	private IExpressContext<K,V> parent = null;
 	private Map<K,V> content;
 	/**
@@ -16,8 +21,13 @@ public class InstructionSetContext<K,V>  implements IExpressContext<K,V> {
 	private ExpressLoader expressLoader;
 	
 	private boolean isSupportDynamicFieldName = false;
-	private ExpressRunner runner;	
+	private ExpressRunner runner;
+	
 	public InstructionSetContext(ExpressRunner aRunner,IExpressContext<K,V> aParent,ExpressLoader aExpressLoader,boolean aIsSupportDynamicFieldName){
+	   this(true,aRunner,aParent, aExpressLoader, aIsSupportDynamicFieldName);
+	}
+	public InstructionSetContext(boolean aIsExpandToParent,ExpressRunner aRunner,IExpressContext<K,V> aParent,ExpressLoader aExpressLoader,boolean aIsSupportDynamicFieldName){
+	    this.isExpandToParent = aIsExpandToParent;
 		this.runner = aRunner;
 		this.parent = aParent;
 		this.expressLoader = aExpressLoader;
@@ -73,11 +83,13 @@ public class InstructionSetContext<K,V>  implements IExpressContext<K,V> {
 			result = this.expressLoader.getInstructionSet(varName);
 		}
 		if(result == null){
-			if( this.parent != null && this.parent instanceof InstructionSetContext){
-			    result = ((InstructionSetContext<K,V>)this.parent).getSymbol(varName);
-			}else{
-			    result = new OperateDataAttr(varName,null);
-			    this.addSymbol(varName, result);
+			if (this.isExpandToParent == true && this.parent != null
+					&& this.parent instanceof InstructionSetContext) {
+				result = ((InstructionSetContext<K, V>) this.parent)
+						.getSymbol(varName);
+			} else {
+				result = new OperateDataAttr(varName, null);
+				this.addSymbol(varName, result);
 			}
 		}	
 		return result;
@@ -93,19 +105,18 @@ public class InstructionSetContext<K,V>  implements IExpressContext<K,V> {
 	public V get(Object key){
 		if(this.content != null && this.content.containsKey(key)){
 			return this.content.get(key);
-		}else if(this.parent != null){
+		}else if(this.isExpandToParent == true && this.parent != null){
 			return this.parent.get(key);
 		}
 		return null;
 	}
-	public void putKeyDefine(K key){
-		if(this.content == null){
-			this.content = new HashMap<K,V>();
-		}
-		this.content.put(key,null);
-	}
 	public V put(K key, V value){
 		if(this.content != null && this.content.containsKey(key) ){
+			return this.content.put(key,value);
+		}else if (this.isExpandToParent == false){
+			if(this.content == null){
+				this.content = new HashMap<K,V>();
+			}
 			return this.content.put(key,value);
 		}else if(this.parent != null){
 			return this.parent.put(key,value);
@@ -113,4 +124,5 @@ public class InstructionSetContext<K,V>  implements IExpressContext<K,V> {
 			throw new RuntimeException("没有定义局部变量：" + key +",而且没有全局上下文");
 		}
 	}
+
 }
