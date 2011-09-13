@@ -42,17 +42,29 @@ public class OperateDataField extends OperateDataAttr {
 			}
 		}
     }
-	public Object getObjectInner(InstructionSetContext<String,Object> context) {
+	public Object getObjectInner(InstructionSetContext<String,Object> context) throws Exception {
 		//如果能找到aFieldName的定义,则再次运算
-
-		return ExpressUtil.getProperty(this.fieldObject,transferFieldName(context,this.orgiFieldName));
+		if(this.fieldObject instanceof OperateDataVirClass){
+			return ((OperateDataVirClass)this.fieldObject).getValue(transferFieldName(context,this.orgiFieldName));
+		}else{
+		  return ExpressUtil.getProperty(this.fieldObject,transferFieldName(context,this.orgiFieldName));
+		}
 	}
     
 	public Class<?> getType(InstructionSetContext<String,Object> context) throws Exception {
-		return ExpressUtil.getPropertyClass(this.fieldObject,transferFieldName(context,this.orgiFieldName));
+		if(this.fieldObject instanceof OperateDataVirClass){
+			return ((OperateDataVirClass)this.fieldObject).getValueType(transferFieldName(context,this.orgiFieldName));
+		}else{
+		    return ExpressUtil.getPropertyClass(this.fieldObject,transferFieldName(context,this.orgiFieldName));
+		}
 	}
 
-	public void setObject(InstructionSetContext<String,Object> context, Object value) {
-		ExpressUtil.setProperty(fieldObject, transferFieldName(context,this.orgiFieldName), value);
+	public void setObject(InstructionSetContext<String,Object> context, Object value) throws Exception{
+		if(this.fieldObject instanceof OperateDataVirClass){
+			((OperateDataVirClass)this.fieldObject).setValue(transferFieldName(context,this.orgiFieldName).toString(),value);
+		}else{
+			ExpressUtil.setProperty(fieldObject, transferFieldName(context,this.orgiFieldName), value);
+		}
+		
 	}
 }
