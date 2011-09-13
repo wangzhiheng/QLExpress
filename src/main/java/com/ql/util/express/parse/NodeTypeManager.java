@@ -15,12 +15,14 @@ public class NodeTypeManager {
 			 "for", "if", "then", "else", "exportAlias", "alias",
 			 "break", "continue", "return", "macro", "function" ,
 			 "def","exportDef", "new","array","anonymousNewArray",
-			 "like",
+			 "like","class",
 			 "=","cast","/**","**/"
 	};
 		private String[] nodeTypeDefines = new String[] {
 				"EOF:TYPE=KEYWORD,FACTORY=com.ql.util.express.instruction.NullInstructionFactory",
 				"FUNCTION_NAME:TYPE=KEYWORD",
+				"VClass:TYPE=KEYWORD",
+				
 				"in:TYPE=KEYWORD,FACTORY=com.ql.util.express.instruction.InInstructionFactory",
 				"CONST_BYTE:TYPE=CONST",
 				"CONST_SHORT:TYPE=CONST",
@@ -37,7 +39,7 @@ public class NodeTypeManager {
 				"CONST:TYPE=CONST,CHILDREN=CONST_NUMBER|CONST_CHAR|CONST_STRING|CONST_BOOLEAN|CONST_CLASS,FACTORY=com.ql.util.express.instruction.ConstDataInstructionFactory",
 
 				",:TYPE=KEYWORD,FACTORY=com.ql.util.express.instruction.NullInstructionFactory",
-				"::TYPE=KEYWORD,FACTORY=com.ql.util.express.instruction.OperatorInstructionFactory",
+				"::TYPE=KEYWORD",
 				"COMMENT:TYPE=BLOCK,STARTTAG=/**,ENDTAG=**/,FACTORY=com.ql.util.express.instruction.NullInstructionFactory",
 				
 				"():TYPE=BLOCK,STARTTAG=(,ENDTAG=),FACTORY=com.ql.util.express.instruction.BlockInstructionFactory",
@@ -54,6 +56,7 @@ public class NodeTypeManager {
 				"STAT_SEMICOLON_EOF:TYPE=TREETYPE,FACTORY=com.ql.util.express.instruction.BlockInstructionFactory",
 				"STAT_MACRO:TYPE=TREETYPE,DEFINE=(macro^)$ID->CONST_STRING${},FACTORY=com.ql.util.express.instruction.MacroInstructionFactory",
 				"STAT_FUNCTION:TYPE=TREETYPE,DEFINE=(function^)$ID->CONST_STRING$()${},FACTORY=com.ql.util.express.instruction.FunctionInstructionFactory",
+				"STAT_CLASS:TYPE=TREETYPE,DEFINE=(class^)$VClass->CONST_STRING$()${},FACTORY=com.ql.util.express.instruction.FunctionInstructionFactory",
 				"STATEMENT:TYPE=TREETYPE,CHILDREN=STAT_SEMICOLON|STAT_SEMICOLON_EOF|STAT_FOR|STAT_IFELSE|STAT_IF|STAT_IF_JAVA|STAT_IFELSE_JAVA |STAT_MACRO ",
 
 				"FUNCTION_DEFINE:TYPE=DEFINE,FACTORY=com.ql.util.express.instruction.BlockInstructionFactory",
@@ -74,10 +77,11 @@ public class NodeTypeManager {
 				"OTHER_KEYWORD:TYPE=TREETYPE,CHILDREN=exportAlias|alias|break|continue|return|def|exportDef|new",
 				"OP_LIST:TYPE=TREETYPE,CHILDREN=OP_LEVEL1|OP_LEVEL2|OP_LEVEL3|OP_LEVEL4|OP_LEVEL5|OP_LEVEL6|OP_LEVEL7||OP_LEVEL8|OP_LEVEL9|=|OTHER_KEYWORD|(|)|[|]|{|}",
 				
-				"VAR_DEFINE:TYPE=TREETYPE,DEFINE=CONST_CLASS$ID->CONST_STRING#def,FACTORY=com.ql.util.express.instruction.OperatorInstructionFactory",
+				"VAR_DEFINE:TYPE=TREETYPE,DEFINE=(CONST_CLASS|VClass->CONST_STRING)$ID->CONST_STRING#def,FACTORY=com.ql.util.express.instruction.OperatorInstructionFactory",
 				"EXPORT_VAR_DEFINE:TYPE=TREETYPE,DEFINE=(exportDef^)$CONST_CLASS$ID->CONST_STRING, FACTORY=com.ql.util.express.instruction.OperatorInstructionFactory",
 				"NEW_OBJECT:TYPE=TREETYPE,DEFINE=(new^)$CONST_CLASS$(),FACTORY=com.ql.util.express.instruction.NewInstructionFactory",
 				"NEW_ARRAY:TYPE=TREETYPE,DEFINE=(new^)$CONST_CLASS$([]*),FACTORY=com.ql.util.express.instruction.NewInstructionFactory",
+				"NEW_VIR_OBJECT:TYPE=TREETYPE,DEFINE=(new^)$VClass->CONST_STRING$(),FACTORY=com.ql.util.express.instruction.NewVClassInstructionFactory",
 				"FIELD_CALL:TYPE=TREETYPE,DEFINE=OPDATA$(.^)$ID->CONST_STRING,FACTORY=com.ql.util.express.instruction.OperatorInstructionFactory",
 				"METHOD_CALL:TYPE=TREETYPE,DEFINE=OPDATA$(.^)$(ID->CONST_STRING|FUNCTION_NAME->CONST_STRING)$(),FACTORY=com.ql.util.express.instruction.MethodCallInstructionFactory",
 				"FUNCTION_CALL:TYPE=TREETYPE,DEFINE=(ID->FUNCTION_NAME|FUNCTION_NAME)$()#FUNCTION_CALL,FACTORY=com.ql.util.express.instruction.CallFunctionInstructionFactory",
@@ -95,7 +99,7 @@ public class NodeTypeManager {
 				"EXPRESS_LEVEL8:TYPE=TREETYPE,DEFINE=OPDATA$(OP_LEVEL8^)$OPDATA,FACTORY=com.ql.util.express.instruction.OperatorInstructionFactory",			
 				"EXPRESS_LEVEL9:TYPE=TREETYPE,DEFINE=OPDATA$(OP_LEVEL9^)$OPDATA,FACTORY=com.ql.util.express.instruction.OperatorInstructionFactory",			
 				"EXPRESS_JUDGEANDSET:TYPE=TREETYPE,DEFINE=OPDATA$?$OPDATA$:$OPDATA#EXPRESS_JUDGEANDSET,FACTORY=com.ql.util.express.instruction.IfInstructionFactory",
-				"EXPRESS_KEY_VALUE:TYPE=TREETYPE,DEFINE=OPDATA$(:^)$OPDATA,FACTORY=com.ql.util.express.instruction.OperatorInstructionFactory",
+				"EXPRESS_KEY_VALUE:TYPE=TREETYPE,DEFINE=OPDATA$(:^)$(OPDATA|{}),FACTORY=com.ql.util.express.instruction.KeyValueInstructionFactory",
 				"EXPRESS_ASSIGN:TYPE=TREETYPE,DEFINE=OPDATA$(=^)$OPDATA,FACTORY=com.ql.util.express.instruction.OperatorInstructionFactory",
 				
 				"EXPRESS_RETURN_DATA:TYPE=TREETYPE,DEFINE=(return^)$OPDATA,FACTORY=com.ql.util.express.instruction.OperatorInstructionFactory",
@@ -109,12 +113,12 @@ public class NodeTypeManager {
 				"EXPORT_ALIAS_CALL:TYPE=TREETYPE,DEFINE=(exportAlias^)$ID->CONST_STRING$OPDATA,FACTORY=com.ql.util.express.instruction.OperatorInstructionFactory",
 				"OP_CALL:TYPE=TREETYPE,DEFINE=((FUNCTION_NAME|OP_LIST)^)$(OPDATA*),FACTORY=com.ql.util.express.instruction.OperatorInstructionFactory",
 				
-				"EXPRESS:TYPE=TREETYPE,CHILDREN=EXPORT_VAR_DEFINE|VAR_DEFINE|NEW_OBJECT|NEW_ARRAY|ANONY_NEW_ARRAY|CAST_CALL|ARRAY_CALL|METHOD_CALL|FIELD_CALL|FUNCTION_CALL|EXPRESS_JUDGEANDSET|EXPRESS_KEY_VALUE|EXPRESS_ASSIGN|EXPRESS_LEVEL1|EXPRESS_LEVEL2|EXPRESS_LEVEL3|EXPRESS_LEVEL4|EXPRESS_LEVEL5|EXPRESS_LEVEL6|EXPRESS_LEVEL7|EXPRESS_LEVEL8|EXPRESS_LEVEL9|EXPRESS_RETURN_DATA|EXPRESS_RETURN_NULL|BREAK_CALL|CONTINUE_CALL|ALIAS_CALL|EXPORT_ALIAS_CALL|OP_CALL",
+				"EXPRESS:TYPE=TREETYPE,CHILDREN=EXPORT_VAR_DEFINE|VAR_DEFINE|NEW_OBJECT|NEW_ARRAY|NEW_VIR_OBJECT|ANONY_NEW_ARRAY|CAST_CALL|ARRAY_CALL|METHOD_CALL|FIELD_CALL|FUNCTION_CALL|EXPRESS_JUDGEANDSET|EXPRESS_KEY_VALUE|EXPRESS_ASSIGN|EXPRESS_LEVEL1|EXPRESS_LEVEL2|EXPRESS_LEVEL3|EXPRESS_LEVEL4|EXPRESS_LEVEL5|EXPRESS_LEVEL6|EXPRESS_LEVEL7|EXPRESS_LEVEL8|EXPRESS_LEVEL9|EXPRESS_RETURN_DATA|EXPRESS_RETURN_NULL|BREAK_CALL|CONTINUE_CALL|ALIAS_CALL|EXPORT_ALIAS_CALL|OP_CALL",
 				"OPDATA:TYPE=TREETYPE,CHILDREN=CONST|ID|()|EXPRESS"
 		};
-		protected String statementDefineStrs = "STAT_FUNCTION,STAT_MACRO,STAT_FOR,STAT_IFELSE,STAT_IF,STAT_IFELSE_JAVA,STAT_IF_JAVA";
+		protected String statementDefineStrs = "STAT_FUNCTION,STAT_CLASS,STAT_MACRO,STAT_FOR,STAT_IFELSE,STAT_IF,STAT_IFELSE_JAVA,STAT_IF_JAVA";
 		protected String[] expressDefineStrs = {
-				"EXPORT_VAR_DEFINE,VAR_DEFINE,NEW_OBJECT,NEW_ARRAY,ARRAY_CALL,METHOD_CALL,FIELD_CALL,FUNCTION_CALL",
+				"EXPORT_VAR_DEFINE,VAR_DEFINE,NEW_OBJECT,NEW_ARRAY,NEW_VIR_OBJECT,ARRAY_CALL,METHOD_CALL,FIELD_CALL,FUNCTION_CALL",
 				"ANONY_NEW_ARRAY",
 				"CAST_CALL",
 				"EXPRESS_LEVEL1", "EXPRESS_LEVEL2", "EXPRESS_LEVEL3",

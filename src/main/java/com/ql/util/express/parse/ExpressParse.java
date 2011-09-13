@@ -2,7 +2,9 @@ package com.ql.util.express.parse;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 
 import org.apache.commons.logging.Log;
@@ -60,7 +62,7 @@ public class ExpressParse {
 	 * @return
 	 * @throws Exception
 	 */
-	public List<ExpressNode> transferWord2ExpressNode(ExpressPackage aRootExpressPackage,Word[] wordObjects) throws Exception{
+	public List<ExpressNode> transferWord2ExpressNode(ExpressPackage aRootExpressPackage,Word[] wordObjects,Map<String,String> selfClassDefine) throws Exception{
 		List<ExpressNode> result = new ArrayList<ExpressNode>();
 		String tempWord;
 		NodeType tempType;
@@ -224,6 +226,9 @@ public class ExpressParse {
 						objectValue = tmpClass;
 					}else if(this.nodeTypeManager.isFunction(tempWord)){
 						tempType = nodeTypeManager.findNodeType("FUNCTION_NAME");
+						point = point + 1;
+					}else if(selfClassDefine != null && selfClassDefine.containsKey(tempWord)){
+						tempType = nodeTypeManager.findNodeType("VClass");
 						point = point + 1;
 				    }else{
 						tempType = nodeTypeManager.findNodeType("ID");
@@ -452,7 +457,35 @@ public class ExpressParse {
 		printTreeNode(builder,node,level);
 		return builder.toString();
 	}
-	public ExpressNode parse(ExpressPackage rootExpressPackage,String express,boolean isTrace) throws Exception{
+	
+    public static void resetParent(ExpressNode node,ExpressNode parent){
+		node.setParent(parent);
+		List<ExpressNode> leftChildren = node.getLeftChildren();
+		if (leftChildren != null && leftChildren.size() > 0) {
+			for (ExpressNode item : leftChildren) {
+				resetParent(item,node);
+			}
+		}
+		List<ExpressNode> rightChildren = node.getRightChildren();
+		if (rightChildren != null && rightChildren.size() > 0) {
+			for (ExpressNode item : rightChildren) {
+				resetParent(item,node);
+			}
+		}    	
+    }
+    /**
+     * 提取自定义的Class
+     * @param words
+     * @return
+     */
+	public static void fetchSelfDefineClass(Word[] words,Map<String,String> selfDefineClass){
+		for(int i=0;i<words.length -1;i++){
+			if("class".equals(words[i].word)){
+				selfDefineClass.put(words[i+1].word, words[i+1].word);
+			}
+		}
+	}
+	public ExpressNode parse(ExpressPackage rootExpressPackage,String express,boolean isTrace,Map<String,String> selfDefineClass) throws Exception{
 		Word[] words = WordSplit.parse(this.nodeTypeManager,express);
 		if(isTrace == true && log.isDebugEnabled()){
 			log.debug("执行的表达式:" + express);	
@@ -462,7 +495,14 @@ public class ExpressParse {
 		if(isTrace == true && log.isDebugEnabled()){
 			log.debug("预处理后结果:" + WordSplit.getPrintInfo(words,","));  
 		}
-    	List<ExpressNode> tempList = this.transferWord2ExpressNode(rootExpressPackage,words);
+		
+		//提取自定义Class
+		if(selfDefineClass == null){
+			selfDefineClass = new HashMap<String,String>();
+		}
+		fetchSelfDefineClass(words,selfDefineClass);
+		
+    	List<ExpressNode> tempList = this.transferWord2ExpressNode(rootExpressPackage,words,selfDefineClass);
     	if(isTrace == true && log.isDebugEnabled()){
     		log.debug("单词分析结果:" + printInfo(tempList,","));
     	}
@@ -477,6 +517,10 @@ public class ExpressParse {
     		printTreeNode(root,1);
     	}
 		buildExpressTree(root);
+
+		//为了生成代码时候进行判断，需要设置每个节点的父亲
+    	resetParent(root,null);
+    	
     	if(isTrace == true && log.isDebugEnabled()){
     		log.debug("最后的语法树:" );
     		printTreeNode(root,1);
@@ -491,7 +535,7 @@ public class ExpressParse {
 		Word[] words = WordSplit.parse(manager,condition);
 			log.debug("执行的表达式:" + condition);	
 			log.debug("单词分解结果:" + WordSplit.getPrintInfo(words,","));  
-    	List<ExpressNode> tempList = parse.transferWord2ExpressNode(null,words);    	
+    	List<ExpressNode> tempList = parse.transferWord2ExpressNode(null,words,null);    	
     		log.debug("单词分析结果:" + printInfo(tempList,","));
     	ExpressNode root = parse.splitExpressBlock(tempList);
     	printTreeNode(root,1);
@@ -507,7 +551,7 @@ public class ExpressParse {
 		String condition="if 1 == 1 then  true ;";
 		NodeTypeManager manager = new NodeTypeManager();
 		ExpressParse parse = new ExpressParse(manager,null,false);
-		parse.parse(null,condition,true);
+		parse.parse(null,condition,true,null);
   }
 	   protected static String printInfo(List<ExpressNode> list,String splitOp){
 		  	StringBuffer buffer = new StringBuffer();
