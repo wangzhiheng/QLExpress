@@ -60,7 +60,7 @@ class StatementDefine{
 		Word[] words = WordSplit.parse(manager, condition);
 		log.debug("执行的表达式:" + condition);
 		log.debug("单词分解结果:" + WordSplit.getPrintInfo(words, ","));
-		List<ExpressNode> tempList = parse.transferWord2ExpressNode(null,words);
+		List<ExpressNode> tempList = parse.transferWord2ExpressNode(null,words,null);
 		log.debug("单词分析结果:" + ExpressParse.printInfo(tempList, ","));
 		ExpressNode root = parse.splitExpressBlock(tempList);
 		ExpressParse.printTreeNode(root, 1);
