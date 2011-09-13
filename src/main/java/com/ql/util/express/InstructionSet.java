@@ -30,8 +30,10 @@ public class InstructionSet {
 	private static final Log log = LogFactory.getLog(InstructionSet.class);
 	public static AtomicInteger uniqIndex = new AtomicInteger(1);
 	public static String TYPE_MAIN ="main";
+	public static String TYPE_CLASS ="VClass";
 	public static String TYPE_FUNCTION ="function";
 	public static String TYPE_MARCO ="marco";
+	
 	
 	private String type ="main";
 	private String name;
@@ -233,22 +235,35 @@ public boolean hasMain(){
 public String getType() {
 	return type;
 }
-
-	public String toString() {
+public void appendSpace(StringBuffer buffer,int level){
+	for(int i=0;i<level;i++){
+		buffer.append("    ");
+	}
+}
+public String toString() {
+	return "\n" + toString(0);
+}
+	public String toString(int level) {
 		try {
 			StringBuffer buffer = new StringBuffer();
 			// 输出宏定义
 			for (FunctionInstructionSet set : this.functionDefine.values()) {
-				buffer.append(set.type + ":" + set.name).append("\n");
-				buffer.append(set.instructionSet);
+				appendSpace(buffer,level);
+				buffer.append(set.type + ":" + set.name).append("(");
+				for (int i=0;i<set.instructionSet.parameterList.size();i++) {
+				    OperateDataLocalVar var = set.instructionSet.parameterList.get(i);
+				    if(i > 0){
+				    	buffer.append(",");
+				    }
+					buffer.append(var.getType(null).getName()).append(" ").append(var.getName());
+				}
+				buffer.append("){\n");
+				buffer.append(set.instructionSet.toString(level + 1));
+				appendSpace(buffer,level);
+				buffer.append("}\n");
 			}
-			// 参数
-			for (OperateDataLocalVar var : this.parameterList) {
-				buffer.append("参数 ：" + var.getName()).append(" ")
-						.append(var.getType(null)).append("\n");
-			}
-			buffer.append("指令集：\n");
 			for (int i = 0; i < this.instructionList.length; i++) {
+				appendSpace(buffer,level);
 				buffer.append(i + 1).append(":").append(this.instructionList[i])
 						.append("\n");
 			}
