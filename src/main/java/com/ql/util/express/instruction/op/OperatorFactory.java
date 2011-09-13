@@ -127,5 +127,11 @@ public class OperatorFactory {
 			throw new Exception("没有为\"" + opItem.getValue() + "\"定义操作符处理对象");
 		return op;
 	}
-
+	public OperatorBase newInstance(String opName) throws Exception {
+		OperatorBase op = operator.get(opName);
+		if (op == null){
+			throw new Exception("没有为\"" + opName + "\"定义操作符处理对象");
+		}	
+		return op;		
+	}
 }

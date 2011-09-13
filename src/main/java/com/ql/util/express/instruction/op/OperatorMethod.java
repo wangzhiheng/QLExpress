@@ -6,6 +6,7 @@ import com.ql.util.express.ExpressUtil;
 import com.ql.util.express.InstructionSetContext;
 import com.ql.util.express.OperateData;
 import com.ql.util.express.instruction.opdata.OperateClass;
+import com.ql.util.express.instruction.opdata.OperateDataVirClass;
 
 public class OperatorMethod extends OperatorBase {
 	public OperatorMethod() {
@@ -15,7 +16,18 @@ public class OperatorMethod extends OperatorBase {
 	static Class<?> ArrayClass = (new Object[]{}).getClass();
 	
 	public OperateData executeInner(InstructionSetContext<String,Object> parent, OperateData[] list) throws Exception {
+		
 		Object obj = list[0].getObject(parent);
+		if(obj instanceof OperateDataVirClass ){
+			OperateDataVirClass vClass = (OperateDataVirClass)obj;
+			String methodName = list[1].getObject(parent).toString();
+			OperateData[] parameters = new OperateData[list.length - 2];
+			for(int i=0;i< list.length -2;i++){
+				parameters[i] =list[i+2];
+			}
+			return vClass.callSelfFunction(methodName, parameters);
+		}
+		
 		String methodName = list[1].getObject(parent).toString();
 		if (obj == null) {
 			// 对象为空，不能执行方法
