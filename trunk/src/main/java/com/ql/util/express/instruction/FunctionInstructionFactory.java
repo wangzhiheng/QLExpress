@@ -18,7 +18,15 @@ public class FunctionInstructionFactory extends InstructionFactory {
 		String functionName =children[0].getValue();
     	ExpressNode[] varDefines = children[1].getChildren();
     	int point =0;
-    	InstructionSet functionSet = new InstructionSet(InstructionSet.TYPE_FUNCTION);
+
+		String  instructionSetType ="";
+		if (node.isTypeEqualsOrChild("class")) {
+			instructionSetType = InstructionSet.TYPE_CLASS;
+		} else {
+			instructionSetType = InstructionSet.TYPE_FUNCTION;
+		}
+		InstructionSet functionSet = new InstructionSet(instructionSetType);
+    	
     	while(point<varDefines.length){
     		if(varDefines[point].isTypeEqualsOrChild("def") == false){
     		  throw new Exception("function的参数定义错误," + varDefines[point] + "不是一个Class");
@@ -35,7 +43,7 @@ public class FunctionInstructionFactory extends InstructionFactory {
 			functionRoot.addLeftChild(tempNode);
 		}
 		aCompile.createInstructionSet(functionRoot,functionSet);		
-		result.addMacroDefine(functionName, new FunctionInstructionSet(functionName,"function",functionSet));
+		result.addMacroDefine(functionName, new FunctionInstructionSet(functionName,instructionSetType,functionSet));
 		return false;
 	}
 }
