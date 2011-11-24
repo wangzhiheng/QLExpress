@@ -102,7 +102,9 @@ public class ExpressParse {
 				  if(result.get(result.size() -1).getValue().equals("-")){
 					  if(result.size() == 1 
 						 || result.size() >=2 
-						    && result.get(result.size() - 2).isTypeEqualsOrChild("OP_LIST")
+						    && (   result.get(result.size() - 2).isTypeEqualsOrChild("OP_LIST")
+						        || result.get(result.size() - 2).isTypeEqualsOrChild(",")
+						        ) 
 						    && result.get(result.size() - 2).isTypeEqualsOrChild(")")==false
 						    && result.get(result.size() - 2).isTypeEqualsOrChild("]")==false 
 						    ){
