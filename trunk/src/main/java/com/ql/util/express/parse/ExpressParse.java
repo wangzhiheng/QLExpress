@@ -12,6 +12,9 @@ import org.apache.commons.logging.LogFactory;
 
 import com.ql.util.express.ExpressUtil;
 import com.ql.util.express.IExpressResourceLoader;
+import com.ql.util.express.match.QLMatchResult;
+import com.ql.util.express.match.QLPattern;
+import com.ql.util.express.match.QLPatternNode;
 
 public class ExpressParse {
 
@@ -29,7 +32,7 @@ public class ExpressParse {
 	}
 	protected Word[] getExpressByName(String expressFileName) throws Exception{
 		String express = this.expressResourceLoader.loadExpress(expressFileName);
-		return WordSplit.parse(nodeTypeManager, express);
+		return WordSplit.parse(nodeTypeManager.splitWord, express);
 	}
 	protected  Word[] dealInclude(Word[] wordObjects) throws Exception{
 	    boolean isInclude = false;
@@ -62,31 +65,33 @@ public class ExpressParse {
 	 * @return
 	 * @throws Exception
 	 */
-	public List<ExpressNode> transferWord2ExpressNode(ExpressPackage aRootExpressPackage,Word[] wordObjects,Map<String,String> selfClassDefine) throws Exception{
+	public List<ExpressNode> transferWord2ExpressNode(ExpressPackage aRootExpressPackage,Word[] wordObjects,Map<String,String> selfClassDefine,boolean dealJavaClass) throws Exception{
 		List<ExpressNode> result = new ArrayList<ExpressNode>();
 		String tempWord;
 		NodeType tempType;
-		ExpressPackage  tmpImportPackage = new ExpressPackage(aRootExpressPackage);  
-
-	    //先处理import，import必须放在文件的最开始，必须以;结束
-	    boolean isImport = false;
-	    StringBuffer importName = new StringBuffer();
 	    int point = 0;
-	    while(point <wordObjects.length ){
-	      if(wordObjects[point].word.equals("import") ==true){
-	    	  isImport = true;
-	    	  importName.setLength(0);
-	      }else if(wordObjects[point].word.equals(";") ==true) {
-	    	  isImport = false;
-	    	  tmpImportPackage.addPackage(importName.toString());
-	      }else if(isImport == true){
-	    	  importName.append(wordObjects[point].word);
-	      }else{
-	    	  break;
-	      }
-	      point = point + 1;
-	    }
-	    
+		ExpressPackage  tmpImportPackage = null;
+		if(dealJavaClass==true){
+			tmpImportPackage = new ExpressPackage(aRootExpressPackage);  
+		    //先处理import，import必须放在文件的最开始，必须以;结束
+		    boolean isImport = false;
+		    StringBuffer importName = new StringBuffer();
+		    while(point <wordObjects.length ){
+		      if(wordObjects[point].word.equals("import") ==true){
+		    	  isImport = true;
+		    	  importName.setLength(0);
+		      }else if(wordObjects[point].word.equals(";") ==true) {
+		    	  isImport = false;
+		    	  tmpImportPackage.addPackage(importName.toString());
+		      }else if(isImport == true){
+		    	  importName.append(wordObjects[point].word);
+		      }else{
+		    	  break;
+		      }
+		      point = point + 1;
+		    }			
+		}
+
 		String orgiValue = null;
 		Object objectValue = null;
 		NodeType treeNodeType = null;
@@ -184,44 +189,35 @@ public class ExpressParse {
 			  point = point + 1;
 		  }else {
 				tempType = nodeTypeManager.isExistNodeTypeDefine(tempWord);
+				if(tempType != null && tempType.getKind() != NodeTypeKind.KEYWORD){
+					//不是关键字
+					tempType = null;
+				}
 				if (tempType == null) {
 					boolean isClass = false;
-					int j = point;
-					Class<?> tmpClass = null;
 					String tmpStr = "";
-					while (j < wordObjects.length) {
-						tmpStr = tmpStr + wordObjects[j].word;
-						tmpClass = tmpImportPackage.getClass(tmpStr);
-						if (tmpClass != null) {
-							point = j + 1;
-							isClass = true;
-							break;
-						}
-						if (j < wordObjects.length - 1 && wordObjects[j + 1].word.equals(".") == true) {
-							tmpStr = tmpStr + wordObjects[j + 1].word;
-							j = j + 2;
-							continue;
-						} else {
-							break;
-						}
-					}
-					if (isClass == true) {
-						// 处理数组问题
-						String arrayStr = "";
-						int tmpPoint = point;
-						while (tmpPoint < wordObjects.length) {
-							if (wordObjects[tmpPoint].word.equals("[]")) {
-								arrayStr = arrayStr + "[]";
-								tmpPoint = tmpPoint + 1;
+					Class<?> tmpClass = null;
+					if (dealJavaClass == true) {
+						int j = point;
+						while (j < wordObjects.length) {
+							tmpStr = tmpStr + wordObjects[j].word;
+							tmpClass = tmpImportPackage.getClass(tmpStr);
+							if (tmpClass != null) {
+								point = j + 1;
+								isClass = true;
+								break;
+							}
+							if (j < wordObjects.length - 1
+									&& wordObjects[j + 1].word.equals(".") == true) {
+								tmpStr = tmpStr + wordObjects[j + 1].word;
+								j = j + 2;
+								continue;
 							} else {
 								break;
 							}
 						}
-						if (arrayStr.length() > 0) {
-							tmpStr = tmpStr + arrayStr;
-							tmpClass = ExpressUtil.getJavaClass(ExpressUtil.getClassName(tmpClass) + arrayStr);
-							point = tmpPoint;
-						}
+					}
+					if (isClass == true){
 						tempWord = ExpressUtil.getClassName(tmpClass);
 						orgiValue = tmpStr;
 						tempType = nodeTypeManager.findNodeType("CONST_CLASS");
@@ -240,7 +236,6 @@ public class ExpressParse {
 					point = point + 1;
 				}
 		  }	  
-		  //System.out.println(tempWord+":" +objectValue + ":" + (objectValue == null?"":objectValue.getClass()));
 		  result.add(new ExpressNode(tempType,tempWord,orgiValue,objectValue,treeNodeType,tmpWordObject.line,tmpWordObject.col));
 		  treeNodeType = null;
 		  objectValue = null;
@@ -337,7 +332,7 @@ public class ExpressParse {
     			i = startPoint + 1;
     			startPoint = i;
     		}else{
-    			MatchResult matchResult = findMatchStatement(children,i,nodeTypeManager.statementDefine);
+    			QLMatchResult matchResult = findMatchStatement(children,i,nodeTypeManager.statementDefine);
     			if(matchResult != null){
     				ExpressNode tempRoot = buildStatementTree(children,i,matchResult);
     				splitStatement(tempRoot);
@@ -386,12 +381,12 @@ public class ExpressParse {
 		for (List<NodeType> expressLevel : nodeTypeManager.expressDefine){
 			int i = 0;
 			while (i < nodes.size()) {
-				MatchResult matchResult = findMatchStatement(nodes, i, expressLevel);
+				QLMatchResult matchResult = findMatchStatement(nodes, i, expressLevel);
 				if (matchResult != null ) {
 					buildStatementTree(nodes, i, matchResult);
 					if(i == nodes.size() -1 && nodes.get(i).getRealTreeType() != null){
 						break;
-					}else if(matchResult.matchLastIndex - i == 1){
+					}else if(matchResult.getMatchLastIndex() - i == 1){
 						i = i+1;
 					}
 				}else{
@@ -401,20 +396,32 @@ public class ExpressParse {
 		}
 	}
 
-    public ExpressNode buildStatementTree(List<ExpressNode> nodes,int point,MatchResult matchResult) throws Exception{
-    	ExpressNode root = StatementDefine.builderStatementTree(nodes, point, matchResult);
-    	root.setTreeType(matchResult.statementNodeType);
+    public ExpressNode buildStatementTree(List<ExpressNode> nodes,int point,QLMatchResult matchResult) throws Exception{
+    	ExpressNode root = builderStatementTree(nodes, point, matchResult);
+    	root.setTreeType((NodeType)matchResult.statementNodeType);
         nodes.set(point,root);
     	return root;
     }
-    public MatchResult findMatchStatement(List<ExpressNode> nodes,int point,List<NodeType> aStatementDefines) throws Exception{
+    
+	public static ExpressNode builderStatementTree(List<ExpressNode> nodes,int point,QLMatchResult match) throws Exception{
+		if(match == null || match.getMatchs() == null || match.getMatchs().size() != 1){
+			throw new Exception("语法定义错误，必须有且只有一个根节点");
+		}
+		match.getMatchs().get(0).buildExpressNodeTree();		
+		for(int i = match.getMatchLastIndex() - 1; i > point;i--){
+			nodes.remove(i);
+		}
+		nodes.set(point,(ExpressNode)match.getMatchs().get(0).getRef());
+		return (ExpressNode)match.getMatchs().get(0).getRef();		
+	}
+    
+    public QLMatchResult findMatchStatement(List<ExpressNode> nodes,int point,List<NodeType> aStatementDefines) throws Exception{
     	for(int i =0;i<aStatementDefines.size();i++){
-    		StatementDefine statement = aStatementDefines.get(i).getStatementDefine();
-			//System.out.println("match:" + statement + ":" + point + ":" + nodes);
+    		QLPatternNode statement = aStatementDefines.get(i).getPatternNode();
     		if(statement == null){ 
     			throw new RuntimeException("没有为" + aStatementDefines.get(i).getTag() +"定义语法规则DEFINE,检查定义：" + aStatementDefines.get(i).getDefineStr());
     		}
-    		MatchResult  result = statement.findMatchStatement(this.nodeTypeManager,nodes, point);
+    		QLMatchResult  result =QLPattern.findMatchStatement(this.nodeTypeManager,statement,nodes, point);
     		if(result != null){
     			result.statementNodeType = aStatementDefines.get(i);
     			return result;
@@ -488,7 +495,7 @@ public class ExpressParse {
 		}
 	}
 	public ExpressNode parse(ExpressPackage rootExpressPackage,String express,boolean isTrace,Map<String,String> selfDefineClass) throws Exception{
-		Word[] words = WordSplit.parse(this.nodeTypeManager,express);
+		Word[] words = WordSplit.parse(this.nodeTypeManager.splitWord,express);
 		if(isTrace == true && log.isDebugEnabled()){
 			log.debug("执行的表达式:" + express);	
 			log.debug("单词分解结果:" + WordSplit.getPrintInfo(words,","));  
@@ -504,7 +511,7 @@ public class ExpressParse {
 		}
 		fetchSelfDefineClass(words,selfDefineClass);
 		
-    	List<ExpressNode> tempList = this.transferWord2ExpressNode(rootExpressPackage,words,selfDefineClass);
+    	List<ExpressNode> tempList = this.transferWord2ExpressNode(rootExpressPackage,words,selfDefineClass,true);
     	if(isTrace == true && log.isDebugEnabled()){
     		log.debug("单词分析结果:" + printInfo(tempList,","));
     	}
@@ -530,32 +537,7 @@ public class ExpressParse {
 		return root;
 	}
 
-	public static void main(String[] args) throws Exception {
-		String condition="/** a **/";
-		NodeTypeManager manager = new NodeTypeManager();
-		ExpressParse parse = new ExpressParse(manager,null,false);
-		Word[] words = WordSplit.parse(manager,condition);
-			log.debug("执行的表达式:" + condition);	
-			log.debug("单词分解结果:" + WordSplit.getPrintInfo(words,","));  
-    	List<ExpressNode> tempList = parse.transferWord2ExpressNode(null,words,null);    	
-    		log.debug("单词分析结果:" + printInfo(tempList,","));
-    	ExpressNode root = parse.splitExpressBlock(tempList);
-    	printTreeNode(root,1);
-    	List<NodeType> statement = new ArrayList<NodeType>();
-    	statement.add(manager.findNodeType("STAT_IF"));
-    	MatchResult result = parse.findMatchStatement(root.getLeftChildren(),0,statement);
-    	parse.buildStatementTree(root.getLeftChildren(),0,result);
-    	System.out.println("匹配结果："+ result);
-    	printTreeNode(root,1);
-
-	}
-	public static void main2(String[] args) throws Exception {
-		String condition="if 1 == 1 then  true ;";
-		NodeTypeManager manager = new NodeTypeManager();
-		ExpressParse parse = new ExpressParse(manager,null,false);
-		parse.parse(null,condition,true,null);
-  }
-	   protected static String printInfo(List<ExpressNode> list,String splitOp){
+	   public static String printInfo(List<ExpressNode> list,String splitOp){
 		  	StringBuffer buffer = new StringBuffer();
 			for(int i=0;i<list.size();i++){
 				if(i > 0){buffer.append(splitOp);}

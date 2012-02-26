@@ -6,8 +6,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class NodeTypeManager {
-	private String[] keyWords;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import com.ql.util.express.match.INodeTypeManager;
+
+public class NodeTypeManager implements INodeTypeManager {
+	private static final Log log = LogFactory.getLog(NodeTypeManager.class);
+	
+		public String[] splitWord;
+		private String[] keyWords;
 		private String[] nodeTypeDefines;
 		protected String statementDefineStrs;
 		protected String[] expressDefineStrs;
@@ -26,6 +34,7 @@ public class NodeTypeManager {
 	    	this(new KeyWordDefine4Java());
 	    }
 	    public NodeTypeManager(KeyWordDefine4SQL keyWorkdDefine){
+	    	this.splitWord = keyWorkdDefine.splitWord;
 			this.keyWords = keyWorkdDefine.keyWords;
 			this.nodeTypeDefines = keyWorkdDefine.nodeTypeDefines;
 			this.statementDefineStrs = keyWorkdDefine.statementDefineStrs;
@@ -34,6 +43,7 @@ public class NodeTypeManager {
 	    	
 	    }
 	    public NodeTypeManager(KeyWordDefine4Java keyWorkdDefine){
+	    	this.splitWord = keyWorkdDefine.splitWord;
 			this.keyWords = keyWorkdDefine.keyWords;
 			this.nodeTypeDefines = keyWorkdDefine.nodeTypeDefines;
 			this.statementDefineStrs = keyWorkdDefine.statementDefineStrs;
@@ -46,9 +56,12 @@ public class NodeTypeManager {
 	    
 		public void initial() {
 			//创建所有的关键字
-			NodeType[] tempKeyWordNodeTypes = new NodeType[keyWords.length];
-			for (int i = 0; i < tempKeyWordNodeTypes.length; i++) {
-				tempKeyWordNodeTypes[i] = this.createNodeType(keyWords[i] + ":TYPE=KEYWORD");
+			NodeType[] tempKeyWordNodeTypes = new NodeType[splitWord.length + keyWords.length];
+			for (int i = 0; i < splitWord.length; i++) {
+				tempKeyWordNodeTypes[i] = this.createNodeType(splitWord[i] + ":TYPE=KEYWORD");
+			}
+			for (int i = 0 ; i < keyWords.length; i++) {
+				tempKeyWordNodeTypes[i + splitWord.length] = this.createNodeType(keyWords[i] + ":TYPE=KEYWORD");
 			}
 			// 初始化所有的类型信息，
 			for (int i = 0; i < tempKeyWordNodeTypes.length; i++) {
@@ -91,7 +104,8 @@ public class NodeTypeManager {
 		String name = aDefineStr.substring(0,index).trim();
 		NodeType define = nodeTypes.get(name);
 		if(define != null ){
-			throw new RuntimeException("节点类型定义重复:"+name+" 定义1="+define.getDefineStr() + " 定义2=" + aDefineStr);
+			log.warn("节点类型定义重复:"+name+" 定义1="+define.getDefineStr() + " 定义2=" + aDefineStr);
+		//	throw new RuntimeException("节点类型定义重复:"+name+" 定义1="+define.getDefineStr() + " 定义2=" + aDefineStr);
 		}
 		define = new NodeType(this,name,aDefineStr);
 		nodeTypes.put(name, define);
@@ -102,6 +116,7 @@ public class NodeTypeManager {
 	 * @param name
 	 * @return
 	 */
+	@Override
 	public NodeType findNodeType(String name){		
 		NodeType result = nodeTypes.get(name);
 		if(result == null){
@@ -153,6 +168,14 @@ public class NodeTypeManager {
 		  result = result.getRealNodeType();
 		}
 		return result;
+	}
+	public boolean isSplitWord(String word){
+		for(String s: this.splitWord){
+			if(s.equals(word)){
+				return true;
+			}
+		}
+		return false;
 	}
 	/**
 	 * 递归判断节点类型是否匹配，例如 :

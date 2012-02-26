@@ -3,8 +3,11 @@ package com.ql.util.express.parse;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.ql.util.express.match.IDataNode;
+import com.ql.util.express.match.INodeType;
 
-public class ExpressNode{
+
+public class ExpressNode implements IDataNode{
 	/**
 	 * 节点类型
 	 */
@@ -62,9 +65,9 @@ public class ExpressNode{
 	}
 	
 	public NodeType isEqualsOrChildAndReturn(NodeType parent){
-	    NodeType result = this.getTreeType().isEqualsOrChildAndReturn(parent);
+	    NodeType result = (NodeType)this.getTreeType().isEqualsOrChildAndReturn(parent);
 	    if(result == null && this.treeType != null){
-	 		result = this.getNodeType().isEqualsOrChildAndReturn(parent);
+	 		result = (NodeType)this.getNodeType().isEqualsOrChildAndReturn(parent);
 	 	}
 	 	return result;
 	}
@@ -219,5 +222,20 @@ public class ExpressNode{
 		  String str =  (this.orgiValue == null ? this.getValue():this.orgiValue) + (this.nodeType.getTag() == null?"":(":" + this.nodeType.getTag()));
 		 // return str + "[" + this.line +"," + this.col +"]";
 		  return str;
+	}
+	public IDataNode createExpressNode(INodeType aType, String aValue) throws Exception {
+		 return new ExpressNode((NodeType)aType,aValue);
+	}
+	public void setNodeType(INodeType type) {
+	   this.setNodeType((NodeType)type);
+		
+	}
+	@Override
+	public void addLeftChild(IDataNode ref) {
+		this.addLeftChild((ExpressNode)ref);
+	}
+	@Override
+	public void setTreeType(INodeType aTreeType) {
+		 this.setTreeType((NodeType)aTreeType);
 	}
 }
