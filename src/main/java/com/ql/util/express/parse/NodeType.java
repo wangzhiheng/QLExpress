@@ -1,13 +1,21 @@
 package com.ql.util.express.parse;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import com.ql.util.express.match.INodeType;
+import com.ql.util.express.match.QLPattern;
+import com.ql.util.express.match.QLPatternNode;
 
 enum NodeTypeKind {
-	KEYWORD,CONST,BLOCK,EXPRESS,SYMBOL,DEFINE,TREETYPE,OPERATOR
+	KEYWORD,CONST,BLOCK,EXPRESS,OPERATOR,WORDDEF,GROUP,STATEMENT
 }
-public class NodeType {
+public class NodeType implements INodeType {
 		NodeTypeManager manager;
 		private String defineStr;
 		private NodeTypeKind kind;
@@ -18,7 +26,8 @@ public class NodeType {
 		private String operatorName;
 		private String instructionFactory;
 		private NodeType targetStatementRoot;
-		private StatementDefine statementDefine;
+		private QLPatternNode qlPatternNode;
+		//private StatementDefine statementDefine;
 		private NodeType realNodeType;
 		private NodeType[] children;
 		
@@ -52,8 +61,8 @@ public class NodeType {
 			if(this.targetStatementRoot == null){
 				result.append(",TARGETROOT=" + this.targetStatementRoot);
 			}
-			if(this.statementDefine != null){
-				result.append(",DEFINE=").append(this.statementDefine);
+			if(this.qlPatternNode != null){
+				result.append(",DEFINE=").append(this.qlPatternNode);
 			}
 			return result.toString();
 		}
@@ -63,15 +72,29 @@ public class NodeType {
 			this.name =aName;
 		}
 		
+		public static String[][] splitProperties(String str){
+			Pattern p = Pattern.compile("(,|:)\\s*(([A-Z]|-|_)*)\\s*=");
+			Matcher matcher = p.matcher(str);
+			List<String[]> list = new ArrayList<String[]>();
+			int endIndex = 0;
+			while(matcher.find()){
+				if(list.size() >0){
+					list.get(list.size() -1)[1] = str.substring(endIndex, matcher.start()).trim();
+				}
+				list.add(new String[2]);
+				list.get(list.size() -1)[0] = str.substring(matcher.start() + 1, matcher.end() - 1 ).trim();
+				endIndex = matcher.end();
+			}
+			if(list.size() > 0){
+				list.get(list.size() -1)[1] = str.substring(endIndex).trim();
+			}
+			return (String[][])list.toArray(new String[0][2]);
+		}		
 		public void initial(){
 			try{
 			int index = this.defineStr.indexOf(":",1);
-			String[] properties = this.defineStr.substring(index + 1).split(",");
-			for(String p:properties){
-				String[] tempList = new String[2];
-				int point = p.indexOf("=");
-				tempList[0] = p.substring(0,point).trim();
-				tempList[1] = p.substring(point + 1).trim();			
+			String[][] properties = splitProperties(this.defineStr.substring(index));
+			for(String[] tempList:properties){			
 				if(tempList[0].equalsIgnoreCase("type")){
 					this.setKind(NodeTypeKind.valueOf(tempList[1]));
 				}else if(tempList[0].equalsIgnoreCase("tag")){
@@ -95,7 +118,7 @@ public class NodeType {
 						children[i] = manager.findNodeType(childrenStrs[i].trim());
 					}
 				}else if(tempList[0].equalsIgnoreCase("define")){
-					this.statementDefine = StatementDefine.createStatementDefine(manager, tempList[1]);
+					this.qlPatternNode = QLPattern.createPattern(this.manager,tempList[1]);
 				}else{
 					throw new RuntimeException("不能识别\""+ this.name + "\"的属性类型："+ tempList[0] + " 定义：" + this.defineStr);
 				}
@@ -128,8 +151,9 @@ public class NodeType {
 		public boolean isEqualsOrChild(NodeType parent){
 			return this.isEqualsOrChildAndReturn(parent) != null;
 		}
-		public NodeType isEqualsOrChildAndReturn(NodeType parent){
-			if(parent.isContainerChild(this)){
+		
+		public INodeType isEqualsOrChildAndReturn(INodeType parent){
+			if(((NodeType)parent).isContainerChild(this)){
 				return this;
 			}
 			return null;
@@ -167,16 +191,6 @@ public class NodeType {
 		public void setDefineStr(String defineStr) {
 			this.defineStr = defineStr;
 		}
-
-		public StatementDefine getStatementDefine() {
-			return statementDefine;
-		}
-
-		public void setStatementDefine(StatementDefine statementDefine) {
-			this.statementDefine = statementDefine;
-		}
-
-
 		public void setKind(NodeTypeKind kind) {
 			this.kind = kind;
 		}
@@ -261,6 +275,9 @@ public class NodeType {
 		}
 		public void setTargetStatementRoot(NodeType targetStatementRoot) {
 			this.targetStatementRoot = targetStatementRoot;
+		}
+		public QLPatternNode getPatternNode() {
+		   return this.qlPatternNode;
 		}
 
 	}	

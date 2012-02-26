@@ -514,8 +514,12 @@ public class ExpressUtil {
 			if(bean.getClass().isArray() && name.equals("length")){
 			   return ((Object[])bean).length;
 			}else if (bean instanceof Class) {
-				Field f = ((Class<?>) bean).getDeclaredField(name.toString());
-				return f.get(null);
+				if(name.equals("class")){
+					return bean;
+				}else{
+					Field f = ((Class<?>) bean).getDeclaredField(name.toString());
+					return f.get(null);
+				}
 			}else if(bean instanceof Map ){
 				return ((Map<?,?>)bean).get(name);
 		    }else {
@@ -531,8 +535,12 @@ public class ExpressUtil {
 			if(bean.getClass().isArray() && name.equals("length")){
 			   return int.class;
 			}else if (bean instanceof Class) {
-				Field f = ((Class<?>) bean).getDeclaredField(name.toString());
-				return f.getType();
+				if(name.equals("class")){
+					return Class.class;
+				}else{
+					Field f = ((Class<?>) bean).getDeclaredField(name.toString());
+					return f.getType();
+				}
 			}else if(bean instanceof Map ){
 				Object o = ((Map<?,?>)bean).get(name);
 				if(o == null){
