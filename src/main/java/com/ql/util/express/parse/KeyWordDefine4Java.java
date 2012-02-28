@@ -56,8 +56,6 @@ public class KeyWordDefine4Java {
 				
 				"OTHER_KEYWORD:TYPE=GROUP,CHILDREN=exportAlias|alias|break|continue|return|def|exportDef|new",
 				"OP_LIST:TYPE=GROUP,CHILDREN=OP_LEVEL1|OP_LEVEL2|OP_LEVEL3|OP_LEVEL4|OP_LEVEL5|OP_LEVEL6|OP_LEVEL7||OP_LEVEL8|OP_LEVEL9|=|OTHER_KEYWORD|(|)|[|]|{|}",
-
-				
 				
 				"STAT_IFELSE:TYPE=STATEMENT,DEFINE=if^$(()|(((OPDATA|OP_LIST)*)#()))$then$({}|(((OPDATA|OP_LIST|;)*)#{}))$else$({}|(((OPDATA|OP_LIST)*)$(;|EOF)#{})),FACTORY=com.ql.util.express.instruction.IfInstructionFactory",
 				"STAT_IF:TYPE=STATEMENT,    DEFINE=if^$(()|(((OPDATA|OP_LIST)*)#()))$then$({}|(((OPDATA|OP_LIST)*)$(;|EOF)#{})),FACTORY=com.ql.util.express.instruction.IfInstructionFactory",
