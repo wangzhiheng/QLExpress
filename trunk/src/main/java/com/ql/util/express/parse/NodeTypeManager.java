@@ -77,7 +77,10 @@ public class NodeTypeManager implements INodeTypeManager {
 			for (int i = 0; i < nodeTypes.length; i++) {
 				nodeTypes[i].initial();
 			}
-			String[] tempStrList = statementDefineStrs.split("\\,");
+			String[] tempStrList = new String[0];
+			if(statementDefineStrs != null && statementDefineStrs.length() >0){
+				tempStrList = statementDefineStrs.split("\\,");	
+			}
 			for (String item : tempStrList) {
 				statementDefine.add(this.findNodeType(item));
 			}
