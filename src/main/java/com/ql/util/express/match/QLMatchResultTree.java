@@ -22,6 +22,9 @@ public 	class QLMatchResultTree{
 	public IDataNode getRef() {
 		return ref;
 	}
+	public List<QLMatchResultTree> getLeft(){
+		return this.left;
+	}
 	public void addLeft(QLMatchResultTree node){
 		if(this.left == null){
 			this.left = new ArrayList<QLMatchResultTree>();

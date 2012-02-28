@@ -25,6 +25,7 @@ public class QLPattern {
 		List<QLMatchResultTree> tempList = new ArrayList<QLMatchResultTree>();
 		int count = 0;
 		int lastPoint = point;
+		
 		while(true){
 			QLMatchResult tempResult = null;
 			if (pattern.matchMode == MatchMode.DETAIL) {
@@ -46,7 +47,19 @@ public class QLPattern {
 				break;
 			}else{
 				lastPoint = tempResult.matchLastIndex;
-				tempList.addAll(tempResult.matchs);
+				if(pattern.isTreeRoot == true){
+					if(tempResult.matchs.size() > 1){
+						throw new Exception("根节点的数量必须是1");
+					}
+					if(tempList.size() == 0){
+						tempList.addAll(tempResult.matchs);
+					}else{	
+						tempResult.matchs.get(0).addLeftAll(tempList);
+						tempList = tempResult.matchs;
+					}
+				}else{
+				   tempList.addAll(tempResult.matchs);
+				}
 			}
 			count = count + 1;			
 			if(count == pattern.maxMatchNum){
@@ -54,13 +67,17 @@ public class QLPattern {
 				break;
 			}
 		}
+		if(result != null && pattern.isSkip == true){
+			//忽略跳过所有匹配到的节点
+			result.matchs.clear();
+		}
 		if(result != null && result.matchs.size() >0 && pattern.rootNodeType != null){
 			QLMatchResultTree tempTree = new QLMatchResultTree(pattern.rootNodeType,nodes.get(0).createExpressNode(pattern.rootNodeType,null));
 			tempTree.addLeftAll(result.matchs);
 			result.matchs.clear();
 			result.matchs.add(tempTree);
 		}
-		if(isRoot == true && log.isTraceEnabled() && result !=null){
+		if( log.isTraceEnabled() && result !=null){
 			if(point >= nodes.size()){
 				log.trace("匹配[start=" + point+":EOF]：" + pattern + (result==null?" NO ":" OK ") );
 			}else{
@@ -130,7 +147,11 @@ public class QLPattern {
 						if (tempResult.matchs.size() > 1)
 							throw new Exception("根节点的数量必须是1");
 						if (root == null) {
-							tempResult.matchs.get(0).addLeftAll(tempList);
+							QLMatchResultTree tempTree = tempResult.matchs.get(0);
+							while(tempTree.getLeft()!= null && tempTree.getLeft().size()>0){
+								tempTree = tempTree.getLeft().get(0);
+							}
+							tempTree.addLeftAll(tempList);
 							tempList.clear();
 						} else {
 							tempResult.matchs.get(0).addLeft(root);
@@ -148,11 +169,7 @@ public class QLPattern {
 			if(root != null){
 				tempList.add(root);
 			}
-			if(tempList.size() > 0){
-				return new QLMatchResult(tempList,point);
-			}else{
-				return null;
-			}
+			return new QLMatchResult(tempList,point);
 		}else{
 			throw new Exception("不正确的类型：" + pattern.matchMode.toString());
 		}
