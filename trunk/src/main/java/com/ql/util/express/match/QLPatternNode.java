@@ -60,6 +60,12 @@ public class QLPatternNode{
 	protected INodeType rootNodeType;
 	
 	/**
+	 * 是否匹配成功，但在输出的时候忽略,用"~"表示
+	 * CONST$(,~$CONST)*
+	 */
+	protected boolean isSkip;
+	
+	/**
 	 * 子匹配模式
 	 */
 	List<QLPatternNode> children = new ArrayList<QLPatternNode>();
@@ -77,139 +83,87 @@ public class QLPatternNode{
 		this.level = aLevel;
 		this.splitChild();
 	}
-	/**
-	 * 拆分用'('和')'分隔的子匹配模式，以及$,|分隔的匹配串
-	 * @throws Exception
-	 */
+	class NodeTree{
+		char c;
+		String children;
+		public NodeTree(char aC,String aChildren){
+			this.c= aC;
+			this.children = aChildren;
+		}
+	}
 	public void splitChild() throws Exception{
 		if(log.isTraceEnabled()){
 			String str ="";
 			for(int i=0;i<this.level;i++){
 				str = str + "  ";
 			}
-			//log.trace("分解匹配模式[LEVEL="+ this.level +"]START:" + str + this.orgiContent);
+			log.trace("分解匹配模式[LEVEL="+ this.level +"]START:" + str + this.orgiContent);
 		}
 		String orgStr = this.orgiContent;
 		
 		String tempStr ="";
 		int count =0;
-		if(orgStr.equals("()")){
-			tempStr = orgStr;
-		}else{
-			for(int i=0;i<orgStr.length();i++){
-				if (orgStr.charAt(i) == '\\') {
-					if(count >0){
-					   tempStr = tempStr + orgStr.charAt(i);
-					}
-				   tempStr = tempStr + orgStr.charAt(i + 1);
-				   i = i + 1;
-				} else if (orgStr.charAt(i) == '(') {
-					if (count > 0) {
-						tempStr = tempStr + orgStr.charAt(i);
-					} else if (count == 0 && tempStr.length() > 0) {
-						children.add(new QLPatternNode(this.nodeTypeManager,tempStr, false,this.level + 1));
-						tempStr = "";
-					}
-					count = count + 1;
-				}else if(orgStr.charAt(i) == ')'){
-				    count = count -1;
-					if(count == 0){//是对应的()匹配
-						if(tempStr.length() > 0){
-							children.add(new QLPatternNode(this.nodeTypeManager,tempStr,true,this.level + 1));
-						  tempStr ="";
-						}else{
-							children.add(new QLPatternNode(this.nodeTypeManager,"()",false,this.level + 1));
-							tempStr ="";
-							//throw new Exception("不正确的模式串:" + orgStr);
-						}
-					}else{
-						tempStr = tempStr + orgStr.charAt(i);
-					}
-				}else if(orgStr.charAt(i) == '$'){
-					if(count > 0){
-						tempStr = tempStr + orgStr.charAt(i);
-					}else{
-						if (this.matchMode != MatchMode.NULL
-								&& this.matchMode != MatchMode.AND) {
-							throw new Exception("不正确的模式串,在一个匹配模式中不能|,$并存,请使用字串模式:"
-									+ orgStr);
-						}
-						if (tempStr.length() > 0) {
-							if(tempStr.equals("^") && children.size() >0){
-								//(FUNCTION_NAME$ID)^$(OPDATA*)的情况
-								children.get(children.size() -1).isTreeRoot = true;
-							}else{
-								children.add(new QLPatternNode(this.nodeTypeManager,tempStr, false,
-									this.level + 1));
-							}
-							tempStr = "";
-						}
-						this.matchMode = MatchMode.AND;
-					}
-				}else if(orgStr.charAt(i) == '|'){
-					if(count > 0){
-						tempStr = tempStr + orgStr.charAt(i);
-					}else{
-						if (this.matchMode != MatchMode.NULL
-								&& this.matchMode != MatchMode.OR) {
-							throw new Exception("不正确的模式串,在一个匹配模式中不能|,$并存,请使用字串模式:"
-									+ orgStr);
-						}
-						
-						if (tempStr.length() > 0) {
-							if(tempStr.equals("^") && children.size() >0){
-								//(FUNCTION_NAME|ID)^|(OPDATA*)的情况
-								children.get(children.size() -1).isTreeRoot = true;
-							}else{
-								children.add(new QLPatternNode(this.nodeTypeManager,tempStr, false,
-									this.level + 1));
-							}
-							tempStr = "";
-						}
-						this.matchMode = MatchMode.OR;
-					}
-			    
-				}else if(orgStr.charAt(i) == '#'){
-					if(count > 0){
-						tempStr = tempStr + orgStr.charAt(i);
-					}else{
-						if (tempStr.length() > 0){
-							children.add(new QLPatternNode(this.nodeTypeManager,tempStr, false,
-									this.level + 1));
-							tempStr = "";
-						}
-						tempStr = orgStr.substring(i);
-						break;//退出
-					}
-				}else {
-					tempStr = tempStr + orgStr.charAt(i);
+		for(int i=0;i<orgStr.length();i++){
+			if (orgStr.charAt(i) == '\\') {
+				if(count >0){
+				   tempStr = tempStr + orgStr.charAt(i);
 				}
+			   tempStr = tempStr + orgStr.charAt(i + 1);
+			   i = i + 1;
+			}else if (orgStr.charAt(i) == '(') {
+				tempStr = tempStr + orgStr.charAt(i);
+				count = count + 1;
+			}else if(orgStr.charAt(i) == ')'){
+				tempStr = tempStr + orgStr.charAt(i);
+				count = count - 1;
+			}else if(count > 0){
+				tempStr = tempStr + orgStr.charAt(i);
+			}else if(orgStr.charAt(i) == '$'){
+				if (this.matchMode != MatchMode.NULL
+						&& this.matchMode != MatchMode.AND) {
+					throw new Exception("不正确的模式串,在一个匹配模式中不能|,$并存,请使用字串模式:"
+							+ orgStr);
+				}
+				children.add(new QLPatternNode(this.nodeTypeManager,tempStr, false,this.level + 1));
+				this.matchMode = MatchMode.AND;
+				tempStr = "";
+			}else if(orgStr.charAt(i) == '|'){
+					if (this.matchMode != MatchMode.NULL
+							&& this.matchMode != MatchMode.OR) {
+						throw new Exception("不正确的模式串,在一个匹配模式中不能|,$并存,请使用字串模式:"
+								+ orgStr);
+					}
+					children.add(new QLPatternNode(this.nodeTypeManager,tempStr, false,this.level + 1));
+					this.matchMode = MatchMode.OR;
+					tempStr = "";
+			}else if(orgStr.charAt(i) == '#'){
+					this.rootNodeType = this.nodeTypeManager.findNodeType(orgStr.substring(i+1));
+					break;
+			}else {
+				tempStr = tempStr + orgStr.charAt(i);
 			}
 		}
-		if(count >0){
+		// 处理没有()的内容
+		if (count > 0) {
 			throw new Exception("不正确的模式串,(没有找到对应的):" + orgStr);
 		}
-		if(tempStr.length() >0){
-			if(tempStr.equals("^*") && this.children.size() == 1){
-				 this.isTreeRoot = true;
-				 this.minMatchNum = 0;
-			     this.maxMatchNum = Integer.MAX_VALUE;				
-			}else if(tempStr.equals("^*") == true && this.children.size() > 1){
-	    		 this.children.get(this.children.size() - 1).isTreeRoot = true;
-	    		 this.children.get(this.children.size() - 1).minMatchNum = 0;
-	    		 this.children.get(this.children.size() - 1).maxMatchNum = Integer.MAX_VALUE;
-	    		 
-			}else if(      tempStr.equals("^") == true && this.children.size() == 1){
-	    		 this.isTreeRoot = true;
-		    }else if(tempStr.equals("^") == true && this.children.size() > 1){
-		    		 this.children.get(this.children.size() - 1).isTreeRoot = true;
-			}else if(tempStr.charAt(0)=='#'){
-		    	this.rootNodeType = this.nodeTypeManager.findNodeType(tempStr.substring(1));
-		    }else if(tempStr.equals("*")){
-		    	this.minMatchNum = 0;
-		    	this.maxMatchNum = Integer.MAX_VALUE;
-		    }else if(tempStr.startsWith("{") && tempStr.endsWith("}") && tempStr.length() > 2){
-				String numStr = tempStr.substring(1,tempStr.length() - 1);
+        
+		if(this.children.size() > 0){
+			children.add(new QLPatternNode(this.nodeTypeManager,tempStr, false,this.level + 1));
+			tempStr ="";
+		}
+		
+		//需要剔除乘法*的情况
+		if(tempStr.endsWith("*") && tempStr.length() >1){
+	    	this.minMatchNum = 0;
+	    	this.maxMatchNum = Integer.MAX_VALUE;
+	    	tempStr = tempStr.substring(0,tempStr.length() -1);
+		}
+		
+    	if(tempStr.endsWith("}")){
+    		int index = tempStr.lastIndexOf("{");
+    		if(index > 0){
+				String numStr = tempStr.substring(index + 1,tempStr.length() - 1);
 				int index2 = numStr.indexOf(':');
 				if (index2 > 0) {
 					this.minMatchNum = Integer.parseInt(numStr.substring(0, index2));
@@ -218,62 +172,44 @@ public class QLPatternNode{
 					this.minMatchNum = Integer.parseInt(numStr);
 					this.maxMatchNum = Integer.parseInt(numStr);
 				}
-		    }else if(this.children.size() > 0){
-		    	this.children.add(new QLPatternNode(this.nodeTypeManager,tempStr,false,this.level + 1));
-		    }else{
-		    	if(tempStr.indexOf('#')>0){
-		    		this.rootNodeType = this.nodeTypeManager.findNodeType(tempStr.substring(tempStr.indexOf('#') + 1));
-		    		tempStr = tempStr.substring(0,tempStr.indexOf('#'));
-		    	}
-				if(tempStr.endsWith("^")==true && tempStr.length() > 1){
-						this.isTreeRoot = true;
-						tempStr = tempStr.substring(0,tempStr.length() -1);
-		    	}
-		    	if(tempStr.endsWith("*")){
-			    	this.minMatchNum = 0;
-			    	this.maxMatchNum = Integer.MAX_VALUE;
-		    		tempStr = tempStr.substring(0,tempStr.length() -1);
-				}
-		    	
-		    	if(tempStr.endsWith("}")){
-		    		int index = tempStr.lastIndexOf("{");
-		    		if(index > 0){
-						String numStr = tempStr.substring(index + 1,tempStr.length() - 1);
-						int index2 = numStr.indexOf(':');
-						if (index2 > 0) {
-							this.minMatchNum = Integer.parseInt(numStr.substring(0, index2));
-							this.maxMatchNum = Integer.parseInt(numStr.substring(index2 + 1));
-						} else {
-							this.minMatchNum = Integer.parseInt(numStr);
-							this.maxMatchNum = Integer.parseInt(numStr);
-						}
-						tempStr = tempStr.substring(0,index);
-		    		}
-		    	}
-		    	
-		    	int index = tempStr.indexOf("->");
-		    	if(index >0){
-		    		this.targetNodeType = this.nodeTypeManager.findNodeType(tempStr.substring(index + 2));
-		    		tempStr = tempStr.substring(0,index);
-		    	}
-		    	
-		    	if(tempStr.length() >0){
-		    		this.matchMode = MatchMode.DETAIL;
-		    		this.nodeType = this.nodeTypeManager.findNodeType(tempStr);
-		    	}
-			}
+				tempStr = tempStr.substring(0,index);
+    		}
+    	}
+    	if(tempStr.endsWith("^")==true && tempStr.length() > 1){
+			this.isTreeRoot = true;
+			tempStr = tempStr.substring(0,tempStr.length() -1);
+    	}
+
+
+		if(tempStr.endsWith("~") && tempStr.length() >1){
+	    	this.isSkip = true;
+	    	tempStr = tempStr.substring(0,tempStr.length() -1);
 		}
-		if(this.matchMode == MatchMode.NULL && this.children.size() == 1){
-			this.matchMode = MatchMode.AND;
+    	if(tempStr.equals("()")){
+			this.nodeType = this.nodeTypeManager.findNodeType(tempStr);
+    	}
+    	
+    	//处理(ABC|bcd)模式
+    	if(tempStr.length() > 2 && tempStr.charAt(0)=='(' && tempStr.charAt(tempStr.length() - 1) ==')'){
+    		this.isChildMode = true;
+    		this.children.add(new QLPatternNode(this.nodeTypeManager,tempStr.substring(1, tempStr.length() - 1), false,this.level + 1));
+    		this.matchMode = MatchMode.AND;
+    		tempStr = "";
+    		
+    	}
+    	
+		int index = tempStr.indexOf("->");
+		if (index > 0) {
+			this.targetNodeType = this.nodeTypeManager.findNodeType(tempStr.substring(index + 2));
+			tempStr = tempStr.substring(0, index);
 		}
-		if(log.isTraceEnabled()){
-			String str ="";
-			for(int i=0;i<this.level;i++){
-				str = str + "  ";
-			}
-			//log.trace("分解匹配模式[LEVEL="+ this.level +"]  END:" + str + this.toString());
+		if (tempStr.length() > 0) {
+			this.matchMode = MatchMode.DETAIL;
+			this.nodeType = this.nodeTypeManager.findNodeType(tempStr);
 		}
-	}
+	}	
+	
+
 	public String getPrintName(INodeType nodeType){
 		return nodeType.getTag();	
 	}
@@ -289,7 +225,15 @@ public class QLPatternNode{
 		if(this.targetNodeType != null){
 			result = result +"->" + getPrintName(this.targetNodeType);
 		}
-		
+		if(this.isChildMode == true){
+			result ="("+ result + ")";
+		}		
+		if(this.isSkip){
+			result = result +'~';	
+		}
+		if(this.isTreeRoot){
+			result = result +'^';	
+		}
 		if(this.minMatchNum == 0 && this.maxMatchNum == Integer.MAX_VALUE){
 			result = result +'*';
 		}else if(this.minMatchNum == this.maxMatchNum && this.maxMatchNum > 1) {
@@ -301,13 +245,6 @@ public class QLPatternNode{
 		if(this.rootNodeType != null){
 			result = result + '#'+ getPrintName(this.rootNodeType);
 		}
-		if(this.isChildMode == true){
-			result ="("+ result + ")";
-		}
-		if(this.isTreeRoot){
-			result = result +'^';	
-		}
-		
 		return result;
 	}
 	public String joinStringList(List<QLPatternNode> list,String splitChar){
