@@ -97,9 +97,20 @@ public class QLPatternNode{
 			for(int i=0;i<this.level;i++){
 				str = str + "  ";
 			}
-			log.trace("分解匹配模式[LEVEL="+ this.level +"]START:" + str + this.orgiContent);
+			//log.trace("分解匹配模式[LEVEL="+ this.level +"]START:" + str + this.orgiContent);
 		}
 		String orgStr = this.orgiContent;
+		if(orgStr.equals("(") || orgStr.equals(")") ){
+			this.matchMode = MatchMode.DETAIL;
+			this.nodeType = this.nodeTypeManager.findNodeType(orgStr);
+			return ;
+		}
+		if(orgStr.equals("(~") || orgStr.equals(")~") ){
+			this.matchMode = MatchMode.DETAIL;
+			this.nodeType = this.nodeTypeManager.findNodeType(orgStr.substring(0,1));
+			this.isSkip = true;
+			return ;
+		}
 		
 		String tempStr ="";
 		int count =0;
@@ -211,7 +222,11 @@ public class QLPatternNode{
 	
 
 	public String getPrintName(INodeType nodeType){
-		return nodeType.getTag();	
+		String tag = nodeType.getTag();
+		if(tag.equals("(") || tag.equals(")")){
+			tag = "\\" + tag;
+		}
+		return tag;	
 	}
 	public String toString(){
 		String result ="";

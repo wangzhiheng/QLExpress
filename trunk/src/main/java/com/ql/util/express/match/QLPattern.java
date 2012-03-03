@@ -143,7 +143,7 @@ public class QLPattern {
 						point,false);
 				if (tempResult != null) {
 					point = tempResult.matchLastIndex;
-					if (item.isTreeRoot == true) {
+					if (item.isTreeRoot == true && tempResult.matchs.size() >0) {
 						if (tempResult.matchs.size() > 1)
 							throw new Exception("根节点的数量必须是1");
 						if (root == null) {
