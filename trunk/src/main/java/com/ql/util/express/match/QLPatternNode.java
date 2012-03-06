@@ -66,6 +66,12 @@ public class QLPatternNode{
 	protected boolean isSkip;
 	
 	/**
+	 * 取反，例如：+@,匹配不是+的所有字符
+	 */
+	protected boolean blame = false;
+	
+	
+	/**
 	 * 子匹配模式
 	 */
 	List<QLPatternNode> children = new ArrayList<QLPatternNode>();
@@ -100,28 +106,16 @@ public class QLPatternNode{
 			//log.trace("分解匹配模式[LEVEL="+ this.level +"]START:" + str + this.orgiContent);
 		}
 		String orgStr = this.orgiContent;
-		if(orgStr.equals("(") || orgStr.equals(")") ){
+		if(orgStr.equals("(") || orgStr.equals(")") || orgStr.equals("|")||orgStr.equals("||")||orgStr.equals("/**") || orgStr.equals("**/")){
 			this.matchMode = MatchMode.DETAIL;
 			this.nodeType = this.nodeTypeManager.findNodeType(orgStr);
-			return ;
-		}
-		if(orgStr.equals("(~") || orgStr.equals(")~") ){
-			this.matchMode = MatchMode.DETAIL;
-			this.nodeType = this.nodeTypeManager.findNodeType(orgStr.substring(0,1));
-			this.isSkip = true;
 			return ;
 		}
 		
 		String tempStr ="";
 		int count =0;
 		for(int i=0;i<orgStr.length();i++){
-			if (orgStr.charAt(i) == '\\') {
-				if(count >0){
-				   tempStr = tempStr + orgStr.charAt(i);
-				}
-			   tempStr = tempStr + orgStr.charAt(i + 1);
-			   i = i + 1;
-			}else if (orgStr.charAt(i) == '(') {
+			if (orgStr.charAt(i) == '(') {
 				tempStr = tempStr + orgStr.charAt(i);
 				count = count + 1;
 			}else if(orgStr.charAt(i) == ')'){
@@ -196,9 +190,10 @@ public class QLPatternNode{
 	    	this.isSkip = true;
 	    	tempStr = tempStr.substring(0,tempStr.length() -1);
 		}
-    	if(tempStr.equals("()")){
-			this.nodeType = this.nodeTypeManager.findNodeType(tempStr);
-    	}
+		if(tempStr.endsWith("@") && tempStr.length() >1){
+	    	this.blame = true;
+	    	tempStr = tempStr.substring(0,tempStr.length() -1);
+		}
     	
     	//处理(ABC|bcd)模式
     	if(tempStr.length() > 2 && tempStr.charAt(0)=='(' && tempStr.charAt(tempStr.length() - 1) ==')'){
@@ -222,11 +217,7 @@ public class QLPatternNode{
 	
 
 	public String getPrintName(INodeType nodeType){
-		String tag = nodeType.getTag();
-		if(tag.equals("(") || tag.equals(")")){
-			tag = "\\" + tag;
-		}
-		return tag;	
+		 return nodeType.getTag();
 	}
 	public String toString(){
 		String result ="";
@@ -245,6 +236,9 @@ public class QLPatternNode{
 		}		
 		if(this.isSkip){
 			result = result +'~';	
+		}
+		if(this.blame){
+			result = result +'@';	
 		}
 		if(this.isTreeRoot){
 			result = result +'^';	

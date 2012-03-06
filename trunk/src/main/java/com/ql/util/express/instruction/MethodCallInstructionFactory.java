@@ -13,17 +13,8 @@ public class MethodCallInstructionFactory extends InstructionFactory {
 	public boolean createInstruction(ExpressRunner aCompile,
 			InstructionSet result, Stack<ForRelBreakContinue> forStack,
 			ExpressNode node, boolean isRoot) throws Exception {
-		ExpressNode[] children = node.getChildren();
-		node.getLeftChildren().remove(children.length - 1);
-		ExpressNode[] parameterList = children[children.length - 1].getChildren();
-		for (int i = 0; i < parameterList.length; i++) {
-			if (parameterList[i].isTypeEqualsOrChild(",") == false) {
-				node.getLeftChildren().add(parameterList[i]);
-			}
-		}
-
 		boolean returnVal = false;
-		children = node.getChildren();
+		ExpressNode[] children = node.getChildren();
 		for (int i = 0; i < children.length; i++) {
 			boolean tmpHas = aCompile.createInstructionSetPrivate(result,forStack, children[i], false);
 			returnVal = returnVal || tmpHas;

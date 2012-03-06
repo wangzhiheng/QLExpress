@@ -65,8 +65,4 @@ public class KeyWordDefine4SQL {
 				
 				
 		};
-	public String statementDefineStrs = "";
-	public String[] expressDefineStrs = {
-				};
-		
 }

@@ -10,7 +10,7 @@ public class KeyWordDefine4Java {
 			 "=","/**","**/"
 	};
 	public  String[] keyWords = new String[] {
-			 "mod","nor",
+			 "mod","nor","in",
 			 "for", "if", "then", "else", "exportAlias", "alias",
 			 "break", "continue", "return", "macro", "function" ,
 			 "def","exportDef", "new","array","anonymousNewArray",
@@ -18,13 +18,19 @@ public class KeyWordDefine4Java {
 			 "cast"
 	};
 	public String[] nodeTypeDefines = new String[] {
-				"in:TYPE=KEYWORD,FACTORY=com.ql.util.express.instruction.InInstructionFactory",
-				",:TYPE=KEYWORD,FACTORY=com.ql.util.express.instruction.NullInstructionFactory",
-				"EOF:TYPE=WORDDEF,FACTORY=com.ql.util.express.instruction.NullInstructionFactory",
+				"EOF:TYPE=WORDDEF",
 				"FUNCTION_NAME:TYPE=WORDDEF",				
-				"FUNCTION_DEFINE:TYPE=WORDDEF,FACTORY=com.ql.util.express.instruction.BlockInstructionFactory",
-				"ID:TYPE=WORDDEF,FACTORY=com.ql.util.express.instruction.LoadAttrInstructionFactory",
-
+				"FUNCTION_DEFINE:TYPE=WORDDEF",
+				"ID:TYPE=WORDDEF",
+				"LEFT_BRACKET:TYPE=WORDDEF,DEFINE=(",
+				"RIGHT_BRACKET:TYPE=WORDDEF,DEFINE=)",
+				"MAYBE:TYPE=WORDDEF,DEFINE=|",
+				"OR:TYPE=WORDDEF,DEFINE=||",
+				"LEFT_COMMENT:TYPE=WORDDEF,DEFINE=/**",
+				"RIGHT_COMMENT:TYPE=WORDDEF,DEFINE=**/",
+				
+				"BRACKET:TYPE=WORDDEF",
+				
 				"CONST_BYTE:TYPE=CONST",
 				"CONST_SHORT:TYPE=CONST",
 				"CONST_INTEGER:TYPE=CONST",
@@ -35,92 +41,118 @@ public class KeyWordDefine4Java {
 				"CONST_CHAR:TYPE=CONST",
 				"CONST_STRING:TYPE=CONST",
 				"CONST_BOOLEAN:TYPE=CONST",
-				"CONST_CLASS:TYPE=CONST,FACTORY=com.ql.util.express.instruction.ConstDataInstructionFactory",
-				"CONST:TYPE=GROUP,CHILDREN=CONST_NUMBER|CONST_CHAR|CONST_STRING|CONST_BOOLEAN|CONST_CLASS,FACTORY=com.ql.util.express.instruction.ConstDataInstructionFactory",
+				"CONST_CLASS:TYPE=CONST",
+				"CONST:TYPE=GROUP,CHILDREN=CONST_NUMBER|CONST_CHAR|CONST_STRING|CONST_BOOLEAN|CONST_CLASS",
 
-				"COMMENT:TYPE=BLOCK,STARTTAG=/**,ENDTAG=**/,FACTORY=com.ql.util.express.instruction.NullInstructionFactory",
-				"():TYPE=BLOCK,STARTTAG=(,ENDTAG=),FACTORY=com.ql.util.express.instruction.BlockInstructionFactory",
-				"[]:TYPE=BLOCK,STARTTAG=[,ENDTAG=],FACTORY=com.ql.util.express.instruction.BlockInstructionFactory",
-				"{}:TYPE=BLOCK,STARTTAG={,ENDTAG=},CHILDREN=FUNCTION_DEFINE,FACTORY=com.ql.util.express.instruction.BlockInstructionFactory",
-				"EXPRESS_CHILD:TYPE=GROUP,CHILDREN=()|[]",	
+				"CHILD_EXPRESS:TYPE=EXPRESS,STARTTAG=(,ENDTAG=),DEFINE=LEFT_BRACKET->CHILD_EXPRESS^$(RIGHT_BRACKET~|(EXPRESS$(,~$EXPRESS)*$RIGHT_BRACKET~))",
+				"[]:TYPE=EXPRESS,STARTTAG=[,ENDTAG=],DEFINE=[~$EXPRESS*$]~#[]",
 				
 				"OP_LEVEL1:TYPE=OPERATOR,CHILDREN=~|!",                         
 				"OP_LEVEL2:TYPE=OPERATOR,CHILDREN=++|--",                       
-				"OP_LEVEL3:TYPE=OPERATOR,CHILDREN=&|\\||<<|>>",                 
+				"OP_LEVEL3:TYPE=OPERATOR,DEFINE=&|MAYBE|<<|>>",                 
 				"OP_LEVEL4:TYPE=OPERATOR,CHILDREN=*|/|mod|%",                   
 				"OP_LEVEL5:TYPE=OPERATOR,CHILDREN=+|-",                         
 				"OP_LEVEL6:TYPE=OPERATOR,CHILDREN=in|like",                     
 				"OP_LEVEL7:TYPE=OPERATOR,CHILDREN=>|>=|<|<=|==|!=",
 				"OP_LEVEL8:TYPE=OPERATOR,CHILDREN=&&",
-				"OP_LEVEL9:TYPE=OPERATOR,CHILDREN=\\|\\||nor",	
+				"OP_LEVEL9:TYPE=OPERATOR,DEFINE=OR|nor",	
 				
-				"OTHER_KEYWORD:TYPE=GROUP,CHILDREN=exportAlias|alias|break|continue|return|def|exportDef|new",
-				"OP_LIST:TYPE=GROUP,CHILDREN=OP_LEVEL1|OP_LEVEL2|OP_LEVEL3|OP_LEVEL4|OP_LEVEL5|OP_LEVEL6|OP_LEVEL7||OP_LEVEL8|OP_LEVEL9|=|OTHER_KEYWORD|(|)|[|]|{|}",
+				"OP_LIST:TYPE=GROUP,CHILDREN=OP_LEVEL1|OP_LEVEL2|OP_LEVEL3|OP_LEVEL4|OP_LEVEL5|OP_LEVEL6|OP_LEVEL7||OP_LEVEL8|OP_LEVEL9|=|(|)|[|]|{|}",
 				
-				"STAT_IFELSE:TYPE=STATEMENT,DEFINE=if^$(()|(((OPDATA|OP_LIST)*)#()))$then$({}|(((OPDATA|OP_LIST|;)*)#{}))$else$({}|(((OPDATA|OP_LIST)*)$(;|EOF)#{})),FACTORY=com.ql.util.express.instruction.IfInstructionFactory",
-				"STAT_IF:TYPE=STATEMENT,    DEFINE=if^$(()|(((OPDATA|OP_LIST)*)#()))$then$({}|(((OPDATA|OP_LIST)*)$(;|EOF)#{})),FACTORY=com.ql.util.express.instruction.IfInstructionFactory",
-				"STAT_IFELSE_JAVA:TYPE=STATEMENT,DEFINE=if^$()$({}|(((OPDATA|OP_LIST|;)*)#{}))$else$({}|(((OPDATA|OP_LIST)*)$(;|EOF)#{})),FACTORY=com.ql.util.express.instruction.IfInstructionFactory",
-				"STAT_IF_JAVA:TYPE=STATEMENT,    DEFINE=if^$()$({}|(((OPDATA|OP_LIST)*)$(;|EOF)#{})),FACTORY=com.ql.util.express.instruction.IfInstructionFactory",
-				                                    
-				"STAT_FOR:TYPE=STATEMENT,DEFINE=for^$()${},FACTORY=com.ql.util.express.instruction.ForInstructionFactory",
-				"STAT_SEMICOLON:TYPE=STATEMENT,FACTORY=com.ql.util.express.instruction.BlockInstructionFactory",
-				"STAT_SEMICOLON_EOF:TYPE=STATEMENT,FACTORY=com.ql.util.express.instruction.BlockInstructionFactory",
-				"STAT_MACRO:TYPE=STATEMENT,DEFINE=macro^$ID->CONST_STRING${},FACTORY=com.ql.util.express.instruction.MacroInstructionFactory",
-				"STAT_FUNCTION:TYPE=STATEMENT,DEFINE=function^$ID->CONST_STRING$()${},FACTORY=com.ql.util.express.instruction.FunctionInstructionFactory",
-				"STAT_CLASS:TYPE=STATEMENT,DEFINE=class^$VClass->CONST_STRING$()${},FACTORY=com.ql.util.express.instruction.FunctionInstructionFactory",
-				"STATEMENT:TYPE=STATEMENT,CHILDREN=STAT_SEMICOLON|STAT_SEMICOLON_EOF|STAT_FOR|STAT_IFELSE|STAT_IF|STAT_IF_JAVA|STAT_IFELSE_JAVA |STAT_MACRO ",
+				"PARAMETER_LIST:TYPE=STATEMENT,DEFINE=LEFT_BRACKET~$(RIGHT_BRACKET~|(EXPRESS$(,~$EXPRESS)*$RIGHT_BRACKET~))",
+				
+				
+				"VAR_DEFINE:TYPE=EXPRESS,DEFINE=(CONST_CLASS|VClass->CONST_STRING)$(([$])#[])*$ID->CONST_STRING#def",
+				"EXPORT_VAR_DEFINE:TYPE=EXPRESS,DEFINE=exportDef^$CONST_CLASS$ID->CONST_STRING",
+				"NEW_OBJECT:TYPE=EXPRESS,DEFINE=new->NEW_OBJECT^$CONST_CLASS$PARAMETER_LIST",
+				"NEW_ARRAY:TYPE=EXPRESS,DEFINE=new->NEW_ARRAY^$CONST_CLASS$([]*)",
+				"ANONY_NEW_ARRAY:TYPE=EXPRESS,DEFINE=[->anonymousNewArray^$(]~|(EXPRESS$(,~$EXPRESS)*$]~))",
+
+				"NEW_VIR_OBJECT:TYPE=EXPRESS,DEFINE=new->NEW_VIR_OBJECT^$VClass->CONST_STRING$PARAMETER_LIST",
+				
+				"OPDATA:TYPE=EXPRESS,DEFINE=ANONY_NEW_ARRAY|VAR_DEFINE|EXPORT_VAR_DEFINE|NEW_OBJECT|NEW_ARRAY|NEW_VIR_OBJECT|CHILD_EXPRESS|CONST|ID",
+				
+				"FIELD_CALL:TYPE=EXPRESS,DEFINE= .->FIELD_CALL^$(ID->CONST_STRING|class->CONST_STRING)",
+				"METHOD_CALL:TYPE=EXPRESS,DEFINE=.->METHOD_CALL^$(ID->CONST_STRING|FUNCTION_NAME->CONST_STRING)$PARAMETER_LIST",
+				"OBJECT_CALL:TYPE=EXPRESS,DEFINE=((COMMENT~)*$OPDATA$(COMMENT~)*)$(METHOD_CALL|FIELD_CALL)^*",
+				
+				"FUNCTION_CALL:TYPE=EXPRESS,DEFINE=(ID->CONST_STRING|FUNCTION_NAME->CONST_STRING)$PARAMETER_LIST#FUNCTION_CALL",
+				
+				"ARRAY_CALL:TYPE=EXPRESS,DEFINE=(FUNCTION_CALL|OBJECT_CALL)$([->ARRAY_CALL^$EXPRESS$]~)^*$(METHOD_CALL|FIELD_CALL)^*",
 
 				
-				
-				"VAR_DEFINE:TYPE=EXPRESS,DEFINE=(CONST_CLASS|VClass->CONST_STRING)$[]*$ID->CONST_STRING#def,FACTORY=com.ql.util.express.instruction.DefineInstructionFactory",
-				"EXPORT_VAR_DEFINE:TYPE=EXPRESS,DEFINE=exportDef^$CONST_CLASS$ID->CONST_STRING, FACTORY=com.ql.util.express.instruction.OperatorInstructionFactory",
-				"NEW_OBJECT:TYPE=EXPRESS,DEFINE=new^$CONST_CLASS$(),FACTORY=com.ql.util.express.instruction.NewInstructionFactory",
-				"NEW_ARRAY:TYPE=EXPRESS,DEFINE=new^$CONST_CLASS$([]*),FACTORY=com.ql.util.express.instruction.NewInstructionFactory",
-				"NEW_VIR_OBJECT:TYPE=EXPRESS,DEFINE=new^$VClass->CONST_STRING$(),FACTORY=com.ql.util.express.instruction.NewVClassInstructionFactory",
-				"FIELD_CALL:TYPE=EXPRESS,DEFINE=(OPDATA$.^$ID->CONST_STRING)|(CONST_CLASS$.^$class->CONST_STRING),FACTORY=com.ql.util.express.instruction.OperatorInstructionFactory",
-				"METHOD_CALL:TYPE=EXPRESS,DEFINE=OPDATA$.^$(ID->CONST_STRING|FUNCTION_NAME->CONST_STRING)$(),FACTORY=com.ql.util.express.instruction.MethodCallInstructionFactory",
-				"FUNCTION_CALL:TYPE=EXPRESS,DEFINE=(ID->FUNCTION_NAME|FUNCTION_NAME)$()#FUNCTION_CALL,FACTORY=com.ql.util.express.instruction.CallFunctionInstructionFactory",
-				"CAST_CALL:TYPE=EXPRESS,DEFINE=()$OPDATA#cast,FACTORY=com.ql.util.express.instruction.CastInstructionFactory",
-				"ARRAY_CALL:TYPE=EXPRESS,DEFINE=OPDATA$[]#ARRAY_CALL,FACTORY=com.ql.util.express.instruction.OperatorInstructionFactory",
-				"ANONY_NEW_ARRAY:TYPE=EXPRESS,DEFINE=[]#anonymousNewArray,FACTORY=com.ql.util.express.instruction.NewInstructionFactory",
-				
-				"EXPRESS_LEVEL1:TYPE=EXPRESS,DEFINE=       OP_LEVEL1^$OPDATA,FACTORY=com.ql.util.express.instruction.OperatorInstructionFactory",
-				"EXPRESS_LEVEL2:TYPE=EXPRESS,DEFINE=OPDATA$OP_LEVEL2^,       FACTORY=com.ql.util.express.instruction.OperatorInstructionFactory",
-				"EXPRESS_LEVEL3:TYPE=EXPRESS,DEFINE=OPDATA$OP_LEVEL3^$OPDATA,FACTORY=com.ql.util.express.instruction.OperatorInstructionFactory",
-				"EXPRESS_LEVEL4:TYPE=EXPRESS,DEFINE=OPDATA$OP_LEVEL4^$OPDATA,FACTORY=com.ql.util.express.instruction.OperatorInstructionFactory",
-				"EXPRESS_LEVEL5:TYPE=EXPRESS,DEFINE=OPDATA$OP_LEVEL5^$OPDATA,FACTORY=com.ql.util.express.instruction.OperatorInstructionFactory",
-				"EXPRESS_LEVEL6:TYPE=EXPRESS,DEFINE=OPDATA$OP_LEVEL6^$OPDATA,FACTORY=com.ql.util.express.instruction.OperatorInstructionFactory",
-				"EXPRESS_LEVEL7:TYPE=EXPRESS,DEFINE=OPDATA$OP_LEVEL7^$OPDATA,FACTORY=com.ql.util.express.instruction.OperatorInstructionFactory",			
-				"EXPRESS_LEVEL8:TYPE=EXPRESS,DEFINE=OPDATA$OP_LEVEL8^$OPDATA,FACTORY=com.ql.util.express.instruction.OperatorInstructionFactory",			
-				"EXPRESS_LEVEL9:TYPE=EXPRESS,DEFINE=OPDATA$OP_LEVEL9^$OPDATA,FACTORY=com.ql.util.express.instruction.OperatorInstructionFactory",			
-				"EXPRESS_JUDGEANDSET:TYPE=EXPRESS,DEFINE=OPDATA$?$OPDATA$:$OPDATA#EXPRESS_JUDGEANDSET,FACTORY=com.ql.util.express.instruction.IfInstructionFactory",
-				"EXPRESS_KEY_VALUE:TYPE=EXPRESS,DEFINE=OPDATA$:^$(OPDATA|{}),FACTORY=com.ql.util.express.instruction.KeyValueInstructionFactory",
-				"EXPRESS_ASSIGN:TYPE=EXPRESS,DEFINE=OPDATA$=^$OPDATA,FACTORY=com.ql.util.express.instruction.OperatorInstructionFactory",
-				
-				"EXPRESS_RETURN:TYPE=EXPRESS,DEFINE=return^$OPDATA,FACTORY=com.ql.util.express.instruction.OperatorInstructionFactory",
+				"CAST_CALL:TYPE=EXPRESS,DEFINE=(LEFT_BRACKET~$CONST_CLASS$RIGHT_BRACKET~#cast)^*$ARRAY_CALL",
+				"EXPRESS_OP_L1:TYPE=EXPRESS,DEFINE=OP_LEVEL1^*$CAST_CALL",
+				"EXPRESS_OP_L2:TYPE=EXPRESS,DEFINE=EXPRESS_OP_L1$OP_LEVEL2^*",
+				"EXPRESS_OP_L3:TYPE=EXPRESS,DEFINE=EXPRESS_OP_L2$(OP_LEVEL3^$EXPRESS_OP_L2)^*",
+				"EXPRESS_OP_L4:TYPE=EXPRESS,DEFINE=EXPRESS_OP_L3$(OP_LEVEL4^$EXPRESS_OP_L3)^*",
+				"EXPRESS_OP_L5:TYPE=EXPRESS,DEFINE=EXPRESS_OP_L4$(OP_LEVEL5^$EXPRESS_OP_L4)^*",
+				"EXPRESS_OP_L6:TYPE=EXPRESS,DEFINE=EXPRESS_OP_L5$(OP_LEVEL6^$EXPRESS_OP_L5)^*",
+				"EXPRESS_OP_L7:TYPE=EXPRESS,DEFINE=EXPRESS_OP_L6$(OP_LEVEL7^$EXPRESS_OP_L6)^*",
+				"EXPRESS_OP_L8:TYPE=EXPRESS,DEFINE=EXPRESS_OP_L7$(OP_LEVEL8^$EXPRESS_OP_L7)^*",
+				"EXPRESS_OP_L9:TYPE=EXPRESS,DEFINE=EXPRESS_OP_L8$(OP_LEVEL9^$EXPRESS_OP_L8)^*",
+				"EXPRESS_COMPUTER:TYPE=EXPRESS,DEFINE=EXPRESS_OP_L9",
 
-				"BREAK_CALL:TYPE=EXPRESS,DEFINE=break^,FACTORY=com.ql.util.express.instruction.BreakInstructionFactory",
-				"CONTINUE_CALL:TYPE=EXPRESS,DEFINE=continue^,FACTORY=com.ql.util.express.instruction.ContinueInstructionFactory",
-				"ALIAS_CALL:TYPE=EXPRESS,DEFINE=alias^$ID->CONST_STRING$OPDATA,FACTORY=com.ql.util.express.instruction.OperatorInstructionFactory",
-				"EXPORT_ALIAS_CALL:TYPE=EXPRESS,DEFINE=exportAlias^$ID->CONST_STRING$OPDATA,FACTORY=com.ql.util.express.instruction.OperatorInstructionFactory",
+				"EXPRESS_JUDGEANDSET:TYPE=EXPRESS,DEFINE=EXPRESS_COMPUTER$(?->EXPRESS_JUDGEANDSET^$EXPRESS_COMPUTER$:~$EXPRESS_COMPUTER)^{0:1}",
+				"EXPRESS_KEY_VALUE:TYPE=EXPRESS,DEFINE=EXPRESS_JUDGEANDSET$(:->EXPRESS_KEY_VALUE^$(EXPRESS_JUDGEANDSET|STAT_BLOCK))^{0:1}",
+				"EXPRESS_ASSIGN:TYPE=EXPRESS,DEFINE=EXPRESS_KEY_VALUE$(=^$EXPRESS_KEY_VALUE)^*",
 				
-				"OP_CALL:TYPE=EXPRESS,DEFINE=(FUNCTION_NAME|OP_LIST)^$(OPDATA*),FACTORY=com.ql.util.express.instruction.OperatorInstructionFactory",
-				"EXPRESS:TYPE=EXPRESS,CHILDREN=EXPORT_VAR_DEFINE|VAR_DEFINE|NEW_OBJECT|NEW_ARRAY|NEW_VIR_OBJECT|ANONY_NEW_ARRAY|CAST_CALL|ARRAY_CALL|METHOD_CALL|FIELD_CALL|FUNCTION_CALL|EXPRESS_JUDGEANDSET|EXPRESS_KEY_VALUE|EXPRESS_ASSIGN|EXPRESS_LEVEL1|EXPRESS_LEVEL2|EXPRESS_LEVEL3|EXPRESS_LEVEL4|EXPRESS_LEVEL5|EXPRESS_LEVEL6|EXPRESS_LEVEL7|EXPRESS_LEVEL8|EXPRESS_LEVEL9|EXPRESS_RETURN|BREAK_CALL|CONTINUE_CALL|ALIAS_CALL|EXPORT_ALIAS_CALL|OP_CALL",
-
-				"OPDATA:TYPE=GROUP,CHILDREN=CONST|ID|()|EXPRESS"
+				"EXPRESS_RETURN:TYPE=EXPRESS,DEFINE=return^$EXPRESS_ASSIGN",
+				"BREAK_CALL:TYPE=EXPRESS,DEFINE=break^",
+				"CONTINUE_CALL:TYPE=EXPRESS,DEFINE=continue^",
+				"ALIAS_CALL:TYPE=EXPRESS,DEFINE=alias^$ID->CONST_STRING$EXPRESS_ASSIGN",
+				"EXPORT_ALIAS_CALL:TYPE=EXPRESS,DEFINE=exportAlias^$ID->CONST_STRING$EXPRESS_ASSIGN",
+				
+				"OP_CALL:TYPE=EXPRESS,DEFINE=(ID->CONST_STRING|FUNCTION_NAME->CONST_STRING)$(EXPRESS$(,~$EXPRESS)*)#FUNCTION_CALL",
+				
+				"EXPRESS:TYPE=EXPRESS,DEFINE=BREAK_CALL|CONTINUE_CALL|EXPRESS_RETURN|ALIAS_CALL|EXPORT_ALIAS_CALL|EXPRESS_ASSIGN|OP_CALL",
+				
+				"STAT_SEMICOLON:TYPE=STATEMENT,DEFINE=;~|(EXPRESS$(EOF|;)~#STAT_SEMICOLON)",
+				
+				"STAT_IFELSE:TYPE=STATEMENT,DEFINE=if^$EXPRESS$then$(STAT_BLOCK|STATEMENT|EXPRESS)$else$(STAT_BLOCK|STATEMENT)",
+				"STAT_IF:TYPE=STATEMENT,    DEFINE=if^$EXPRESS$then$(STAT_BLOCK|STATEMENT)",
+				"STAT_IFELSE_JAVA:TYPE=STATEMENT,DEFINE=if^$CHILD_EXPRESS$(STAT_BLOCK|STATEMENT|EXPRESS)$else$(STAT_BLOCK|STATEMENT)",
+				"STAT_IF_JAVA:TYPE=STATEMENT,    DEFINE=if^$CHILD_EXPRESS$(STAT_BLOCK|STATEMENT)",
+				
+				"PARAMETER_DEFINE:TYPE=STATEMENT,DEFINE=LEFT_BRACKET->CHILD_EXPRESS^$(RIGHT_BRACKET~|(VAR_DEFINE$(,~$VAR_DEFINE)*$RIGHT_BRACKET~))",
+				
+				"STAT_FOR:TYPE=STATEMENT,DEFINE=for^$(LEFT_BRACKET~$STATEMENT{0:2}$EXPRESS$RIGHT_BRACKET~#CHILD_EXPRESS)$STAT_BLOCK$;~*",
+				"STAT_MACRO:TYPE=STATEMENT,DEFINE=macro^$ID->CONST_STRING$STAT_BLOCK$;~*",
+				"STAT_FUNCTION:TYPE=STATEMENT,DEFINE=function^$ID->CONST_STRING$PARAMETER_DEFINE$STAT_BLOCK$;~*",
+				"STAT_CLASS:TYPE=STATEMENT,DEFINE=class^$VClass->CONST_STRING$PARAMETER_DEFINE$STAT_BLOCK$;~*",
+				
+				"COMMENT:TYPE=BLOCK,STARTTAG=/**,ENDTAG=**/,DEFINE=LEFT_COMMENT$(RIGHT_COMMENT@)*$RIGHT_COMMENT#COMMENT",
+				
+				"STATEMENT:TYPE=STATEMENT,DEFINE=COMMENT|STAT_IFELSE|STAT_IF|STAT_IFELSE_JAVA|STAT_IF_JAVA|STAT_FOR|STAT_MACRO|STAT_FUNCTION|STAT_CLASS|STAT_SEMICOLON," 
+				+ "CHILDREN=COMMENT|STAT_IFELSE|STAT_IF|STAT_IFELSE_JAVA|STAT_IF_JAVA|STAT_FOR|STAT_MACRO|STAT_FUNCTION|STAT_CLASS|STAT_SEMICOLON",
+				
+				"STAT_BLOCK:TYPE=BLOCK,DEFINE={->STAT_BLOCK^$STAT_LIST$}~",
+				"STAT_LIST:TYPE=BLOCK,DEFINE=(STAT_BLOCK|STATEMENT)*",
+				
+				"PROGRAM:TYPE=BLOCK,DEFINE=STAT_LIST#STAT_BLOCK",
 		};
-	public String statementDefineStrs = "STAT_FUNCTION,STAT_CLASS,STAT_MACRO,STAT_FOR,STAT_IFELSE,STAT_IF,STAT_IFELSE_JAVA,STAT_IF_JAVA";
-	public String[] expressDefineStrs = {
-				"EXPORT_VAR_DEFINE,VAR_DEFINE,NEW_OBJECT,NEW_ARRAY,NEW_VIR_OBJECT,ARRAY_CALL,METHOD_CALL,FIELD_CALL,FUNCTION_CALL",
-				"ANONY_NEW_ARRAY",
-				"CAST_CALL",
-				"EXPRESS_LEVEL1", "EXPRESS_LEVEL2", "EXPRESS_LEVEL3",
-				"EXPRESS_LEVEL4", "EXPRESS_LEVEL5", "EXPRESS_LEVEL6",
-				"EXPRESS_LEVEL7", "EXPRESS_LEVEL8","EXPRESS_LEVEL9",
-				"EXPRESS_JUDGEANDSET",
-				"EXPRESS_KEY_VALUE",
-				"EXPRESS_ASSIGN", "BREAK_CALL,CONTINUE_CALL",
-				"EXPRESS_RETURN",
-				"ALIAS_CALL,EXPORT_ALIAS_CALL,OP_CALL" };
-		
+	public String[][] instructionFacotryMapping = {
+			{"~,!,++,--,&,|,<<,>>,*,/,mod,%,+,-,like,>,>=,<,<=,==,!=,&&,||,nor,=,return,alias,exportAlias,ARRAY_CALL","com.ql.util.express.instruction.OperatorInstructionFactory"},	
+			{"in","com.ql.util.express.instruction.InInstructionFactory"},
+			{"exportDef","com.ql.util.express.instruction.OperatorInstructionFactory"},
+			{"ID","com.ql.util.express.instruction.LoadAttrInstructionFactory"},	
+			{"CONST,CONST_CLASS","com.ql.util.express.instruction.ConstDataInstructionFactory"},
+			{"[],STAT_SEMICOLON,STAT_BLOCK,FUNCTION_DEFINE,CHILD_EXPRESS","com.ql.util.express.instruction.BlockInstructionFactory"},
+			{"def","com.ql.util.express.instruction.DefineInstructionFactory"},
+			{"NEW_OBJECT,NEW_ARRAY,anonymousNewArray","com.ql.util.express.instruction.NewInstructionFactory"},
+			{"FIELD_CALL","com.ql.util.express.instruction.OperatorInstructionFactory"},
+			{"METHOD_CALL","com.ql.util.express.instruction.MethodCallInstructionFactory"},
+			{"cast","com.ql.util.express.instruction.CastInstructionFactory"},
+			{"break","com.ql.util.express.instruction.BreakInstructionFactory"},
+			{"continue","com.ql.util.express.instruction.ContinueInstructionFactory"},
+			{"FUNCTION_CALL","com.ql.util.express.instruction.CallFunctionInstructionFactory"},
+			{"if,EXPRESS_JUDGEANDSET","com.ql.util.express.instruction.IfInstructionFactory"},
+			{"for","com.ql.util.express.instruction.ForInstructionFactory"},
+			{"function,class","com.ql.util.express.instruction.FunctionInstructionFactory"},
+			{"macro","com.ql.util.express.instruction.MacroInstructionFactory"},
+			{"NEW_VIR_OBJECT","com.ql.util.express.instruction.NewVClassInstructionFactory"},
+			{"COMMENT","com.ql.util.express.instruction.NullInstructionFactory"},
+			{"EXPRESS_KEY_VALUE","com.ql.util.express.instruction.KeyValueInstructionFactory"},
+			
+	};
 }

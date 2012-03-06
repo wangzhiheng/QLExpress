@@ -31,7 +31,7 @@ public class IfInstructionFactory extends  InstructionFactory {
     		point = point + 1;
     	}
     	if(point == 2){
-    		children[2] = new ExpressNode(aCompile.getNodeTypeManager().findNodeType("{}"),null);  
+    		children[2] = new ExpressNode(aCompile.getNodeTypeManager().findNodeType("STAT_BLOCK"),null);  
     	}    	
 		int [] finishPoint = new int[children.length];
    		boolean r1 = aCompile.createInstructionSetPrivate(result,forStack,children[0],false);//condition	

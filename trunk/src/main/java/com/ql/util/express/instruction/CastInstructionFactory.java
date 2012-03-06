@@ -15,13 +15,12 @@ public class CastInstructionFactory  extends InstructionFactory{
 		boolean returnVal = false;	
 		OperatorBase op = aCompile.getOperatorFactory().newInstance(node);
 		ExpressNode[] children = node.getChildren();
-		ExpressNode[] castClass = children[0].getChildren();
-		if(castClass.length ==0){
+		if(children.length ==0){
 			throw new Exception("扩展类型不存在");
-		}else if(castClass.length > 1) {
+		}else if(children.length > 2) {
 			throw new Exception("扩展操作只能有一个类型为Class的操作数");
-		}else if(castClass[0].getNodeType().isEqualsOrChild("CONST_CLASS") == false){
-			throw new Exception("扩展操作只能有一个类型为Class的操作数,当前的数据类型是：" + castClass[0].getNodeType().getTag());
+		}else if(children[0].getNodeType().isEqualsOrChild("CONST_CLASS") == false){
+			throw new Exception("扩展操作只能有一个类型为Class的操作数,当前的数据类型是：" + children[0].getNodeType().getTag());
 		}
 		
 		for(int i =0;i < children.length;i++){
