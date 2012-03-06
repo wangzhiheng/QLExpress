@@ -20,8 +20,6 @@ public class OpCallTest {
 			runner.addOperatorWithAlias("是否VIP","isVIP","亲爱的$1,你还不是VIP用户");
 			
 			String[][] expressTest = new String[][] {
-					{"+ 1 2","3"},
-					{"@love 'a' 'b'","b{a}b"},
 					{"println \"ssssss\"","null"},
 					{"println (\"ssssss\")","null"},
 					{"abc (\"bbbbbbbb\")","null"},
