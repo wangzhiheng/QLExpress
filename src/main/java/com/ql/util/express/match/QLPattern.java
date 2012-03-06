@@ -15,8 +15,10 @@ public class QLPattern {
 	}
 	public static QLMatchResult findMatchStatement(INodeTypeManager aManager,QLPatternNode pattern ,List<? extends IDataNode> nodes,int point) throws Exception{
 		QLMatchResult result = findMatchStatementWithAddRoot(aManager,pattern,nodes,point,true);
-		if(result != null && result.matchs.size() != 1){
-			throw new Exception("语法定义错误，必须有一个根节点：" + pattern);
+		if(result == null || result.matchs.size() == 0){
+			throw new Exception("程序错误，不满足语法规范，没有匹配到合适的语法");
+		}else if(result != null && result.matchs.size() != 1){
+			throw new Exception("程序错误，不满足语法规范，必须有一个根节点：" + pattern);
 		}
 		return result;
 	}
@@ -25,7 +27,6 @@ public class QLPattern {
 		List<QLMatchResultTree> tempList = new ArrayList<QLMatchResultTree>();
 		int count = 0;
 		int lastPoint = point;
-		
 		while(true){
 			QLMatchResult tempResult = null;
 			if (pattern.matchMode == MatchMode.DETAIL) {
@@ -71,37 +72,42 @@ public class QLPattern {
 			//忽略跳过所有匹配到的节点
 			result.matchs.clear();
 		}
+
 		if(result != null && result.matchs.size() >0 && pattern.rootNodeType != null){
 			QLMatchResultTree tempTree = new QLMatchResultTree(pattern.rootNodeType,nodes.get(0).createExpressNode(pattern.rootNodeType,null));
 			tempTree.addLeftAll(result.matchs);
 			result.matchs.clear();
 			result.matchs.add(tempTree);
 		}
-		if( log.isTraceEnabled() && result !=null){
-			if(point >= nodes.size()){
-				log.trace("匹配[start=" + point+":EOF]：" + pattern + (result==null?" NO ":" OK ") );
-			}else{
-				log.trace("匹配[start=" + point+":" + nodes.get(point) +"]：" + pattern + (result==null?" NO ":" OK ") );
-			}
-		}
+//		if( log.isTraceEnabled() && result !=null){
+//			if(point >= nodes.size()){
+//				log.trace("匹配[start=" + point+":EOF]：" + pattern + (result==null?" NO ":" OK ") );
+//			}else{
+//				log.trace("匹配[start=" + point+":" + nodes.get(point) +"][end=" + result.matchLastIndex+":" + (result.matchLastIndex >=nodes.size()?"EOF":nodes.get(result.matchLastIndex)) +"]：" + pattern + (result==null?" NO ":" OK ") );
+//				
+//			}
+//		}
 		return result;
 	}
 	private  static QLMatchResult matchDetailOneTime(INodeTypeManager aManager,QLPatternNode pattern ,List<? extends IDataNode> nodes,int point) throws Exception{
 		QLMatchResult result = null;
 		if (pattern.matchMode == MatchMode.DETAIL) {
-			if(point == nodes.size() && pattern.nodeType == aManager.findNodeType("EOF")){
+			if(pattern.nodeType == aManager.findNodeType("EOF") && point == nodes.size()){
+				result = new QLMatchResult(new ArrayList<QLMatchResultTree>(), point + 1);
+			}else if(pattern.nodeType == aManager.findNodeType("EOF") && point < nodes.size() && nodes.get(point).getValue().equals("}") ){
 				result = new QLMatchResult(new ArrayList<QLMatchResultTree>(), point);
 			}else if(point == nodes.size() && pattern.nodeType.getPatternNode() != null){
 				result = findMatchStatementWithAddRoot(aManager,pattern.nodeType.getPatternNode(),nodes,point,false);
 			}else if( point < nodes.size()){
 				INodeType tempNodeType = nodes.get(point).getTreeType();
 				
+				if(tempNodeType == null){
+					tempNodeType = nodes.get(point).getNodeType();
+				}
 				if(tempNodeType != null){
 					tempNodeType = tempNodeType.isEqualsOrChildAndReturn(pattern.nodeType);
-				}else{
-					tempNodeType = nodes.get(point).getNodeType().isEqualsOrChildAndReturn(
-							pattern.nodeType);
 				}
+
 				if(tempNodeType != null){
 					List<QLMatchResultTree> tempList = new ArrayList<QLMatchResultTree>();
 					tempList.add(new QLMatchResultTree(tempNodeType,nodes.get(point),pattern.targetNodeType));
@@ -109,6 +115,22 @@ public class QLPattern {
 					result = new QLMatchResult(tempList, point);
 				}else if(pattern.nodeType.getPatternNode() != null){
 					result = findMatchStatementWithAddRoot(aManager,pattern.nodeType.getPatternNode(),nodes,point,false);
+					if(pattern.targetNodeType != null && result != null && result.matchs.size() >0){
+						if(result.matchs.size() > 1){
+							throw new Exception("设置了类型转换的语法，只能有一个根节点");
+						}
+						result.matchs.get(0).targetNodeType = pattern.targetNodeType;
+					}
+				}
+				if(pattern.blame == true){//取返处理
+					if( result == null){
+						List<QLMatchResultTree> tempList = new ArrayList<QLMatchResultTree>();
+						tempList.add(new QLMatchResultTree(tempNodeType,nodes.get(point),null));
+						point = point + 1;
+						result = new QLMatchResult(tempList, point);
+					}else{
+						result = null;
+					}
 				}
 			}
 		}else{

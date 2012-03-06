@@ -19,7 +19,7 @@ class KeyValueInstructionFactory  extends InstructionFactory{
 			children[0].setTreeType(aCompile.getNodeTypeManager().findNodeType("CONST"));
 			children[0].setObjectValue(children[0].getValue());			
 		}
-		if( node.getParent() != null && node.getParent().isTypeEqualsOrChild("STATEMENT") && children[1].isTypeEqualsOrChild("{}")){
+		if( node.getParent() != null && node.getParent().isTypeEqualsOrChild("STATEMENT") && children[1].isTypeEqualsOrChild("STAT_BLOCK")){
 			returnVal = new MacroInstructionFactory().createInstruction(aCompile, result, forStack, node, isRoot);
 		} else if (node.getParent() != null&& node.getParent().isTypeEqualsOrChild("STATEMENT")) {
 			for(int i =0;i < children.length;i++){

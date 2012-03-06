@@ -16,18 +16,9 @@ public class CallFunctionInstructionFactory extends InstructionFactory{
 			ExpressNode node, boolean isRoot) throws Exception {
 		ExpressNode[] children = node.getChildren();
 		String functionName = children[0].getValue();
-
-		node.getLeftChildren().clear();
-		ExpressNode[] parameterList = children[1].getChildren();
-		for (int i = 0; i < parameterList.length; i++) {
-			if (parameterList[i].isTypeEqualsOrChild(",") == false) {
-				node.getLeftChildren().add(parameterList[i]);
-			}
-		}
-
 		boolean returnVal = false;
 		children = node.getChildren();
-		for (int i = 0; i < children.length; i++) {
+		for (int i = 1; i < children.length; i++) {
 			boolean tmpHas = aCompile.createInstructionSetPrivate(result,
 					forStack, children[i], false);
 			returnVal = returnVal || tmpHas;
@@ -35,11 +26,12 @@ public class CallFunctionInstructionFactory extends InstructionFactory{
 
 		OperatorBase op = aCompile.getOperatorFactory().getOperator(
 				functionName);
+		int opNum = children.length -1;
 		if (op != null) {
-			result.addInstruction(new InstructionOperator(op, children.length));
+			result.addInstruction(new InstructionOperator(op,opNum ));
 		} else {
 			result.addInstruction(new InstructionCallSelfDefineFunction(
-					functionName, children.length));
+					functionName,opNum));
 		}
 		return returnVal;
 	}

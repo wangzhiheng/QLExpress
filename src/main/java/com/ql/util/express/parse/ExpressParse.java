@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Stack;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -14,7 +13,6 @@ import com.ql.util.express.ExpressUtil;
 import com.ql.util.express.IExpressResourceLoader;
 import com.ql.util.express.match.QLMatchResult;
 import com.ql.util.express.match.QLPattern;
-import com.ql.util.express.match.QLPatternNode;
 
 public class ExpressParse {
 
@@ -244,191 +242,6 @@ public class ExpressParse {
 		return result;
 	}
 
-	
-	/**
-	 * 将所有的表达式，根据(),[],{},;分成子块
-	 * @throws Exception 
-	 */
-    public ExpressNode splitExpressBlock(List<ExpressNode> nodes) throws Exception{
-    	Stack<ExpressNode> startNodeStack = new Stack<ExpressNode>();
-    	Stack<List<ExpressNode>> childrenStack = new Stack<List<ExpressNode>>();
-    	startNodeStack.push(new ExpressNode(nodeTypeManager.findNodeType("FUNCTION_DEFINE"),"main"));
-    	childrenStack.push(new ArrayList<ExpressNode>());
-    	boolean isMatch = false;
-    	for(int i=0;i<nodes.size();i++){
-    		ExpressNode tempNode = nodes.get(i);
-    		isMatch = false;
-    		if(tempNode.getNodeType().getTag().equals("(")){
-    			startNodeStack.push(new ExpressNode(nodeTypeManager.findNodeType("()"),null));
-    	    	childrenStack.push(new ArrayList<ExpressNode>());
-    		}else if(tempNode.getNodeType().getTag().equals("[")){
-    			startNodeStack.push(new ExpressNode(nodeTypeManager.findNodeType("[]"),null));
-    	    	childrenStack.push(new ArrayList<ExpressNode>());  
-    		}else if(tempNode.getNodeType().getTag().equals("{")){
-    			startNodeStack.push(new ExpressNode(nodeTypeManager.findNodeType("{}"),null));
-    	    	childrenStack.push(new ArrayList<ExpressNode>());  
-    		}else if(tempNode.getNodeType().getTag().equals("/**")){
-    			startNodeStack.push(new ExpressNode(nodeTypeManager.findNodeType("COMMENT"),null));
-    	    	childrenStack.push(new ArrayList<ExpressNode>());  
-    		}else if(tempNode.getNodeType().getTag().equals(")") 
-    				|| tempNode.getNodeType().getTag().equals("]")
-    				||tempNode.getNodeType().getTag().equals("}")
-    				||tempNode.getNodeType().getTag().equals("**/")   ){
-    			if (startNodeStack.peek().getNodeType().getEndTag().getTag().equals(tempNode.getNodeType().getTag()) ==false){
-					throw new Exception(
-							(startNodeStack.peek().getNodeType().getStartTag() == null ? startNodeStack
-									.peek().getNodeType().getTag()
-									: startNodeStack.peek().getValue())
-									+ " 与" + tempNode.getValue() + "不匹配");
-				}
-    			isMatch = true;
-    		}else{
-    			childrenStack.peek().add(tempNode);
-    		}
-    		if(isMatch == true){
-    			startNodeStack.peek().setLeftChildren(childrenStack.pop());    	
-    			ExpressNode  tempBlockNode = startNodeStack.pop();
-    			if(tempBlockNode.getNodeType() != nodeTypeManager.findNodeType("COMMENT") ){
-    		    	childrenStack.peek().add(tempBlockNode);
-    			}
-    		}
-    	}
-    	if(startNodeStack.size() >1){
-    		throw new Exception("\""+startNodeStack.peek().getNodeType().getStartTag().getTag() + "\"没有找到对应匹配的符号");
-    	}
-    	startNodeStack.peek().setLeftChildren(childrenStack.pop());
-    	
-    	return startNodeStack.pop();
-    }
-    /**
-     * 拆分语句：";" ,"for(){}","if(){}else{}"
-     * @param root
-     * @throws Exception 
-     */
-    public void splitStatement(ExpressNode root) throws Exception{
-    	splitStatement(root,root.getLeftChildren());
-    	splitStatement(root,root.getRightChildren());   
-    	root.setSplitStatement(true);
-    }
-    public  void splitStatement(ExpressNode root,List<ExpressNode> children) throws Exception{    	
-    	if(children == null || children.size() ==0){
-    		return;
-    	}
-    	int startPoint = 0;
-    	int i=0;
-    	for(ExpressNode tempNode:children){
-    		if(tempNode.isSplitStatement() == false){
-    		    splitStatement(tempNode);
-    		}
-    	}
-    	while(i<children.size()){
-    		ExpressNode tempNode = children.get(i);
-    		if(tempNode.getNodeType().getTag().equals(";")){
-    			for(int j= startPoint;j<i;j++){    	    		
-    				tempNode.addLeftChild(children.get(startPoint));
-    				children.remove(startPoint);//移除原有的东东
-    			}
-    			tempNode.setTreeType(nodeTypeManager.findNodeType("STAT_SEMICOLON"));
-    			i = startPoint + 1;
-    			startPoint = i;
-    		}else{
-    			QLMatchResult matchResult = findMatchStatement(children,i,nodeTypeManager.statementDefine);
-    			if(matchResult != null){
-    				ExpressNode tempRoot = buildStatementTree(children,i,matchResult);
-    				splitStatement(tempRoot);
-    				i = i + 1;
-    				startPoint = i;
-    			}else{
-    			  i = i+1;
-    			}
-    		}
-    	}
-    	//处理最后
-    	if(root.getTreeType().isEqualsOrChild("{}")
-    		 &&	children.get(children.size() - 1).getTreeType().isEqualsOrChild(nodeTypeManager.S_STATEMNET) == false){
-    		ExpressNode tempNode = new ExpressNode(nodeTypeManager.findNodeType(";"),";");
-    			for(int j= startPoint;j<i;j++){
-    				tempNode.addLeftChild(children.get(startPoint));
-    				children.remove(startPoint);//移除原有的东东
-    			}
-    		tempNode.setTreeType(nodeTypeManager.findNodeType("STAT_SEMICOLON_EOF"));	
-    		children.add(tempNode);	    		
-    	}
-    }
-	public void buildExpressTree(ExpressNode root) throws Exception {
-		buildExpressTree(root,root.getLeftChildren());
-		buildExpressTree(root,root.getRightChildren());		
-	}
-	public void buildExpressTree(ExpressNode root,List<ExpressNode> children) throws Exception {
-		if (children == null || children.size() == 0) {
-			return;
-		}
-		for (ExpressNode tempNode : children) {
-			buildExpressTree(tempNode);
-		}
-		if (root.getTreeType().isEqualsOrChild("STAT_SEMICOLON")
-				|| root.getTreeType().isEqualsOrChild("STAT_SEMICOLON_EOF")
-				|| root.getTreeType().isEqualsOrChild("EXPRESS_CHILD")) {
-			buildExpressTreeSingle(children);
-		}
-
-	}
-
-     public void buildExpressTreeSingle(List<ExpressNode> nodes) throws Exception{
-    	if(nodes == null || nodes.size() == 0){
-    		return;
-    	}        	
-		for (List<NodeType> expressLevel : nodeTypeManager.expressDefine){
-			int i = 0;
-			while (i < nodes.size()) {
-				QLMatchResult matchResult = findMatchStatement(nodes, i, expressLevel);
-				if (matchResult != null ) {
-					buildStatementTree(nodes, i, matchResult);
-					if(i == nodes.size() -1 && nodes.get(i).getRealTreeType() != null){
-						break;
-					}else if(matchResult.getMatchLastIndex() - i == 1){
-						i = i+1;
-					}
-				}else{
-				    i = i + 1;
-				}
-			}
-		}
-	}
-
-    public ExpressNode buildStatementTree(List<ExpressNode> nodes,int point,QLMatchResult matchResult) throws Exception{
-    	ExpressNode root = builderStatementTree(nodes, point, matchResult);
-    	root.setTreeType((NodeType)matchResult.statementNodeType);
-        nodes.set(point,root);
-    	return root;
-    }
-    
-	public static ExpressNode builderStatementTree(List<ExpressNode> nodes,int point,QLMatchResult match) throws Exception{
-		if(match == null || match.getMatchs() == null || match.getMatchs().size() != 1){
-			throw new Exception("语法定义错误，必须有且只有一个根节点");
-		}
-		match.getMatchs().get(0).buildExpressNodeTree();		
-		for(int i = match.getMatchLastIndex() - 1; i > point;i--){
-			nodes.remove(i);
-		}
-		nodes.set(point,(ExpressNode)match.getMatchs().get(0).getRef());
-		return (ExpressNode)match.getMatchs().get(0).getRef();		
-	}
-    
-    public QLMatchResult findMatchStatement(List<ExpressNode> nodes,int point,List<NodeType> aStatementDefines) throws Exception{
-    	for(int i =0;i<aStatementDefines.size();i++){
-    		QLPatternNode statement = aStatementDefines.get(i).getPatternNode();
-    		if(statement == null){ 
-    			throw new RuntimeException("没有为" + aStatementDefines.get(i).getTag() +"定义语法规则DEFINE,检查定义：" + aStatementDefines.get(i).getDefineStr());
-    		}
-    		QLMatchResult  result =QLPattern.findMatchStatement(this.nodeTypeManager,statement,nodes, point);
-    		if(result != null){
-    			result.statementNodeType = aStatementDefines.get(i);
-    			return result;
-    		}
-    	}	
-    	return null;
-    }
     public static void printTreeNode(StringBuilder builder,ExpressNode node, int level){
 		builder.append(level+":" );
 		
@@ -515,18 +328,19 @@ public class ExpressParse {
     	if(isTrace == true && log.isDebugEnabled()){
     		log.debug("单词分析结果:" + printInfo(tempList,","));
     	}
-    	ExpressNode root = splitExpressBlock(tempList);
-    	if(isTrace == true && log.isDebugEnabled()){
-    		log.debug("Block拆分后的结果:");
-    		printTreeNode(root,1);
-    	}
-    	splitStatement(root);    	
-    	if(isTrace == true && log.isDebugEnabled()){
-    		log.debug("语句拆分后的结果:");
-    		printTreeNode(root,1);
-    	}
-		buildExpressTree(root);
+    	
 
+		QLMatchResult result = QLPattern.findMatchStatement(this.nodeTypeManager, this.nodeTypeManager
+						.findNodeType("PROGRAM").getPatternNode(), tempList,0);
+		if(result == null){
+			throw new Exception("语法匹配失败");
+		}
+		if(result.getMatchLastIndex() < tempList.size()){
+			throw new Exception("还有单词没有完成语法匹配：" + result.getMatchLastIndex() +" 之后的单词 :" + express);
+		}
+		result.getMatchs().get(0).buildExpressNodeTree();
+		ExpressNode root =(ExpressNode)result.getMatchs().get(0).getRef();
+		
 		//为了生成代码时候进行判断，需要设置每个节点的父亲
     	resetParent(root,null);
     	

@@ -1,5 +1,6 @@
 package com.ql.util.express;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -512,7 +513,7 @@ public class ExpressUtil {
 	public static Object getProperty(Object bean, Object name) {
 		try {
 			if(bean.getClass().isArray() && name.equals("length")){
-			   return ((Object[])bean).length;
+			   return Array.getLength(bean);
 			}else if (bean instanceof Class) {
 				if(name.equals("class")){
 					return bean;

@@ -14,6 +14,7 @@ public class NewInstructionFactory  extends InstructionFactory{
 	public boolean createInstruction(ExpressRunner aCompile,
 			InstructionSet result, Stack<ForRelBreakContinue> forStack,
 			ExpressNode node, boolean isRoot) throws Exception {
+		OperatorBase op = aCompile.getOperatorFactory().newInstance("new");
 		ExpressNode[] children = node.getChildren();
 		if (node.isTypeEqualsOrChild("NEW_ARRAY")) {
 			String tempStr = children[0].getValue();
@@ -23,24 +24,8 @@ public class NewInstructionFactory  extends InstructionFactory{
 			children[0].setValue(tempStr);
 			children[0].setOrgiValue(tempStr);
 			children[0].setObjectValue(ExpressUtil.getJavaClass(tempStr));
-		}else if (node.isTypeEqualsOrChild("ANONY_NEW_ARRAY")) {
-				node.getLeftChildren().clear();
-				ExpressNode[] tempChildren = children[0].getChildren();
-				for (int i = 0; i < tempChildren.length; i++) {
-					if (tempChildren[i].isTypeEqualsOrChild(",") == false) {
-						node.getLeftChildren().add(tempChildren[i]);
-					}
-				}
-		} else if (node.isTypeEqualsOrChild("NEW_OBJECT")) {
-			node.getLeftChildren().remove(1);
-			ExpressNode[] parameterList = children[1].getChildren();
-			for (int i = 0; i < parameterList.length; i++) {
-				if (parameterList[i].isTypeEqualsOrChild(",") == false) {
-					node.getLeftChildren().add(parameterList[i]);
-				}
-			}
-		} else {
-			throw new Exception("不支持的类型：" + node.getTreeType().getTag());
+		}else if (node.isTypeEqualsOrChild("anonymousNewArray")) {
+			op = aCompile.getOperatorFactory().newInstance("anonymousNewArray");
 		}
 
 		boolean returnVal = false;
@@ -49,7 +34,6 @@ public class NewInstructionFactory  extends InstructionFactory{
 			boolean tmpHas = aCompile.createInstructionSetPrivate(result,forStack, children[i], false);
 			returnVal = returnVal || tmpHas;
 		}
-		OperatorBase op = aCompile.getOperatorFactory().newInstance(node);
 		result.addInstruction(new InstructionOperator(op, children.length));
 		return returnVal;
 	}

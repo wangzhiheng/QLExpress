@@ -17,14 +17,9 @@ public class NodeTypeManager implements INodeTypeManager {
 		public String[] splitWord;
 		private String[] keyWords;
 		private String[] nodeTypeDefines;
-		protected String statementDefineStrs;
-		protected String[] expressDefineStrs;
-		
+		protected String[][] instructionFacotryMapping;
 		protected List<NodeType> statementDefine = new ArrayList<NodeType>();
 		protected List<List<NodeType>> expressDefine = new ArrayList<List<NodeType>>();
-	    public NodeType S_STATEMNET = null;
-	    public NodeType S_ID = null;
-	    
 	    protected Map<String,NodeType> nodeTypes = new HashMap<String,NodeType>();	
 	    
 	    //所有的函数定义
@@ -37,8 +32,6 @@ public class NodeTypeManager implements INodeTypeManager {
 	    	this.splitWord = keyWorkdDefine.splitWord;
 			this.keyWords = keyWorkdDefine.keyWords;
 			this.nodeTypeDefines = keyWorkdDefine.nodeTypeDefines;
-			this.statementDefineStrs = keyWorkdDefine.statementDefineStrs;
-			this.expressDefineStrs = keyWorkdDefine.expressDefineStrs;
 			this.initial();
 	    	
 	    }
@@ -46,8 +39,7 @@ public class NodeTypeManager implements INodeTypeManager {
 	    	this.splitWord = keyWorkdDefine.splitWord;
 			this.keyWords = keyWorkdDefine.keyWords;
 			this.nodeTypeDefines = keyWorkdDefine.nodeTypeDefines;
-			this.statementDefineStrs = keyWorkdDefine.statementDefineStrs;
-			this.expressDefineStrs = keyWorkdDefine.expressDefineStrs;
+			this.instructionFacotryMapping = keyWorkdDefine.instructionFacotryMapping;
 			this.initial();
 			this.addOperatorWithRealNodeType("and","&&");
 			this.addOperatorWithRealNodeType("or","||");
@@ -78,23 +70,16 @@ public class NodeTypeManager implements INodeTypeManager {
 				nodeTypes[i].initial();
 			}
 			String[] tempStrList = new String[0];
-			if(statementDefineStrs != null && statementDefineStrs.length() >0){
-				tempStrList = statementDefineStrs.split("\\,");	
-			}
 			for (String item : tempStrList) {
 				statementDefine.add(this.findNodeType(item));
 			}
 
-			for (String item : expressDefineStrs) {
-				String[] tempList = item.split("\\,");
-				List<NodeType> tempNodeTypeList = new ArrayList<NodeType>();
-				for (String str:tempList) {
-					tempNodeTypeList.add(this.findNodeType(str));
+			//初始化指令Facotry
+			for(String[] list : this.instructionFacotryMapping){
+				for(String s :list[0].split(",")){
+					this.findNodeType(s).setInstructionFactory(list[1]);
 				}
-				expressDefine.add(tempNodeTypeList);
 			}
-			S_STATEMNET = this.findNodeType("STATEMENT");
-			S_ID = this.findNodeType("ID");
 		}
 	    
 	/**
@@ -108,7 +93,7 @@ public class NodeTypeManager implements INodeTypeManager {
 		NodeType define = nodeTypes.get(name);
 		if(define != null ){
 			log.warn("节点类型定义重复:"+name+" 定义1="+define.getDefineStr() + " 定义2=" + aDefineStr);
-		//	throw new RuntimeException("节点类型定义重复:"+name+" 定义1="+define.getDefineStr() + " 定义2=" + aDefineStr);
+			throw new RuntimeException("节点类型定义重复:"+name+" 定义1="+define.getDefineStr() + " 定义2=" + aDefineStr);
 		}
 		define = new NodeType(this,name,aDefineStr);
 		nodeTypes.put(name, define);

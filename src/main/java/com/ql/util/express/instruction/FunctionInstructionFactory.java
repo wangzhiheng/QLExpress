@@ -35,7 +35,7 @@ public class FunctionInstructionFactory extends InstructionFactory {
     		String varName = varDefines[point].getChildren()[1].getValue();    		
     		OperateDataLocalVar tmpVar = new OperateDataLocalVar(varName,varClass);
     		functionSet.addParameter(tmpVar);
-    		point = point + 2;
+    		point = point + 1;
     	}
     	
     	ExpressNode functionRoot = new ExpressNode(aCompile.getNodeTypeManager().findNodeType("FUNCTION_DEFINE"),"function-" + functionName);
