@@ -1,7 +1,6 @@
 package com.ql.util.express.parse;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,8 +17,6 @@ public class NodeTypeManager implements INodeTypeManager {
 		private String[] keyWords;
 		private String[] nodeTypeDefines;
 		protected String[][] instructionFacotryMapping;
-		protected List<NodeType> statementDefine = new ArrayList<NodeType>();
-		protected List<List<NodeType>> expressDefine = new ArrayList<List<NodeType>>();
 	    protected Map<String,NodeType> nodeTypes = new HashMap<String,NodeType>();	
 	    
 	    //所有的函数定义
@@ -69,12 +66,7 @@ public class NodeTypeManager implements INodeTypeManager {
 			for (int i = 0; i < nodeTypes.length; i++) {
 				nodeTypes[i].initial();
 			}
-			String[] tempStrList = new String[0];
-			for (String item : tempStrList) {
-				statementDefine.add(this.findNodeType(item));
-			}
-
-			//初始化指令Facotry
+						//初始化指令Facotry
 			for(String[] list : this.instructionFacotryMapping){
 				for(String s :list[0].split(",")){
 					this.findNodeType(s).setInstructionFactory(list[1]);
@@ -130,15 +122,16 @@ public class NodeTypeManager implements INodeTypeManager {
 	 * 增加新的操作符号，其优先级别，以及语法关系与参照的操作符号一致
 	 * @param operName
 	 * @param refOperName
+	 * @throws Exception 
 	 */
-	public void addOperatorWithLevelOfReference(String operName, String refOperName){
+	public void addOperatorWithLevelOfReference(String operName, String refOperName) throws Exception{
 		NodeType target =  this.createNodeType(operName + ":TYPE=KEYWORD");
 		target.initial();
 		NodeType[] list = this.getNodeTypesByKind(NodeTypeKind.OPERATOR);
 		NodeType refNodeType = this.findNodeType(refOperName);
 		target.setInstructionFactory(refNodeType.getInstructionFactory());
 		for(NodeType item:list){
-			if(item.isContainsChild(refNodeType)){
+			if(item.isContainerChild(refNodeType)){
 				item.addChild(target);
 				return;
 			}
@@ -157,38 +150,7 @@ public class NodeTypeManager implements INodeTypeManager {
 		}
 		return result;
 	}
-	public boolean isSplitWord(String word){
-		for(String s: this.splitWord){
-			if(s.equals(word)){
-				return true;
-			}
-		}
-		return false;
-	}
-	/**
-	 * 递归判断节点类型是否匹配，例如 :
-	 * isNodeTypeOrChild(CONST_LONG,CONST)==true
-	 * isNodeTypeOrChild(CONST_LONG,CONST_NUMBER)==true
-	 * isNodeTypeOrChild(CONST_LONG,CONST_BOOLEAN)==false
-	 * @param child
-	 * @param parent
-	 * @return
-	 */
-	public NodeType isEqualsOrChildAndReturn2(NodeType child,NodeType parent){
-		if (child == parent)
-			return child;
-		NodeType[] tempList = parent.getChildren();
-		if (tempList != null) {
-			for (NodeType item : tempList) {
-				NodeType result = isEqualsOrChildAndReturn2(child, item);
-				if (result != null) {
-					return result;
-				}
-			}
-		}
-		return null;
-	}
-	
+
 	public NodeType[] getNodeTypesByKind(NodeTypeKind aKind){
 		List<NodeType> result  = new ArrayList<NodeType>();
 		for(NodeType item :this.nodeTypes.values()){
@@ -198,39 +160,10 @@ public class NodeTypeManager implements INodeTypeManager {
 		}
 		return result.toArray(new NodeType[0]);
 	}
-	public NodeType[] getNodeTypesSortByKind(){
-		NodeType[] list = nodeTypes.values().toArray(new NodeType[0]);
-		Arrays.sort(list,new NodeTypeComparator());
-		return list;
-	}
 	public boolean isFunction(String name){
 		return this.functions.containsKey(name);
 	}
 	public void addFunctionName(String name){
 		this.functions.put(name, name);
-	}
-	public static String[] splist(String str,char splitChar,boolean isIncludeSplitChar){
-		List<String> result = new ArrayList<String>();
-		String tempStr ="";
-		for(int i=0;i<str.length();i++){
-			if (str.charAt(i) == '\\') {
-				tempStr = tempStr + str.charAt(i + 1);
-				i = i + 1;
-			} else if (str.charAt(i) == splitChar) {
-				if(tempStr.length() >0){
-				    result.add(tempStr);
-				}
-				if(isIncludeSplitChar == true){
-					result.add(splitChar + "");
-				}
-				tempStr = "";
-			} else {
-				tempStr = tempStr + str.charAt(i);
-			}
-		}
-		if(tempStr.length() >0){
-			result.add(tempStr);
-		}
-		return result.toArray(new String[0]);
 	}
 }

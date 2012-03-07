@@ -116,9 +116,9 @@ public class OperatorFactory {
 	 * 创建一个新的操作符实例
 	 */
 	public OperatorBase newInstance(ExpressNode opItem) throws Exception {
-		OperatorBase op = operator.get(opItem.getNodeType().getTag());
+		OperatorBase op = operator.get(opItem.getNodeType().getName());
 		if (op == null) {
-			op = operator.get(opItem.getTreeType().getTag());
+			op = operator.get(opItem.getTreeType().getName());
 		}
 		if(op == null){
 			op = operator.get(opItem.getValue());

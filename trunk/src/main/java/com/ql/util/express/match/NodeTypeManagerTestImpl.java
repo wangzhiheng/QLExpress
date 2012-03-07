@@ -9,12 +9,12 @@ public class NodeTypeManagerTestImpl implements INodeTypeManager {
 }
 
 class TestNodeTypeImpl implements INodeType{
-	String tag;
-    public TestNodeTypeImpl(String aTag){
-    	this.tag = aTag;
+	String name;
+    public TestNodeTypeImpl(String aName){
+    	this.name = aName;
     }
-	public String getTag() {
-		return this.tag;
+	public String getName() {
+		return this.name;
 	}
 
 	public INodeTypeManager getManager() {
@@ -25,10 +25,4 @@ class TestNodeTypeImpl implements INodeType{
 	public QLPatternNode getPatternNode() {
 		throw new RuntimeException("没有实现的方法");
 	}
-
-	@Override
-	public INodeType isEqualsOrChildAndReturn(INodeType nodeType) {
-		throw new RuntimeException("没有实现的方法");
-	}
-	
 }

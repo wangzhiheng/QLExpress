@@ -7,9 +7,7 @@ package com.ql.util.express.match;
  *
  */
 public interface INodeType {
-	public String getTag();	
+	public String getName();	
 	public INodeTypeManager getManager();
-	
 	public QLPatternNode getPatternNode();
-	public INodeType isEqualsOrChildAndReturn(INodeType nodeType);
 }

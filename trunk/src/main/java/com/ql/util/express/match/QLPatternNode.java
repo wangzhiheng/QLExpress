@@ -12,6 +12,9 @@ enum MatchMode{
 public class QLPatternNode{
 	private static final Log log = LogFactory.getLog(QLPatternNode.class);
 	INodeTypeManager nodeTypeManager;
+	
+	String name;
+	
 	/**
 	 * 原始的字符串
 	 */
@@ -76,26 +79,19 @@ public class QLPatternNode{
 	 */
 	List<QLPatternNode> children = new ArrayList<QLPatternNode>();
 	
-	protected QLPatternNode(INodeTypeManager aManager,String aOrgiContent) throws Exception{
-		this(aManager,aOrgiContent,false,1);
+	protected QLPatternNode(INodeTypeManager aManager,String aName,String aOrgiContent) throws Exception{
+		this(aManager,aName,aOrgiContent,false,1);
 		if(this.toString().equals(aOrgiContent)==false){
 				throw new Exception("语法定义解析后的结果与原始值不一致，原始值:"+ aOrgiContent + " 解析结果:" + this.toString());
 		}
 	}
-	private QLPatternNode(INodeTypeManager aManager,String aOrgiContent,boolean aIsChildMode,int aLevel) throws Exception{
+	protected QLPatternNode(INodeTypeManager aManager,String aName,String aOrgiContent,boolean aIsChildMode,int aLevel) throws Exception{
 		this.nodeTypeManager = aManager;
+		this.name = aName;
 		this.orgiContent = aOrgiContent;
 		this.isChildMode = aIsChildMode;
 		this.level = aLevel;
 		this.splitChild();
-	}
-	class NodeTree{
-		char c;
-		String children;
-		public NodeTree(char aC,String aChildren){
-			this.c= aC;
-			this.children = aChildren;
-		}
 	}
 	public void splitChild() throws Exception{
 		if(log.isTraceEnabled()){
@@ -106,7 +102,7 @@ public class QLPatternNode{
 			//log.trace("分解匹配模式[LEVEL="+ this.level +"]START:" + str + this.orgiContent);
 		}
 		String orgStr = this.orgiContent;
-		if(orgStr.equals("(") || orgStr.equals(")") || orgStr.equals("|")||orgStr.equals("||")||orgStr.equals("/**") || orgStr.equals("**/")){
+		if(orgStr.equals("(") || orgStr.equals(")") || orgStr.equals("|")||orgStr.equals("||")||orgStr.equals("/**") || orgStr.equals("**/")||orgStr.equals("*")){
 			this.matchMode = MatchMode.DETAIL;
 			this.nodeType = this.nodeTypeManager.findNodeType(orgStr);
 			return ;
@@ -129,7 +125,7 @@ public class QLPatternNode{
 					throw new Exception("不正确的模式串,在一个匹配模式中不能|,$并存,请使用字串模式:"
 							+ orgStr);
 				}
-				children.add(new QLPatternNode(this.nodeTypeManager,tempStr, false,this.level + 1));
+				children.add(new QLPatternNode(this.nodeTypeManager,"ANONY_PATTERN",tempStr, false,this.level + 1));
 				this.matchMode = MatchMode.AND;
 				tempStr = "";
 			}else if(orgStr.charAt(i) == '|'){
@@ -138,7 +134,7 @@ public class QLPatternNode{
 						throw new Exception("不正确的模式串,在一个匹配模式中不能|,$并存,请使用字串模式:"
 								+ orgStr);
 					}
-					children.add(new QLPatternNode(this.nodeTypeManager,tempStr, false,this.level + 1));
+					children.add(new QLPatternNode(this.nodeTypeManager,"ANONY_PATTERN",tempStr, false,this.level + 1));
 					this.matchMode = MatchMode.OR;
 					tempStr = "";
 			}else if(orgStr.charAt(i) == '#'){
@@ -154,7 +150,7 @@ public class QLPatternNode{
 		}
         
 		if(this.children.size() > 0){
-			children.add(new QLPatternNode(this.nodeTypeManager,tempStr, false,this.level + 1));
+			children.add(new QLPatternNode(this.nodeTypeManager,"ANONY_PATTERN",tempStr, false,this.level + 1));
 			tempStr ="";
 		}
 		
@@ -198,7 +194,7 @@ public class QLPatternNode{
     	//处理(ABC|bcd)模式
     	if(tempStr.length() > 2 && tempStr.charAt(0)=='(' && tempStr.charAt(tempStr.length() - 1) ==')'){
     		this.isChildMode = true;
-    		this.children.add(new QLPatternNode(this.nodeTypeManager,tempStr.substring(1, tempStr.length() - 1), false,this.level + 1));
+    		this.children.add(new QLPatternNode(this.nodeTypeManager,"ANONY_PATTERN",tempStr.substring(1, tempStr.length() - 1), false,this.level + 1));
     		this.matchMode = MatchMode.AND;
     		tempStr = "";
     		
@@ -214,10 +210,18 @@ public class QLPatternNode{
 			this.nodeType = this.nodeTypeManager.findNodeType(tempStr);
 		}
 	}	
+    public List<QLPatternNode> getChildren(){
+    	return this.children;
+    }
+    public INodeType getNodeType(){
+    	return this.nodeType;
+    }
 	
-
-	public String getPrintName(INodeType nodeType){
-		 return nodeType.getTag();
+	public boolean  isDetailMode(){
+		return this.matchMode == MatchMode.DETAIL;
+	}
+	public boolean  isAndMode(){
+		return this.matchMode == MatchMode.AND;
 	}
 	public String toString(){
 		String result ="";
@@ -226,10 +230,10 @@ public class QLPatternNode{
 		}else if(this.matchMode ==MatchMode.OR){
 			result = this.joinStringList(this.children,"|");
 		}else{
-			result = getPrintName(this.nodeType);
+			result = this.nodeType.getName();
 		}
 		if(this.targetNodeType != null){
-			result = result +"->" + getPrintName(this.targetNodeType);
+			result = result +"->" + this.targetNodeType.getName();
 		}
 		if(this.isChildMode == true){
 			result ="("+ result + ")";
@@ -252,7 +256,7 @@ public class QLPatternNode{
 		}
 		
 		if(this.rootNodeType != null){
-			result = result + '#'+ getPrintName(this.rootNodeType);
+			result = result + '#'+ this.rootNodeType.getName();
 		}
 		return result;
 	}

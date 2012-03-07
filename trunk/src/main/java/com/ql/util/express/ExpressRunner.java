@@ -303,8 +303,9 @@ public class ExpressRunner {
 	 * 添加操作符号，此操作符号的优先级与 "*"相同，语法形式也是  data name data
 	 * @param name
 	 * @param op
+	 * @throws Exception 
 	 */
-	public void addOperator(String name,Operator op) {
+	public void addOperator(String name,Operator op) throws Exception {
 		 this.addOperator(name, "*", op);
 	}
 	/**
@@ -312,8 +313,9 @@ public class ExpressRunner {
 	 * @param name 操作符号名称
 	 * @param aRefOpername 参照的操作符号，例如 "+","--"等
 	 * @param op
+	 * @throws Exception 
 	 */
-	public void addOperator(String name,String aRefOpername,Operator op) {
+	public void addOperator(String name,String aRefOpername,Operator op) throws Exception {
 		this.manager.addOperatorWithLevelOfReference(name, aRefOpername);
 		this.operatorManager.addOperator(name, op);
 	}
@@ -341,16 +343,16 @@ public class ExpressRunner {
 		if(realNodeType == null){
 			throw new Exception("关键字：" + realKeyWordName +"不存在");			
 		}
-		boolean isExist = this.operatorManager.isExistOperator(realNodeType.getTag());
+		boolean isExist = this.operatorManager.isExistOperator(realNodeType.getName());
 		if(isExist == false &&  errorInfo != null){
 			throw new Exception("关键字：" + realKeyWordName +"是通过指令来实现的，不能设置错误的提示信息，errorInfo 必须是 null");
 		}
 		if(isExist == false || errorInfo == null){
 			//不需要新增操作符号，只需要建立一个关键子即可
-			this.manager.addOperatorWithRealNodeType(keyWordName, realNodeType.getTag());
+			this.manager.addOperatorWithRealNodeType(keyWordName, realNodeType.getName());
 		}else{
-			this.manager.addOperatorWithLevelOfReference(keyWordName, realNodeType.getTag());		
-			this.operatorManager.addOperatorWithAlias(keyWordName, realNodeType.getTag(), errorInfo);
+			this.manager.addOperatorWithLevelOfReference(keyWordName, realNodeType.getName());		
+			this.operatorManager.addOperatorWithAlias(keyWordName, realNodeType.getName(), errorInfo);
 		}
 	}
 	/**
