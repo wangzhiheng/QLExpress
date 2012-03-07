@@ -20,7 +20,7 @@ public class CastInstructionFactory  extends InstructionFactory{
 		}else if(children.length > 2) {
 			throw new Exception("扩展操作只能有一个类型为Class的操作数");
 		}else if(children[0].getNodeType().isEqualsOrChild("CONST_CLASS") == false){
-			throw new Exception("扩展操作只能有一个类型为Class的操作数,当前的数据类型是：" + children[0].getNodeType().getTag());
+			throw new Exception("扩展操作只能有一个类型为Class的操作数,当前的数据类型是：" + children[0].getNodeType().getName());
 		}
 		
 		for(int i =0;i < children.length;i++){

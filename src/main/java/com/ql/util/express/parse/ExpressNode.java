@@ -64,13 +64,6 @@ public class ExpressNode implements IDataNode{
 		this.col =aCol;
 	}
 	
-	public NodeType isEqualsOrChildAndReturn(NodeType parent){
-	    NodeType result = (NodeType)this.getTreeType().isEqualsOrChildAndReturn(parent);
-	    if(result == null && this.treeType != null){
-	 		result = (NodeType)this.getNodeType().isEqualsOrChildAndReturn(parent);
-	 	}
-	 	return result;
-	}
 	public boolean isTypeEqualsOrChild(String parent){
 	 	boolean result = this.getTreeType().isEqualsOrChild(parent);
 	 	if(result == false && this.treeType != null){
@@ -78,13 +71,7 @@ public class ExpressNode implements IDataNode{
 	 	}
 	 	return result;
 	}
-	public boolean isTypeEqualsOrChild(NodeType parent){
-	 	boolean result = this.getTreeType().isEqualsOrChild(parent);
-	 	if(result == false && this.treeType != null){
-	 		result = this.getNodeType().isEqualsOrChild(parent);
-	 	}
-	 	return result;
-	}
+
 	public NodeType getNodeType() {
 		return nodeType;
 	}
@@ -93,7 +80,7 @@ public class ExpressNode implements IDataNode{
 	}
 	public String getValue() {
 		if(value == null){
-			return this.nodeType.getTag();
+			return this.nodeType.getName();
 		}else{
 		  return value;
 		}
@@ -108,15 +95,7 @@ public class ExpressNode implements IDataNode{
 	public void setSplitStatement(boolean isSplitStatement) {
 		this.isSplitStatement = isSplitStatement;
 	}
-	public String getOperatorName(){
-		if(this.treeType != null && this.treeType.getOperatorName() != null){
-			return this.treeType.getOperatorName();
-		}
-		if(this.nodeType.getOperatorName() != null){
-			return this.nodeType.getOperatorName();
-		}
-		throw new RuntimeException("没有定义节点的操作信息：" + this.nodeType.getTag()+ (this.treeType == null?"":" 或者 "  +this.treeType.getTag()) );
-	}
+
 	public String getInstructionFactory(){
 		if(this.nodeType.getInstructionFactory() != null){
 			return this.nodeType.getInstructionFactory();
@@ -124,7 +103,7 @@ public class ExpressNode implements IDataNode{
 		if(this.treeType != null && this.treeType.getInstructionFactory() != null){
 			return this.treeType.getInstructionFactory();
 		}
-		throw new RuntimeException("没有定义节点的指令InstructionFactory信息：" + this.nodeType.getTag()+ (this.treeType == null?"":" 或者 "  +this.treeType.getTag()) );
+		throw new RuntimeException("没有定义节点的指令InstructionFactory信息：" + this.nodeType.getName()+ (this.treeType == null?"":" 或者 "  +this.treeType.getName()) );
 	}
 	
 	public String getOrgiValue() {
@@ -219,7 +198,7 @@ public class ExpressNode implements IDataNode{
 	}
 	
 	public String toString(){
-		  String str =  (this.orgiValue == null ? this.getValue():this.orgiValue) + (this.nodeType.getTag() == null?"":(":" + this.nodeType.getTag()));
+		  String str =  (this.orgiValue == null ? this.getValue():this.orgiValue) + (this.nodeType.getName() == null?"":(":" + this.nodeType.getName()));
 		 // return str + "[" + this.line +"," + this.col +"]";
 		  return str;
 	}

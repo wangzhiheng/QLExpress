@@ -80,7 +80,7 @@ public 	class QLMatchResultTree{
 		for (int i = 0; i < level; i++) {
 			builder.append("   ");
 		}
-		builder.append(ref.getValue() + ":" + this.matchNodeType.getTag())
+		builder.append(ref.getValue() + ":" + this.matchNodeType.getName())
 				.append("\n");
 		if (this.left != null) {
 			for (QLMatchResultTree item : this.left) {

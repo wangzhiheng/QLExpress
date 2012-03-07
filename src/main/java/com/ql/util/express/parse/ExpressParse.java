@@ -254,7 +254,7 @@ public class ExpressParse {
 				builder.append("   ");
 			}
 		}
-		builder.append("\t"+ node.getTreeType().getTag()).append("\n");
+		builder.append("\t"+ node.getTreeType().getName()).append("\n");
 		
 		List<ExpressNode> leftChildren = node.getLeftChildren();
 		if (leftChildren != null && leftChildren.size() > 0) {
@@ -336,7 +336,9 @@ public class ExpressParse {
 			throw new Exception("语法匹配失败");
 		}
 		if(result.getMatchLastIndex() < tempList.size()){
-			throw new Exception("还有单词没有完成语法匹配：" + result.getMatchLastIndex() +" 之后的单词 :" + express);
+			int maxPoint = result.getMatchLastIndex();
+			ExpressNode tempNode = tempList.get(maxPoint);
+			throw new Exception("还有单词没有完成语法匹配：" + result.getMatchLastIndex() +"["+ tempNode.getValue() + ":line=" + tempNode.getLine() + ",col=" + tempNode.getCol() +"] 之后的单词 \n" + express);
 		}
 		result.getMatchs().get(0).buildExpressNodeTree();
 		ExpressNode root =(ExpressNode)result.getMatchs().get(0).getRef();
