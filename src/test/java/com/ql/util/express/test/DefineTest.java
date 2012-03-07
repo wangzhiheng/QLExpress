@@ -12,7 +12,7 @@ import com.ql.util.express.InstructionSet;
 public class DefineTest {
 	@org.junit.Test
 	public void testDefExpressInner() throws Exception{
-		String express = "int qh = 1";
+		String express = "int qh =  1 ";
 		DefaultContext<String, Object>  context = new DefaultContext<String, Object>();
 		ExpressRunner runner = new ExpressRunner(false,true);	
 		context.put("qh",100);
@@ -33,7 +33,7 @@ public class DefineTest {
 	}
 	@org.junit.Test
 	public void testAlias() throws Exception {
-		String express = " 定义别名 qh example.child ; "
+		String express = " 定义别名 qh example.child; "
 				+ "{定义别名 qh example.child.a;" + " qh =qh + \"-ssss\";" + "};"
 				+ " qh.a = qh.a +\"-qh\";" + " return example.child.a";
 		ExpressRunner runner = new ExpressRunner();
