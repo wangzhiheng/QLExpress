@@ -26,10 +26,13 @@ public class PatternTest {
 			//	{"EXPRESS","!!3 * !!4 * 5 + 8 + 7 +9 like ABC"},
 			//	{"EXPRESS_OP_L5","7+!!3*4 like 9 +!!2*4"},
 			//	{"SELECT","select TAB.TABLE_NAME  + '-ABC',TAB.COL_NAME.B  * 100 from A,B"},
-				{"EXPRESS","(new int[3][5])[1].length"},
+				{"EXPRESS_OP_L4","-3*-5"},
 				
 		};
 		NodeTypeManager manager = new NodeTypeManager(new KeyWordDefine4Java());
+		if( manager.findNodeType("OP_LIST").isContainerChild(manager.findNodeType("*")) ==false){
+			 throw new Exception("Ñ°ÕÒ¶ù×ÓÊ§°Ü");
+		}
 		ExpressParse parse = new ExpressParse(manager,null,false);
 		for(String[] row : defines){
 			Word[] words = WordSplit.parse(manager.splitWord,row[1]);
