@@ -66,13 +66,16 @@ public class NodeTypeManager implements INodeTypeManager {
 			for (int i = 0; i < nodeTypes.length; i++) {
 				nodeTypes[i].initial();
 			}
-						//初始化指令Facotry
-			for(String[] list : this.instructionFacotryMapping){
-				for(String s :list[0].split(",")){
+			
+			//初始化指令Facotry
+		if (this.instructionFacotryMapping != null) {
+			for (String[] list : this.instructionFacotryMapping) {
+				for (String s : list[0].split(",")) {
 					this.findNodeType(s).setInstructionFactory(list[1]);
 				}
 			}
 		}
+	}
 	    
 	/**
 	 * 创建节点类型，需要注意的是不能初始化，必须所有的类型都创建完成后才能调用初始化方法
