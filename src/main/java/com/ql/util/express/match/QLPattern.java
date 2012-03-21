@@ -26,7 +26,7 @@ public class QLPattern {
 	}
 	private  static QLMatchResult findMatchStatementWithAddRoot(INodeTypeManager aManager,QLPatternNode pattern ,List<? extends IDataNode> nodes,int point,boolean isRoot,AtomicLong maxMatchPoint) throws Exception{
 		QLMatchResult result = null;
-		List<QLMatchResultTree> tempList = new ArrayList<QLMatchResultTree>();
+		List<QLMatchResultTree> tempList = null;
 		int count = 0;
 		int lastPoint = point;
 		while(true){
@@ -43,12 +43,18 @@ public class QLPattern {
 			if(tempResult == null){
 				if(count >= pattern.minMatchNum && count <=pattern.maxMatchNum){
 					//正确匹配
+					if(tempList == null){
+						 tempList = new ArrayList<QLMatchResultTree>();
+					}
 					result = new QLMatchResult(tempList,lastPoint);
 				}else{
 					result = null;
 				}
 				break;
 			}else{
+				if(tempList == null){
+					 tempList = new ArrayList<QLMatchResultTree>();
+				}
 				lastPoint = tempResult.matchLastIndex;
 				if(pattern.isTreeRoot == true){
 					if(tempResult.matchs.size() > 1){
@@ -85,7 +91,6 @@ public class QLPattern {
 	}
 	private  static QLMatchResult matchDetailOneTime(INodeTypeManager aManager,QLPatternNode pattern ,List<? extends IDataNode> nodes,int point,AtomicLong maxMatchPoint) throws Exception{
 		QLMatchResult result = null;
-		if (pattern.matchMode == MatchMode.DETAIL) {
 			if(pattern.nodeType == aManager.findNodeType("EOF") && point == nodes.size()){
 				result = new QLMatchResult(new ArrayList<QLMatchResultTree>(), point + 1);
 			}else if(pattern.nodeType == aManager.findNodeType("EOF") && point < nodes.size() && nodes.get(point).getValue().equals("}") ){
@@ -128,35 +133,30 @@ public class QLPattern {
 					}
 				}
 			}
-		}else{
-			throw new Exception("不正确的类型：" + pattern.matchMode.toString());
-		}
 		if(result != null && result.matchLastIndex > maxMatchPoint.longValue()){
 			maxMatchPoint.set(result.matchLastIndex);
 		}
 		return result;
 
 	}	
-	private  static QLMatchResult matchOrOneTime(INodeTypeManager aManager,QLPatternNode pattern ,List<? extends IDataNode> nodes,int point,AtomicLong maxMatchPoint) throws Exception{
+
+	private static QLMatchResult matchOrOneTime(INodeTypeManager aManager,
+			QLPatternNode pattern, List<? extends IDataNode> nodes, int point,
+			AtomicLong maxMatchPoint) throws Exception {
 		QLMatchResult result = null;
-		if (pattern.matchMode == MatchMode.OR) {
-			for (QLPatternNode item : pattern.children) {
-				QLMatchResult tempResult = findMatchStatementWithAddRoot(aManager,item,nodes,point,false,maxMatchPoint);
-				if (tempResult != null) {
-					return tempResult;
-				}
+		for (QLPatternNode item : pattern.children) {
+			QLMatchResult tempResult = findMatchStatementWithAddRoot(aManager,item, nodes, point, false, maxMatchPoint);
+			if (tempResult != null) {
+				return tempResult;
 			}
-		}else{
-			throw new Exception("不正确的类型：" + pattern.matchMode.toString());
-		}	
+		}
 		return result;
 	}
 	private  static QLMatchResult matchAndOneTime(INodeTypeManager aManager,QLPatternNode pattern ,List<? extends IDataNode> nodes,int point,AtomicLong maxMatchPoint) throws Exception{
 		int orgiPoint = point;
-		if(pattern.matchMode ==MatchMode.AND ){
 			QLMatchResultTree root = null;
 			int matchCount =0;//用于调试日志的输出
-    		List<QLMatchResultTree> tempList = new ArrayList<QLMatchResultTree>();
+    		List<QLMatchResultTree> tempList =null;
 			for (QLPatternNode item : pattern.children) {
 				if(point > nodes.size()){
 					return null;
@@ -166,6 +166,9 @@ public class QLPattern {
 				if (tempResult != null) {
 					if(tempResult.matchs.size() > 0){
 						matchCount = matchCount + 1;
+					}
+					if(tempList == null){
+					   tempList = new ArrayList<QLMatchResultTree>();
 					}
 					point = tempResult.matchLastIndex;
 					if (item.isTreeRoot == true && tempResult.matchs.size() >0) {
@@ -197,9 +200,6 @@ public class QLPattern {
 			QLMatchResult result = new QLMatchResult(tempList,point);
 			traceLog(pattern,result,nodes,orgiPoint,matchCount);
 			return result;
-		}else{
-			throw new Exception("不正确的类型：" + pattern.matchMode.toString());
-		}
 	}
 
 	public static void traceLog(QLPatternNode pattern, QLMatchResult result,
