@@ -53,7 +53,7 @@ public class ExpressRunner {
     /**
      * 语法定义的管理器
      */
-	private NodeTypeManager manager = new NodeTypeManager();
+	private NodeTypeManager manager;
 	/**
 	 * 操作符的管理器
 	 */
@@ -77,7 +77,10 @@ public class ExpressRunner {
 	 * @param aIstrace 是否跟踪执行指令的过程
 	 */
 	public ExpressRunner(boolean aIsPrecise,boolean aIstrace){
-		this(aIsPrecise,aIstrace,new DefaultExpressResourceLoader());
+		this(aIsPrecise,aIstrace,new DefaultExpressResourceLoader(),null);
+	}
+	public ExpressRunner(boolean aIsPrecise,boolean aIstrace,NodeTypeManager aManager){
+		this(aIsPrecise,aIstrace,new DefaultExpressResourceLoader(),aManager);
 	}
 	/**
 	 * 
@@ -85,10 +88,15 @@ public class ExpressRunner {
 	 * @param aIstrace 是否跟踪执行指令的过程
 	 * @param aExpressResourceLoader 表达式的资源装载器
 	 */
-	public ExpressRunner(boolean aIsPrecise,boolean aIstrace,IExpressResourceLoader aExpressResourceLoader){
+	public ExpressRunner(boolean aIsPrecise,boolean aIstrace,IExpressResourceLoader aExpressResourceLoader,NodeTypeManager aManager){
 		this.isTrace = aIstrace;
 		this.isPrecise = aIsPrecise;
 		this.expressResourceLoader = aExpressResourceLoader;
+		if(aManager == null){
+			manager = new NodeTypeManager();
+		}else{
+			manager = aManager;
+		}
 		this.operatorManager = new OperatorFactory(this.isPrecise);
 		this.loader = new ExpressLoader(this);
 		this.parse =  new ExpressParse(manager,this.expressResourceLoader,this.isPrecise);
