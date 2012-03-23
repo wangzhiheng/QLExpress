@@ -52,14 +52,15 @@
 
 	<distributionManagement>
 		<repository>
-			<id>taocodeReleases</id>
-			<url>http://code.taobao.org/mvn/repositories/releases/</url>
+			<id>releases</id>
+			<url>http://mvnrepo.taobao.ali.com/mvn/releases</url>
 		</repository>
 		<snapshotRepository>
-			<id>taocodeSnapshots</id>
-			<url>http://code.taobao.org/mvn/repositories/snapshots</url>
+			<id>snapshots</id>
+			<url>http://mvnrepo.taobao.ali.com/mvn/snapshots</url>
 		</snapshotRepository>
 	</distributionManagement>
+
 
 	<build>
 		<plugins>
@@ -71,18 +72,20 @@
 					<target>1.6</target>
 				</configuration>
 			</plugin>
-
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>attach-sources</id>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-					</execution>
-				</executions>
+			<plugin>  
+				<artifactId>maven-source-plugin</artifactId>  
+				<version>2.1</version>  
+				<configuration>  
+					<attach>true</attach>  
+				</configuration>  
+				<executions>  
+					<execution>  
+						<phase>compile</phase>  
+						<goals>  
+							<goal>jar</goal>  
+						</goals>  
+					</execution>  
+				</executions>  
 			</plugin>
 		</plugins>
 	</build>
