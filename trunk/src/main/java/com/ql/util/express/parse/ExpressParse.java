@@ -145,13 +145,13 @@ public class ExpressParse {
 				  objectValue = Long.valueOf(tempWord);
 			  }else{
 				  long tempLong = Long.parseLong(tempWord);
-				  if(tempLong > Integer.MAX_VALUE){
-					  tempType = nodeTypeManager.findNodeType("CONST_LONG");
-					  objectValue = Long.valueOf(tempLong);
-				  }else{
+				  if(tempLong <= Integer.MAX_VALUE && tempLong >= Integer.MIN_VALUE){
 					  tempType = nodeTypeManager.findNodeType("CONST_INTEGER");
 					  objectValue = Integer.valueOf((int)tempLong);
-				  }				  
+				  }else{
+					  tempType = nodeTypeManager.findNodeType("CONST_LONG");
+					  objectValue = Long.valueOf(tempLong);
+				  }
 			  }
 			  treeNodeType = nodeTypeManager.findNodeType("CONST");
 			  point = point + 1;
