@@ -12,6 +12,7 @@ public class NewExpressTest {
 	@Test
 	public void testParse() throws Exception{
 		String[][] expresses = new String[][]{
+				{"0 - 3295837566L","-3295837566"},
 				{"1==1? 50+50:100+100","100"},
 				{"1==2? 50+50:100+100","200"},				
 				{"int[][] abc = new int[10][10]; abc[0][0] = 100; abc[0][0]-10","90"},
