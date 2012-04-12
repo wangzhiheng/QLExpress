@@ -301,7 +301,7 @@ class PreciseNumberOperator {
 		}
 		if(result.scale() ==0){
 			long tempLong =  result.longValue();
-			if(tempLong <= Integer.MAX_VALUE){
+			if(tempLong <= Integer.MAX_VALUE && tempLong >= Integer.MIN_VALUE){
 				return (int)tempLong;
 			}else{
 				return tempLong;
@@ -328,7 +328,7 @@ class PreciseNumberOperator {
 		}
 		if(result.scale() ==0){
 			long tempLong =  result.longValue();
-			if(tempLong <= Integer.MAX_VALUE){
+			if(tempLong <= Integer.MAX_VALUE && tempLong >= Integer.MIN_VALUE){
 				return (int)tempLong;
 			}else{
 				return tempLong;
@@ -354,7 +354,7 @@ class PreciseNumberOperator {
 		}
 		if(result.scale() ==0){
 			long tempLong =  result.longValue();
-			if(tempLong <= Integer.MAX_VALUE){
+			if(tempLong <= Integer.MAX_VALUE && tempLong >= Integer.MIN_VALUE){
 				return (int)tempLong;
 			}else{
 				return tempLong;
@@ -380,7 +380,7 @@ class PreciseNumberOperator {
 		}
 		if(result.scale() ==0){
 			long tempLong =  result.longValue();
-			if(tempLong <= Integer.MAX_VALUE){
+			if(tempLong <= Integer.MAX_VALUE && tempLong >= Integer.MIN_VALUE){
 				return (int)tempLong;
 			}else{
 				return tempLong;
