@@ -3,6 +3,7 @@ package com.ql.util.express.test;
 import org.junit.Assert;
 
 import com.ql.util.express.DefaultContext;
+import com.ql.util.express.ExpressRemoteCacheRunner;
 import com.ql.util.express.ExpressRunner;
 import com.ql.util.express.IExpressContext;
 import com.ql.util.express.LocalExpressCacheRunner;
@@ -12,7 +13,7 @@ public class ExpressRemoteCacheTest {
 	@org.junit.Test
 	public void testcache(){
 		ExpressRunner runner =new ExpressRunner();		
-		LocalExpressCacheRunner cacheRunner = new LocalExpressCacheRunner(runner);
+		ExpressRemoteCacheRunner cacheRunner = new LocalExpressCacheRunner(runner);
 		cacheRunner.loadCache("加法计算", "a+b");
 		cacheRunner.loadCache("减法计算", "a-b");
 		
