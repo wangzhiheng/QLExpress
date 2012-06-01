@@ -6,7 +6,7 @@
 	<groupId>com.taobao.util</groupId>
 	<artifactId>taobao-express</artifactId>
 	<packaging>jar</packaging>
-	<version>3.0.0</version>
+	<version>3.0.1</version>
 	<name>taobao-express</name>
 	
 	<dependencies>
