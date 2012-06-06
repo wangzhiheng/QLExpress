@@ -1,5 +1,6 @@
 package com.ql.util.express;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,8 +26,13 @@ import com.ql.util.express.instruction.opdata.OperateDataLocalVar;
  *
  */
 
-public class InstructionSet {
+public class InstructionSet implements Serializable{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1841743860792681669L;
+	
 	private static final Log log = LogFactory.getLog(InstructionSet.class);
 	public static AtomicInteger uniqIndex = new AtomicInteger(1);
 	public static String TYPE_MAIN ="main";
