@@ -6,6 +6,7 @@ import com.ql.util.express.OperateData;
 import com.ql.util.express.RunEnvironment;
 
 public class InstructionGoToWithCondition extends Instruction{
+	private static final long serialVersionUID = -4817805156872407837L;
 	/**
 	 * 跳转指令的偏移量
 	 */

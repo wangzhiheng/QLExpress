@@ -10,6 +10,7 @@ import com.ql.util.express.instruction.op.OperatorBase;
 import com.ql.util.express.instruction.opdata.OperateDataAttr;
 
 public class InstructionOperator extends Instruction{
+	private static final long serialVersionUID = -1217916524030161947L;
 	OperatorBase operator;
 	int opDataNumber;
 	public InstructionOperator(OperatorBase aOperator,int aOpDataNumber){

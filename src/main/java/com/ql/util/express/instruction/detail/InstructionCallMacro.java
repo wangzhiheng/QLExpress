@@ -9,6 +9,7 @@ import com.ql.util.express.RunEnvironment;
 
 
 public class InstructionCallMacro extends Instruction{
+	    private static final long serialVersionUID = -5760553701305043649L;
 		String name;
 		public InstructionCallMacro(String aName){
 			this.name = aName;

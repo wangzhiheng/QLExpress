@@ -7,6 +7,7 @@ import com.ql.util.express.RunEnvironment;
 import com.ql.util.express.instruction.opdata.OperateDataAttr;
 
 public class InstructionConstData extends Instruction {
+	private static final long serialVersionUID = 745531116947232321L;
 	OperateData operateData;
 
 	public InstructionConstData(OperateData data) {

@@ -13,6 +13,7 @@ import com.ql.util.express.instruction.opdata.OperateDataAttr;
 import com.ql.util.express.instruction.opdata.OperateDataLocalVar;
 
 public class InstructionCallSelfDefineFunction extends Instruction{
+	private static final long serialVersionUID = 8315682251443515151L;
 	String functionName;
 	int opDataNumber;
 	public InstructionCallSelfDefineFunction(String name,int aOpDataNumber){
