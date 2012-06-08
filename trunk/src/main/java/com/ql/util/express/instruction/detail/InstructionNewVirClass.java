@@ -8,6 +8,7 @@ import com.ql.util.express.instruction.opdata.OperateDataAttr;
 import com.ql.util.express.instruction.opdata.OperateDataVirClass;
 
 public class InstructionNewVirClass extends Instruction {
+	private static final long serialVersionUID = -4174411242319009814L;
 	String className;
 	int opDataNumber;
 

@@ -7,9 +7,10 @@ package com.ql.util.express;
  *
  */
 
-public class OperateData {
-	public final static OperateData OperateData_TRUE = new OperateData(true,Boolean.TYPE);
-	public final static OperateData OperateData_FALSE = new OperateData(false,Boolean.TYPE);
+public class OperateData implements java.io.Serializable {
+	private static final long serialVersionUID = 4749348640699065036L;
+	public final static transient OperateData OperateData_TRUE = new OperateData(true,Boolean.TYPE);
+	public final static transient OperateData OperateData_FALSE = new OperateData(false,Boolean.TYPE);
 	
 	protected Object dataObject;
 	public Class<?> type;

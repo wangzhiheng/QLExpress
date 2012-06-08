@@ -23,7 +23,8 @@ import com.ql.util.express.OperateData;
  * 
  */
 
-public abstract class OperatorBase {
+public abstract class OperatorBase implements java.io.Serializable {
+	
 	protected String aliasName;
 
 	protected String name;
