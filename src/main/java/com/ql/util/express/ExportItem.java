@@ -1,11 +1,14 @@
 package com.ql.util.express;
 
+import java.io.Serializable;
+
 /**
  * 输出给其它指令共享使用的对象
  * @author xuannan
  *
  */
-public class ExportItem{
+public class ExportItem implements Serializable{
+	private static final long serialVersionUID = 5440012774123494760L;
 	public static String TYPE_ALIAS ="alias";
 	public static String TYPE_DEF ="def";
 	public static String TYPE_FUNCTION ="function";
