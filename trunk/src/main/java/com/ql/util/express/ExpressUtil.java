@@ -9,7 +9,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -249,6 +248,7 @@ public class ExpressUtil {
     		if(result == null){
     			methodCache.put(key, void.class);    			
     		}else{
+    			((Method)result).setAccessible(true);
     			methodCache.put(key,result); 
     		}
     	}else if(result == void.class){
@@ -258,7 +258,7 @@ public class ExpressUtil {
     }
 	public static Method findMethod(Class<?> baseClass, String methodName,
 			Class<?>[] types, boolean publicOnly, boolean isStatic) {
-		Vector<Method> candidates = gatherMethodsRecursive(baseClass, methodName,
+		List<Method> candidates = gatherMethodsRecursive(baseClass, methodName,
 				types.length, publicOnly, isStatic, null /* candidates */);
 		Method method = findMostSpecificMethod(types, (Method[]) candidates
 				.toArray(new Method[0]));
@@ -292,11 +292,11 @@ public class ExpressUtil {
 
 	}
 
-	private static Vector<Method> gatherMethodsRecursive(Class<?> baseClass,
+	private static List<Method> gatherMethodsRecursive(Class<?> baseClass,
 			String methodName, int numArgs, boolean publicOnly,
-			boolean isStatic, Vector<Method> candidates) {
+			boolean isStatic, List<Method> candidates) {
 		if (candidates == null)
-			candidates = new Vector<Method>();
+			candidates = new ArrayList<Method>();
 
 		addCandidates(baseClass.getDeclaredMethods(), methodName, numArgs,
 				publicOnly, isStatic, candidates);
@@ -314,8 +314,8 @@ public class ExpressUtil {
 		return candidates;
 	}
 
-	private static Vector<Method> addCandidates(Method[] methods, String methodName,
-			int numArgs, boolean publicOnly, boolean isStatic, Vector<Method> candidates) {
+	private static List<Method> addCandidates(Method[] methods, String methodName,
+			int numArgs, boolean publicOnly, boolean isStatic, List<Method> candidates) {
 		for (int i = 0; i < methods.length; i++) {
 			Method m = methods[i];
 			if (m.getName().equals(methodName)

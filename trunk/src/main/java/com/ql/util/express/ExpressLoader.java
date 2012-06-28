@@ -1,8 +1,8 @@
 package com.ql.util.express;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.ql.util.express.instruction.FunctionInstructionSet;
 
@@ -14,7 +14,7 @@ import com.ql.util.express.instruction.FunctionInstructionSet;
  * 
  */
 public class ExpressLoader {
-	private Map<String, InstructionSet> expressInstructionSetCache = new HashMap<String, InstructionSet>();
+	private  ConcurrentHashMap<String, InstructionSet> expressInstructionSetCache = new ConcurrentHashMap<String, InstructionSet>();
 	ExpressRunner creator;
 	public ExpressLoader(ExpressRunner aCreator){
 		this.creator = aCreator;
@@ -61,9 +61,7 @@ public class ExpressLoader {
 	   this.expressInstructionSetCache.clear();
    }
 	public InstructionSet getInstructionSet(String expressName) {
-		synchronized (expressInstructionSetCache) {
 			return expressInstructionSetCache.get(expressName);
-		}
 	}
 	public ExportItem[] getExportInfo(){
 		Map<String,ExportItem> result = new TreeMap<String,ExportItem>();
