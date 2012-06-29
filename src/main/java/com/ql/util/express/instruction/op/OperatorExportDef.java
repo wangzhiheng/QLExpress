@@ -20,7 +20,7 @@ public class OperatorExportDef extends OperatorBase {
 		//OperateDataLocalVar result = new OperateDataLocalVar(varName,tmpClass);
 		//context.exportSymbol(varName, result);
 		OperateDataAttr result = (OperateDataAttr)context.getSymbol(varName);
-		result.type = tmpClass;
+		result.setDefineType(tmpClass);
 		return result;
 	}
 }
