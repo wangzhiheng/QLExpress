@@ -21,11 +21,11 @@ public class OperateData implements java.io.Serializable {
 	 * @param obj
 	 * @param aType
 	 */
-	protected void initial(Object obj, Class<?> aType) {
+	public void initial(Object obj, Class<?> aType) {
 		this.type = aType;
 		this.dataObject = obj;
 	}
-	protected void clear(){
+	public void clear(){
 		this.dataObject = null;
 		this.type = null;
 	}

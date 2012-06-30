@@ -3,6 +3,8 @@ package com.ql.util.express;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.ql.util.express.instruction.OperateDataCacheManager;
+
 public class InstructionSetContext  implements IExpressContext<String,Object> {
 	/*
 	 * 没有知道数据类型的变量定义是否传递到最外层的Context

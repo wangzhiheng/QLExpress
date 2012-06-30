@@ -3,7 +3,7 @@ package com.ql.util.express.instruction.op;
 import com.ql.util.express.ExpressUtil;
 import com.ql.util.express.InstructionSetContext;
 import com.ql.util.express.OperateData;
-import com.ql.util.express.OperateDataCacheManager;
+import com.ql.util.express.instruction.OperateDataCacheManager;
 
 public class OperatorCast extends OperatorBase {
 	public OperatorCast(String aName) {

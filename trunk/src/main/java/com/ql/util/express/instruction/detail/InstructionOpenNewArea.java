@@ -3,8 +3,8 @@ package com.ql.util.express.instruction.detail;
 import java.util.List;
 
 import com.ql.util.express.InstructionSetContext;
-import com.ql.util.express.OperateDataCacheManager;
 import com.ql.util.express.RunEnvironment;
+import com.ql.util.express.instruction.OperateDataCacheManager;
 
 public class InstructionOpenNewArea extends Instruction{
 	private static final long serialVersionUID = -118527079334123637L;
