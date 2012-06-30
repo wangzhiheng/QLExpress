@@ -11,9 +11,16 @@ public class OperateDataAttr extends OperateData {
 			super(null,aType);
 			this.name = aName;
 		}
-		public OperateDataAttr(String name) {
-			super(null,null);
-			this.name = name;
+		public void initialDataAttr(String aName, Class<?> aType) {
+			super.initial(null, aType);
+			this.name = aName;
+		}
+		public void clearDataAttr(){
+			super.clear();
+			this.name = null;
+		}
+		public void setDefineType(Class<?> orgiType){
+			this.type = orgiType;
 		}
 		public Class<?> getDefineType(){
 	    	return this.type;
@@ -37,7 +44,7 @@ public class OperateDataAttr extends OperateData {
 				return ex.getMessage();
 			}
 		}
-		public Object getObjectInner(InstructionSetContext<String,Object> context) throws Exception {
+		public Object getObjectInner(InstructionSetContext context) throws Exception {
 			if (this.name.equalsIgnoreCase("null")) {
 				return null;
 			}
@@ -52,7 +59,7 @@ public class OperateDataAttr extends OperateData {
 			}
 		}
 	    
-		public Class<?> getType(InstructionSetContext<String,Object> context) throws Exception {
+		public Class<?> getType(InstructionSetContext context) throws Exception {
 			   if(this.type != null){
 				   return this.type;
 			   }
@@ -63,7 +70,7 @@ public class OperateDataAttr extends OperateData {
 			     return obj.getClass();
 		}
 
-		public void setObject(InstructionSetContext<String,Object> parent, Object object) throws Exception {
+		public void setObject(InstructionSetContext parent, Object object) throws Exception {
 			try {
 				  parent.put(this.name, object);
 			} catch (Exception e) {

@@ -13,26 +13,44 @@ public class RunEnvironment {
 		private Object returnValue = null; 
 		
 		private InstructionSet instructionSet;
-		private InstructionSetContext<String, Object> context;
+		private InstructionSetContext context;
 		
 		
-		public RunEnvironment(InstructionSet aInstructionSet,InstructionSetContext<String, Object> aContext,boolean aIsTrace){
+		public RunEnvironment(InstructionSet aInstructionSet,InstructionSetContext  aContext,boolean aIsTrace){
 			dataContainer = new OperateData[INIT_DATA_LENTH];
 			this.instructionSet = aInstructionSet;
 			this.context = aContext;
 			this.isTrace = aIsTrace;
 		}
 		
-		
+		public void initial(InstructionSet aInstructionSet,InstructionSetContext  aContext,boolean aIsTrace){
+			dataContainer = new OperateData[INIT_DATA_LENTH];
+			this.instructionSet = aInstructionSet;
+			this.context = aContext;
+			this.isTrace = aIsTrace;
+		}
+		public void clear(){
+		    isTrace = false;	
+			point = -1;
+		    programPoint = 0;
+			dataContainer = null;
+			
+			isExit = false;
+			returnValue = null; 
+			
+			instructionSet = null;
+			context = null;
+			
+		}
 		public InstructionSet getInstructionSet() {
 			return instructionSet;
 		}
 
 
-		public InstructionSetContext<String, Object> getContext(){
+		public InstructionSetContext getContext(){
 			return this.context;
 		}
-		public void setContext(InstructionSetContext<String, Object> aContext){
+		public void setContext(InstructionSetContext aContext){
 			this.context = aContext;
 		}
 
@@ -98,14 +116,14 @@ public class RunEnvironment {
 	 * @return
 	 * @throws Exception
 	 */
-		public OperateData[] popArray(InstructionSetContext<String, Object> context,int len) throws Exception {
+		public OperateData[] popArray(InstructionSetContext context,int len) throws Exception {
 			int start = point - len + 1;
 			OperateData[] result = new OperateData[len];
 			System.arraycopy(this.dataContainer,start, result,0, len);
 			point = point - len;
 			return result;
 		}
-		public OperateData[] popArrayBackUp(InstructionSetContext<String, Object> context,int len) throws Exception {
+		public OperateData[] popArrayBackUp(InstructionSetContext context,int len) throws Exception {
 			int start = point - len + 1;
 			if(start <0){
 				throw new Exception("堆栈溢出，请检查表达式是否错误");

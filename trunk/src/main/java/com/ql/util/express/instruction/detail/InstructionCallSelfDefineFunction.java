@@ -8,6 +8,7 @@ import com.ql.util.express.InstructionSet;
 import com.ql.util.express.InstructionSetContext;
 import com.ql.util.express.InstructionSetRunner;
 import com.ql.util.express.OperateData;
+import com.ql.util.express.OperateDataCacheManager;
 import com.ql.util.express.RunEnvironment;
 import com.ql.util.express.instruction.opdata.OperateDataAttr;
 import com.ql.util.express.instruction.opdata.OperateDataLocalVar;
@@ -59,18 +60,18 @@ public class InstructionCallSelfDefineFunction extends Instruction{
 	}	
 	public static OperateData executeSelfFunction(RunEnvironment environment,InstructionSet functionSet,
 			OperateData[] parameters,List<String> errorList,Log log)throws Exception{	
-		InstructionSetContext<String, Object> context = new InstructionSetContext<String, Object>(
-				environment.getContext().getExpressRunner(),environment.getContext(),environment.getContext().getExpressLoader(),environment.getContext().isSupportDynamicFieldName());
+		InstructionSetContext  context = OperateDataCacheManager.fetchInstructionSetContext (
+				true,environment.getContext().getExpressRunner(),environment.getContext(),environment.getContext().getExpressLoader(),environment.getContext().isSupportDynamicFieldName());
 		OperateDataLocalVar[] vars = functionSet.getParameters();
 		for(int i=0;i<vars.length;i++){
 			//注意此处必须new 一个新的对象，否则就会在多次调用的时候导致数据冲突
-			OperateDataLocalVar var = new OperateDataLocalVar(vars[i].getName(),vars[i].type);
+			OperateDataLocalVar var = OperateDataCacheManager.fetchOperateDataLocalVar(vars[i].getName(),vars[i].getOrgiType());
 			context.addSymbol(var.getName(), var);
 			var.setObject(context, parameters[i].getObject(environment.getContext()));
 		}
 		Object result =InstructionSetRunner.execute(new InstructionSet[]{(InstructionSet)functionSet},
 				context,errorList,environment.isTrace(),false,true,log);
-		return new OperateData(result,null);
+		return OperateDataCacheManager.fetchOperateData(result,null);
 	}
 	public String toString(){
 	  return "call Function[" + this.functionName +"] OPNUMBER["+ this.opDataNumber +"]"  ;	

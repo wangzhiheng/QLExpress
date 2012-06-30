@@ -15,7 +15,7 @@ public class OperatorMacro extends OperatorBase {
 		this.errorInfo = aErrorInfo;
 	}
 
-	public OperateData executeInner(InstructionSetContext<String,Object> context, OperateData[] list) throws Exception {
+	public OperateData executeInner(InstructionSetContext context, OperateData[] list) throws Exception {
 		String varName = (String)list[0].getObjectInner(context);	
 		OperateDataAttr realAttr = (OperateDataAttr)list[1];
 		OperateDataAttr result = new OperateDataAlias(varName,realAttr);

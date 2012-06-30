@@ -2,6 +2,7 @@ package com.ql.util.express.instruction.op;
 
 import com.ql.util.express.InstructionSetContext;
 import com.ql.util.express.OperateData;
+import com.ql.util.express.OperateDataCacheManager;
 import com.ql.util.express.instruction.opdata.OperateDataLocalVar;
 import com.ql.util.express.instruction.opdata.OperateDataVirClass;
 
@@ -15,7 +16,7 @@ public class OperatorDef extends OperatorBase {
 		this.errorInfo = aErrorInfo;
 	}
 	
-	public OperateData executeInner(InstructionSetContext<String,Object> context, OperateData[] list) throws Exception {
+	public OperateData executeInner(InstructionSetContext context, OperateData[] list) throws Exception {
 		Object type = list[0].getObject(context);
 		String varName = (String)list[1].getObject(context);	
 		Class<?> tmpClass = null;
@@ -24,7 +25,7 @@ public class OperatorDef extends OperatorBase {
 		}else{
 			tmpClass = OperateDataVirClass.class;
 		}
-		OperateDataLocalVar result = new OperateDataLocalVar(varName,tmpClass);
+		OperateDataLocalVar result = OperateDataCacheManager.fetchOperateDataLocalVar(varName,tmpClass);
 		context.addSymbol(varName, result);
 		return result;
 	}

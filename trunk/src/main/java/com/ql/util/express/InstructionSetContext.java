@@ -3,16 +3,14 @@ package com.ql.util.express;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.ql.util.express.instruction.opdata.OperateDataAttr;
-
-public class InstructionSetContext<K,V>  implements IExpressContext<K,V> {
+public class InstructionSetContext  implements IExpressContext<String,Object> {
 	/*
 	 * 没有知道数据类型的变量定义是否传递到最外层的Context
 	 */
 	private boolean isExpandToParent = true;
 	
-	private IExpressContext<K,V> parent = null;
-	private Map<K,V> content;
+	private IExpressContext<String,Object> parent = null;
+	private Map<String,Object> content;
 	/**
 	 * 符号表
 	 */
@@ -23,20 +21,28 @@ public class InstructionSetContext<K,V>  implements IExpressContext<K,V> {
 	private boolean isSupportDynamicFieldName = false;
 	private ExpressRunner runner;
 	
-	public InstructionSetContext(ExpressRunner aRunner,IExpressContext<K,V> aParent,ExpressLoader aExpressLoader,boolean aIsSupportDynamicFieldName){
-	   this(true,aRunner,aParent, aExpressLoader, aIsSupportDynamicFieldName);
+	public InstructionSetContext(boolean aIsExpandToParent,ExpressRunner aRunner,IExpressContext<String,Object> aParent,ExpressLoader aExpressLoader,boolean aIsSupportDynamicFieldName){
+	   this.initial(aIsExpandToParent, aRunner, aParent, aExpressLoader, aIsSupportDynamicFieldName);
 	}
-	public InstructionSetContext(boolean aIsExpandToParent,ExpressRunner aRunner,IExpressContext<K,V> aParent,ExpressLoader aExpressLoader,boolean aIsSupportDynamicFieldName){
+	public void initial(boolean aIsExpandToParent,ExpressRunner aRunner,IExpressContext<String,Object> aParent,ExpressLoader aExpressLoader,boolean aIsSupportDynamicFieldName){
 	    this.isExpandToParent = aIsExpandToParent;
 		this.runner = aRunner;
 		this.parent = aParent;
 		this.expressLoader = aExpressLoader;
-		this.isSupportDynamicFieldName = aIsSupportDynamicFieldName;
-		
+		this.isSupportDynamicFieldName = aIsSupportDynamicFieldName;		
 	}
+    public void clear(){
+    	isExpandToParent = true;    	
+    	parent = null;
+    	content = null;
+    	symbolTable = null;
+    	expressLoader = null;    	
+    	isSupportDynamicFieldName = false;
+    	runner = null;   	
+    }
 	public void exportSymbol(String varName,Object aliasNameObject) throws Exception{
 		if( this.parent != null && this.parent instanceof InstructionSetContext){
-			((InstructionSetContext<K,V>)this.parent).exportSymbol(varName, aliasNameObject);
+			((InstructionSetContext)this.parent).exportSymbol(varName, aliasNameObject);
 		}else{
 		    this.addSymbol(varName, aliasNameObject);
 		}
@@ -67,7 +73,7 @@ public class InstructionSetContext<K,V>  implements IExpressContext<K,V> {
 		}
 		if(result == null){
 			if( this.parent != null && this.parent instanceof InstructionSetContext){
-			    result = ((InstructionSetContext<K,V>)this.parent).findAliasOrDefSymbol(varName);
+			    result = ((InstructionSetContext)this.parent).findAliasOrDefSymbol(varName);
 			}else{
 			    result = null;
 			}
@@ -85,10 +91,10 @@ public class InstructionSetContext<K,V>  implements IExpressContext<K,V> {
 		if(result == null){
 			if (this.isExpandToParent == true && this.parent != null
 					&& this.parent instanceof InstructionSetContext) {
-				result = ((InstructionSetContext<K, V>) this.parent)
+				result = ((InstructionSetContext) this.parent)
 						.getSymbol(varName);
 			} else {
-				result = new OperateDataAttr(varName, null);
+				result = OperateDataCacheManager.fetchOperateDataAttr(varName, null);
 				this.addSymbol(varName, result);
 			}
 		}	
@@ -99,10 +105,10 @@ public class InstructionSetContext<K,V>  implements IExpressContext<K,V> {
 		return expressLoader;
 	}
 
-	public IExpressContext<K,V> getParent(){
+	public IExpressContext<String,Object> getParent(){
 		return  this.parent;
 	}
-	public V get(Object key){
+	public Object get(Object key){
 		if(this.content != null && this.content.containsKey(key)){
 			return this.content.get(key);
 		}else if(this.isExpandToParent == true && this.parent != null){
@@ -110,12 +116,12 @@ public class InstructionSetContext<K,V>  implements IExpressContext<K,V> {
 		}
 		return null;
 	}
-	public V put(K key, V value){
+	public Object put(String key, Object value){
 		if(this.content != null && this.content.containsKey(key) ){
 			return this.content.put(key,value);
 		}else if (this.isExpandToParent == false){
 			if(this.content == null){
-				this.content = new HashMap<K,V>();
+				this.content = new HashMap<String,Object>();
 			}
 			return this.content.put(key,value);
 		}else if(this.parent != null){

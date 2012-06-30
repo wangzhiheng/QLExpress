@@ -12,7 +12,16 @@ public class OperateDataKeyValue extends OperateData {
 		this.key = aKey;
 		this.value = aValue;
 	}
-
+    public void initialDataKeyValue(OperateData aKey, OperateData aValue){
+    	super.initial(null, null);
+    	this.key = aKey;
+		this.value = aValue;
+    }
+	public void clearDataKeyValue(){
+		super.clear();
+		this.key = null;
+		this.value = null;
+	}
 	public OperateData getKey() {
 		return key;
 	}
@@ -25,16 +34,16 @@ public class OperateDataKeyValue extends OperateData {
 		return this.key + ":" + this.value;
 	}
 
-	public Object getObjectInner(InstructionSetContext<String, Object> context) {
+	public Object getObjectInner(InstructionSetContext context) {
 		throw new RuntimeException("没有实现方法：getObjectInner");
 	}
 
-	public Class<?> getType(InstructionSetContext<String, Object> context)
+	public Class<?> getType(InstructionSetContext context)
 			throws Exception {
 		throw new RuntimeException("没有实现方法：getType");
 	}
 
-	public void setObject(InstructionSetContext<String, Object> parent,
+	public void setObject(InstructionSetContext parent,
 			Object object) {
 		throw new RuntimeException("没有实现方法：setObject");
 	}

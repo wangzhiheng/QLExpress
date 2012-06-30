@@ -13,11 +13,11 @@ public class OperatorEvaluate extends OperatorBase {
 		this.aliasName = aAliasName;
 		this.errorInfo = aErrorInfo;
 	}
-	public OperateData executeInner(InstructionSetContext<String,Object> parent, OperateData[] list) throws Exception {
+	public OperateData executeInner(InstructionSetContext parent, OperateData[] list) throws Exception {
 		return executeInner(parent, list[0], list[1]);
 	}
 
-	public OperateData executeInner(InstructionSetContext<String,Object> parent,
+	public OperateData executeInner(InstructionSetContext parent,
 			OperateData op1, OperateData op2) throws Exception {
 		Class<?> targetType = op1.getDefineType();
 		Class<?> sourceType = op2.getType(parent);

@@ -13,13 +13,23 @@ public class OperateDataArrayItem extends OperateDataAttr {
 		this.arrayObject = aArrayObject;
 		this.index = aIndex;
 	}
+	public void initialDataArrayItem(OperateData aArrayObject,int aIndex){
+		super.initialDataAttr("array[" + aArrayObject +"," + aIndex +"]",null);
+		this.arrayObject = aArrayObject;
+		this.index = aIndex;
+	}
+	public void clearDataArrayItem(){
+		super.clearDataAttr();
+		this.arrayObject = null;
+		this.index = -1;
+	}
 	public void toResource(StringBuilder builder,int level){		
 		builder.append(this.index);
     }
-	public Class<?> getType(InstructionSetContext<String,Object> context) throws Exception {
+	public Class<?> getType(InstructionSetContext context) throws Exception {
 		  return this.arrayObject.getObject(context).getClass();
 	}
-	public Object getObjectInner(InstructionSetContext<String,Object> context){
+	public Object getObjectInner(InstructionSetContext context){
 		try {
 			return Array.get(this.arrayObject.getObject(context),this.index);
 		} catch (Exception e) {
@@ -27,7 +37,7 @@ public class OperateDataArrayItem extends OperateDataAttr {
 		}
 	}
 
-	public void setObject(InstructionSetContext<String,Object> context, Object value) {
+	public void setObject(InstructionSetContext context, Object value) {
 		try {
 		 Array.set(this.arrayObject.getObject(context), this.index, value);
 		} catch (Exception e) {

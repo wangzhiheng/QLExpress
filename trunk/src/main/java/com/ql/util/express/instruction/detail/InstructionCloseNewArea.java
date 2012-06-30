@@ -12,7 +12,7 @@ public class InstructionCloseNewArea extends Instruction{
 		if(environment.isTrace() && log.isDebugEnabled()){
 			log.debug(this);
 		}
-		environment.setContext((InstructionSetContext<String, Object>)environment.getContext().getParent());
+		environment.setContext((InstructionSetContext )environment.getContext().getParent());
 		environment.programPointAddOne();
 	}
 	public String toString(){

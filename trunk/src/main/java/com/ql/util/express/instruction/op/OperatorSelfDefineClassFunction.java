@@ -6,6 +6,7 @@ import java.lang.reflect.Modifier;
 import com.ql.util.express.ExpressUtil;
 import com.ql.util.express.InstructionSetContext;
 import com.ql.util.express.OperateData;
+import com.ql.util.express.OperateDataCacheManager;
 
 /**
  * 用户自定义的函数操作
@@ -65,7 +66,7 @@ public class OperatorSelfDefineClassFunction extends OperatorBase implements Can
 				this.operDataAnnotation, errorInfo);
 		return result;
 	}
-  public OperateData executeInner(InstructionSetContext<String,Object> context, OperateData[] list) throws
+  public OperateData executeInner(InstructionSetContext context, OperateData[] list) throws
       Exception {
       if(this.parameterClasses.length != list.length){
         throw new Exception("定义的参数长度与运行期传入的参数长度不一致");
@@ -82,7 +83,7 @@ public class OperatorSelfDefineClassFunction extends OperatorBase implements Can
       }
 
       if(obj != null){
-          return new OperateData(obj,obj.getClass());
+          return OperateDataCacheManager.fetchOperateData(obj,obj.getClass());
        }
        return null;
   }

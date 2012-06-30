@@ -5,6 +5,7 @@ import java.lang.reflect.Method;
 import com.ql.util.express.ExpressUtil;
 import com.ql.util.express.InstructionSetContext;
 import com.ql.util.express.OperateData;
+import com.ql.util.express.OperateDataCacheManager;
 import com.ql.util.express.instruction.opdata.OperateClass;
 import com.ql.util.express.instruction.opdata.OperateDataVirClass;
 
@@ -15,7 +16,7 @@ public class OperatorMethod extends OperatorBase {
 
 	static Class<?> ArrayClass = (new Object[]{}).getClass();
 	
-	public OperateData executeInner(InstructionSetContext<String,Object> parent, OperateData[] list) throws Exception {
+	public OperateData executeInner(InstructionSetContext parent, OperateData[] list) throws Exception {
 		
 		Object obj = list[0].getObject(parent);
 		if(obj instanceof OperateDataVirClass ){
@@ -92,7 +93,7 @@ public class OperatorMethod extends OperatorBase {
 				tmpObj = m.invoke(obj, ExpressUtil.transferArray(objs,m.getParameterTypes()));
 				m.setAccessible(oldA);
 			}
-			return new OperateData(tmpObj, m.getReturnType());
+			return OperateDataCacheManager.fetchOperateData(tmpObj, m.getReturnType());
 		}
 	}
     public String toString(){

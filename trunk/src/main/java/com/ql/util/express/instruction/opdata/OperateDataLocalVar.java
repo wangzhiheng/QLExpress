@@ -8,6 +8,13 @@ public class OperateDataLocalVar extends OperateDataAttr {
 	public OperateDataLocalVar(String name,Class<?> type) {
 		super(name,type);
 	}
+	
+	public void initialDataLocalVar(String name,Class<?> type){
+		super.initialDataAttr(name, type);
+	}
+	public void clearDataLocalVar(){
+		super.clear();
+	}
 	public String toString() {
 		try {			
 			return name +":localVar";
@@ -16,7 +23,7 @@ public class OperateDataLocalVar extends OperateDataAttr {
 		}
 	}
 
-	public Object getObjectInner(InstructionSetContext<String,Object> context) {
+	public Object getObjectInner(InstructionSetContext context) {
 		try {
 			return this.dataObject;
 		} catch (Exception e) {
@@ -24,11 +31,11 @@ public class OperateDataLocalVar extends OperateDataAttr {
 		}
 	}
     
-	public Class<?> getType(InstructionSetContext<String,Object> context) throws Exception {
+	public Class<?> getType(InstructionSetContext context) throws Exception {
 		  return this.type;
 	}
 
-	public void setObject(InstructionSetContext<String,Object> parent, Object value) {
+	public void setObject(InstructionSetContext parent, Object value) {
 		this.dataObject = value;
 	}
 }

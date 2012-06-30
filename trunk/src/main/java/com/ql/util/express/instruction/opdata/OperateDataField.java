@@ -9,11 +9,27 @@ public class OperateDataField extends OperateDataAttr {
 	
 	public OperateDataField(Object aFieldObject,String aFieldName) {
 		super(null,null);
-		this.name = aFieldObject.getClass().getName() + "." + aFieldName;
+		if(aFieldObject == null){
+		   this.name = "没有初始化的Field";	
+		}else{
+		   this.name = aFieldObject.getClass().getName() + "." + aFieldName;
+		}
 		this.fieldObject = aFieldObject;
 		this.orgiFieldName =aFieldName;
 	}
 	
+	public void initialDataField(Object aFieldObject,String aFieldName){
+		super.initialDataAttr(null, null);
+		this.name = aFieldObject.getClass().getName() + "." + aFieldName;
+		this.fieldObject = aFieldObject;
+		this.orgiFieldName = aFieldName;
+	}
+	public void clearDataField(){
+		super.clearDataAttr();
+		this.name = null;
+		this.fieldObject = null;
+		this.orgiFieldName = null;
+	}
     public String getName(){
     	return name;
     }
@@ -25,7 +41,7 @@ public class OperateDataField extends OperateDataAttr {
 		}
 	}
 
-    public Object transferFieldName(InstructionSetContext<String,Object> context,String oldName){
+    public Object transferFieldName(InstructionSetContext context,String oldName){
 		if (context.isSupportDynamicFieldName() == false) {
 			return oldName;
 		} else {
@@ -42,7 +58,7 @@ public class OperateDataField extends OperateDataAttr {
 			}
 		}
     }
-	public Object getObjectInner(InstructionSetContext<String,Object> context) throws Exception {
+	public Object getObjectInner(InstructionSetContext context) throws Exception {
 		//如果能找到aFieldName的定义,则再次运算
 		if(this.fieldObject instanceof OperateDataVirClass){
 			return ((OperateDataVirClass)this.fieldObject).getValue(transferFieldName(context,this.orgiFieldName));
@@ -51,7 +67,7 @@ public class OperateDataField extends OperateDataAttr {
 		}
 	}
     
-	public Class<?> getType(InstructionSetContext<String,Object> context) throws Exception {
+	public Class<?> getType(InstructionSetContext context) throws Exception {
 		if(this.fieldObject instanceof OperateDataVirClass){
 			return ((OperateDataVirClass)this.fieldObject).getValueType(transferFieldName(context,this.orgiFieldName));
 		}else{
@@ -59,7 +75,7 @@ public class OperateDataField extends OperateDataAttr {
 		}
 	}
 
-	public void setObject(InstructionSetContext<String,Object> context, Object value) throws Exception{
+	public void setObject(InstructionSetContext context, Object value) throws Exception{
 		if(this.fieldObject instanceof OperateDataVirClass){
 			((OperateDataVirClass)this.fieldObject).setValue(transferFieldName(context,this.orgiFieldName).toString(),value);
 		}else{
