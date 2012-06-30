@@ -6,7 +6,7 @@ import java.lang.reflect.Modifier;
 import com.ql.util.express.ExpressUtil;
 import com.ql.util.express.InstructionSetContext;
 import com.ql.util.express.OperateData;
-import com.ql.util.express.OperateDataCacheManager;
+import com.ql.util.express.instruction.OperateDataCacheManager;
 
 /**
  * 用户自定义的函数操作

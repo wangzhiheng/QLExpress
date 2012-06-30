@@ -3,8 +3,8 @@ package com.ql.util.express.instruction.detail;
 import java.util.List;
 
 import com.ql.util.express.OperateData;
-import com.ql.util.express.OperateDataCacheManager;
 import com.ql.util.express.RunEnvironment;
+import com.ql.util.express.instruction.OperateDataCacheManager;
 
 public class InstructionGoToWithCondition extends Instruction{
 	private static final long serialVersionUID = -4817805156872407837L;

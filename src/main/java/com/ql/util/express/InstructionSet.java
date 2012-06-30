@@ -12,6 +12,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.ql.util.express.instruction.FunctionInstructionSet;
+import com.ql.util.express.instruction.OperateDataCacheManager;
 import com.ql.util.express.instruction.detail.Instruction;
 import com.ql.util.express.instruction.detail.InstructionConstData;
 import com.ql.util.express.instruction.detail.InstructionLoadAttr;

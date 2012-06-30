@@ -5,7 +5,7 @@ import java.util.Map;
 
 import com.ql.util.express.InstructionSetContext;
 import com.ql.util.express.OperateData;
-import com.ql.util.express.OperateDataCacheManager;
+import com.ql.util.express.instruction.OperateDataCacheManager;
 import com.ql.util.express.instruction.opdata.OperateDataKeyValue;
 
 public class OperatorAnonymousNewMap extends OperatorBase {

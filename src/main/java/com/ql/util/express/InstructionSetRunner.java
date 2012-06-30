@@ -5,6 +5,8 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.ql.util.express.instruction.OperateDataCacheManager;
+
 public class InstructionSetRunner {
 	private static final Log log = LogFactory.getLog(InstructionSetRunner.class);
 	  public static Object executeOuter(ExpressRunner runner,InstructionSet[] sets,ExpressLoader loader,

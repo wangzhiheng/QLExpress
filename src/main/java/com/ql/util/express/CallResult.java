@@ -1,6 +1,6 @@
 package com.ql.util.express;
 
-class CallResult{
+public class CallResult{
 	private Object returnValue;
 	private boolean isExit;
 	public CallResult(Object aReturnValue,boolean aIsExit){
