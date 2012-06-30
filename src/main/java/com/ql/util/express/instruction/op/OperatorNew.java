@@ -6,13 +6,14 @@ import java.lang.reflect.Constructor;
 import com.ql.util.express.ExpressUtil;
 import com.ql.util.express.InstructionSetContext;
 import com.ql.util.express.OperateData;
+import com.ql.util.express.OperateDataCacheManager;
 
 public class OperatorNew extends OperatorBase {
 	public OperatorNew(String aName) {
 		this.name = aName;
 	}
 
-	public OperateData executeInner(InstructionSetContext<String,Object> parent, OperateData[] list) throws Exception {
+	public OperateData executeInner(InstructionSetContext parent, OperateData[] list) throws Exception {
 		Class<?> obj = (Class<?>) list[0].getObject(parent);
 		if (obj.isArray()) {
 			Class<?> tmpClass = obj;
@@ -26,7 +27,7 @@ public class OperatorNew extends OperatorBase {
 				dimLength[index] = ((Number) (list[index + 1].getObject(parent)))
 						.intValue();
 			}
-			return new OperateData(Array.newInstance(tmpClass, dimLength), obj);
+			return OperateDataCacheManager.fetchOperateData(Array.newInstance(tmpClass, dimLength), obj);
 		}
 		Class<?>[] types = new Class[list.length - 1];
 		Object[] objs = new Object[list.length - 1];
@@ -53,6 +54,6 @@ public class OperatorNew extends OperatorBase {
 		}
 
 		tmpObj = c.newInstance(objs);
-		return new OperateData(tmpObj, obj);
+		return OperateDataCacheManager.fetchOperateData(tmpObj, obj);
 	}
 }

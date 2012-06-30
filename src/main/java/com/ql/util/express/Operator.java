@@ -9,7 +9,7 @@ import com.ql.util.express.instruction.op.OperatorBase;
  */
 public abstract class Operator extends  OperatorBase{
 	
-	public OperateData executeInner(InstructionSetContext<String,Object> context, OperateData[] list) throws Exception{
+	public OperateData executeInner(InstructionSetContext context, OperateData[] list) throws Exception{
 		Object[] parameters = new Object[list.length];
 		for(int i = 0;i <list.length;i++){			
 			parameters[i] = list[i].getObject(context);
@@ -19,9 +19,11 @@ public abstract class Operator extends  OperatorBase{
 			throw new Exception("操作符号定义的返回类型错误：" + this.getAliasName());
 		}
 		if(result == null){
-			return new OperateData(null,null);
+			//return new OperateData(null,null);
+			return OperateDataCacheManager.fetchOperateData(null, null);
 		}else{
-			return new OperateData(result,ExpressUtil.getSimpleDataType(result.getClass()));
+			//return new OperateData(result,ExpressUtil.getSimpleDataType(result.getClass()));
+			return OperateDataCacheManager.fetchOperateData(result,ExpressUtil.getSimpleDataType(result.getClass()));
 		}
 	}
 	public abstract Object executeInner(Object[] list) throws Exception;

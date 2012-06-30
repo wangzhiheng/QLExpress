@@ -8,6 +8,7 @@ import com.ql.util.express.InstructionSet;
 import com.ql.util.express.InstructionSetContext;
 import com.ql.util.express.InstructionSetRunner;
 import com.ql.util.express.OperateData;
+import com.ql.util.express.OperateDataCacheManager;
 
 
 /**
@@ -19,7 +20,7 @@ public class OperateDataVirClass extends OperateDataAttr{
     /**
      * 虚拟Class的数据上下文
      */
-    InstructionSetContext<String, Object> context;     
+    InstructionSetContext context;     
     /**
      * 虚拟类的指令集合
      */
@@ -28,13 +29,13 @@ public class OperateDataVirClass extends OperateDataAttr{
     boolean isTrace;
     Log log;    
     public OperateDataVirClass(String name){
-    	super(name);
+    	super(name,null);
     }
-	public void initialInstance(InstructionSetContext<String,Object> parent,OperateData[] parameters, 
+	public void initialInstance(InstructionSetContext parent,OperateData[] parameters, 
 			List<String> errorList,boolean aIsTrace,Log aLog) throws Exception {		
 		this.isTrace = aIsTrace;
 		this.log = aLog;
-		this.context = new InstructionSetContext<String, Object>(false,
+		this.context = OperateDataCacheManager.fetchInstructionSetContext(false,
 				parent.getExpressRunner(),parent,parent.getExpressLoader(),parent.isSupportDynamicFieldName());
 		Object functionSet = parent.getSymbol(this.name);		
 		if (functionSet == null || functionSet instanceof InstructionSet == false) {
@@ -45,7 +46,7 @@ public class OperateDataVirClass extends OperateDataAttr{
 		OperateDataLocalVar[] vars = virClassInstructionSet.getParameters();
 		for(int i=0;i<vars.length;i++){
 			//注意此处必须new 一个新的对象，否则就会在多次调用的时候导致数据冲突
-			OperateDataLocalVar var = new OperateDataLocalVar(vars[i].getName(),vars[i].type);
+			OperateDataLocalVar var = OperateDataCacheManager.fetchOperateDataLocalVar(vars[i].getName(),vars[i].getOrgiType());
 			this.context.addSymbol(var.getName(), var);
 			var.setObject(context, parameters[i].getObject(parent));
 		}
@@ -59,19 +60,19 @@ public class OperateDataVirClass extends OperateDataAttr{
 		}
 		InstructionSet functionSet = (InstructionSet)function;
 		
-		InstructionSetContext<String, Object> tempContext = new InstructionSetContext<String, Object>(
-				this.context.getExpressRunner(),this.context,this.context.getExpressLoader(),
+		InstructionSetContext tempContext = OperateDataCacheManager.fetchInstructionSetContext(
+				true,this.context.getExpressRunner(),this.context,this.context.getExpressLoader(),
 				this.context.isSupportDynamicFieldName());
 		OperateDataLocalVar[] vars = functionSet.getParameters();
 		for(int i=0;i<vars.length;i++){
 			//注意此处必须new 一个新的对象，否则就会在多次调用的时候导致数据冲突
-			OperateDataLocalVar var = new OperateDataLocalVar(vars[i].getName(),vars[i].type);
+			OperateDataLocalVar var = OperateDataCacheManager.fetchOperateDataLocalVar(vars[i].getName(),vars[i].getOrgiType());
 			tempContext.addSymbol(var.getName(), var);
 			var.setObject(tempContext, parameters[i].getObject(this.context));
 		}
 		Object result =InstructionSetRunner.execute(new InstructionSet[]{(InstructionSet)functionSet},
 				tempContext,null,this.isTrace,false,true,this.log);
-		return new OperateData(result,null);
+		return OperateDataCacheManager.fetchOperateData(result,null);
 	}
 	public Object getValue(Object name) throws Exception{
 		Object o = this.context.findAliasOrDefSymbol(name.toString());
@@ -80,8 +81,8 @@ public class OperateDataVirClass extends OperateDataAttr{
 		}else if(o instanceof OperateData){//变量定义
 			return ((OperateData)o).getObject(context);
 		}else if( o instanceof InstructionSet){//宏定义
-			InstructionSetContext<String, Object> tempContext = new InstructionSetContext<String, Object>(
-					this.context.getExpressRunner(),this.context,this.context.getExpressLoader(),
+			InstructionSetContext tempContext = OperateDataCacheManager.fetchInstructionSetContext(
+					true,this.context.getExpressRunner(),this.context,this.context.getExpressLoader(),
 					this.context.isSupportDynamicFieldName());
 			Object result =InstructionSetRunner.execute(
 					this.context.getExpressRunner(),
@@ -117,15 +118,15 @@ public class OperateDataVirClass extends OperateDataAttr{
 			throw new Exception("不支持的数据类型:" + o.getClass().getName());
 		}
 	}
-	public Object getObjectInner(InstructionSetContext<String,Object> context) {
+	public Object getObjectInner(InstructionSetContext context) {
 		 return this;
 	}
     
-	public Class<?> getType(InstructionSetContext<String,Object> context) throws Exception {
+	public Class<?> getType(InstructionSetContext context) throws Exception {
 		return this.getClass();
 	}
 
-	public void setObject(InstructionSetContext<String,Object> parent, Object object) {
+	public void setObject(InstructionSetContext parent, Object object) {
 			throw new RuntimeException("不支持的方法");
 	}
 	

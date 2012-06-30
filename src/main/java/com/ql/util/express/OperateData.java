@@ -8,21 +8,34 @@ package com.ql.util.express;
  */
 
 public class OperateData implements java.io.Serializable {
-	private static final long serialVersionUID = 4749348640699065036L;
-	public final static transient OperateData OperateData_TRUE = new OperateData(true,Boolean.TYPE);
-	public final static transient OperateData OperateData_FALSE = new OperateData(false,Boolean.TYPE);
-	
+	private static final long serialVersionUID = 4749348640699065036L;	
 	protected Object dataObject;
-	public Class<?> type;
+	protected Class<?> type;
 
 	public OperateData(Object obj, Class<?> aType) {
 		this.type = aType;
 		this.dataObject = obj;
 	}
+	/**
+	 * 给对象缓存接口使用
+	 * @param obj
+	 * @param aType
+	 */
+	protected void initial(Object obj, Class<?> aType) {
+		this.type = aType;
+		this.dataObject = obj;
+	}
+	protected void clear(){
+		this.dataObject = null;
+		this.type = null;
+	}
     public Class<?> getDefineType(){
     	throw new RuntimeException(this.getClass().getName() + "必须实现方法:getDefineType");
     }
-	public Class<?> getType(InstructionSetContext<String,Object> parent) throws Exception {
+    public Class<?> getOrgiType(){
+    	return this.type;
+    }
+	public Class<?> getType(InstructionSetContext parent) throws Exception {
 		if (type != null)
 			return type;
 
@@ -33,13 +46,13 @@ public class OperateData implements java.io.Serializable {
 			return obj.getClass();
 	}
 
-	public final Object getObject(InstructionSetContext<String,Object> context) throws Exception {
+	public final Object getObject(InstructionSetContext context) throws Exception {
 		return getObjectInner(context);
 	}
-    public Object getObjectInner(InstructionSetContext<String,Object> context) throws Exception{
+    public Object getObjectInner(InstructionSetContext context) throws Exception{
     	return this.dataObject;
     }
-    public void setObject(InstructionSetContext<String,Object> parent, Object object) throws Exception {
+    public void setObject(InstructionSetContext parent, Object object) throws Exception {
 		throw new RuntimeException("必须在子类中实现此方法");
 	}
 	public String toJavaCode(){		

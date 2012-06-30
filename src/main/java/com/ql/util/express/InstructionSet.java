@@ -132,7 +132,7 @@ public class InstructionSet implements Serializable{
  * @return
  * @throws Exception
  */
-	public CallResult excute(RunEnvironment environmen,InstructionSetContext<String,Object> context,
+	public CallResult excute(RunEnvironment environmen,InstructionSetContext context,
 			List<String> errorList,boolean isLast,boolean isReturnLastData,Log aLog)
 			throws Exception {
 		//将函数export到上下文中
@@ -157,9 +157,7 @@ public class InstructionSet implements Serializable{
 		if (environmen.getDataStackSize() > 1) {
 			throw new Exception("在表达式执行完毕后，堆栈中还存在多个数据");
 		}
-		CallResult result = new CallResult();		
-		result.returnValue = environmen.getReturnValue();
-		result.isExit = environmen.isExit();
+		CallResult result = OperateDataCacheManager.fetchCallResult(environmen.getReturnValue(), environmen.isExit());
 		return result;
 	}
 	  public void executeInnerOrigiInstruction(RunEnvironment environmen,List<String> errorList,Log aLog) throws Exception{
@@ -278,13 +276,6 @@ public String toString() {
 			throw new RuntimeException(e);
 		}
 	}
-}
-
-
-
-class CallResult{
-	Object returnValue;
-	boolean isExit;
 }
 
 	

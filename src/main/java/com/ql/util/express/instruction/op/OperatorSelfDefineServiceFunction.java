@@ -5,6 +5,7 @@ import java.lang.reflect.Method;
 import com.ql.util.express.ExpressUtil;
 import com.ql.util.express.InstructionSetContext;
 import com.ql.util.express.OperateData;
+import com.ql.util.express.OperateDataCacheManager;
 
 /**
  * 用户自定义的服务函数操作
@@ -69,7 +70,7 @@ public class OperatorSelfDefineServiceFunction extends OperatorBase implements C
 				this.operDataDesc, this.operDataAnnotation, errorInfo);
 		return result;
 	}
-  public OperateData executeInner(InstructionSetContext<String,Object> context, OperateData[] list) throws
+  public OperateData executeInner(InstructionSetContext context, OperateData[] list) throws
       Exception {
       if(this.parameterClasses.length != list.length){
         throw new Exception("定义的参数长度与运行期传入的参数长度不一致");
@@ -81,7 +82,7 @@ public class OperatorSelfDefineServiceFunction extends OperatorBase implements C
 
       Object obj = this.method.invoke(this.serviceObject,ExpressUtil.transferArray(parameres,parameterClasses));
       if(obj != null){
-         return new OperateData(obj,obj.getClass());
+         return OperateDataCacheManager.fetchOperateData(obj,obj.getClass());
       }
       return null;
   }

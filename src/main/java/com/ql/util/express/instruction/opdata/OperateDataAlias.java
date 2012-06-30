@@ -15,7 +15,7 @@ public class OperateDataAlias extends OperateDataAttr {
 			return ex.getMessage();
 		}
 	}
-	public Object getObjectInner(InstructionSetContext<String,Object> context) {
+	public Object getObjectInner(InstructionSetContext context) {
 		try {
 			return realAttr.getObject(context);
 		} catch (Exception e) {
@@ -23,11 +23,11 @@ public class OperateDataAlias extends OperateDataAttr {
 		}		
 	}
     
-	public Class<?> getType(InstructionSetContext<String,Object> context) throws Exception {
+	public Class<?> getType(InstructionSetContext context) throws Exception {
 		return realAttr.getType(context);
 	}
 
-	public void setObject(InstructionSetContext<String,Object> context, Object object) {		
+	public void setObject(InstructionSetContext context, Object object) {		
 		try {
 			realAttr.setObject(context, object);
 		} catch (Exception e) {

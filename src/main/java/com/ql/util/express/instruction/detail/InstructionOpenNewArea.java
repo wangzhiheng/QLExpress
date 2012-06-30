@@ -3,6 +3,7 @@ package com.ql.util.express.instruction.detail;
 import java.util.List;
 
 import com.ql.util.express.InstructionSetContext;
+import com.ql.util.express.OperateDataCacheManager;
 import com.ql.util.express.RunEnvironment;
 
 public class InstructionOpenNewArea extends Instruction{
@@ -12,8 +13,9 @@ public class InstructionOpenNewArea extends Instruction{
 		if(environment.isTrace() && log.isDebugEnabled()){
 			log.debug(this);
 		}
-		InstructionSetContext<String, Object> parentContext = environment.getContext();
-		environment.setContext(new InstructionSetContext<String, Object>(
+		InstructionSetContext  parentContext = environment.getContext();
+		environment.setContext(OperateDataCacheManager.fetchInstructionSetContext (
+				true,
 				parentContext.getExpressRunner(),
 				parentContext,
 				parentContext.getExpressLoader(),

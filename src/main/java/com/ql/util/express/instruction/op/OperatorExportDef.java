@@ -14,7 +14,7 @@ public class OperatorExportDef extends OperatorBase {
 		this.errorInfo = aErrorInfo;
 	}
 
-	public OperateData executeInner(InstructionSetContext<String,Object> context, OperateData[] list) throws Exception {
+	public OperateData executeInner(InstructionSetContext context, OperateData[] list) throws Exception {
 		Class<?> tmpClass = (Class<?>) list[0].getObject(context);
 		String varName = (String)list[1].getObject(context);		
 		//OperateDataLocalVar result = new OperateDataLocalVar(varName,tmpClass);

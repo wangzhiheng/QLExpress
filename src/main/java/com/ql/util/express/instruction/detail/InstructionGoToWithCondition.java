@@ -3,6 +3,7 @@ package com.ql.util.express.instruction.detail;
 import java.util.List;
 
 import com.ql.util.express.OperateData;
+import com.ql.util.express.OperateDataCacheManager;
 import com.ql.util.express.RunEnvironment;
 
 public class InstructionGoToWithCondition extends Instruction{
@@ -25,7 +26,7 @@ public class InstructionGoToWithCondition extends Instruction{
 		    o = environment.peek().getObject(environment.getContext());	
 			if(o == null){
 				environment.pop();
-				environment.push(new OperateData(false,boolean.class));
+				environment.push(OperateDataCacheManager.fetchOperateData(false,boolean.class));
 			}
 		}else{
 			o = environment.pop().getObject(environment.getContext());	

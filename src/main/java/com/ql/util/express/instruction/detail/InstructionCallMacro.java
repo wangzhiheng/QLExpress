@@ -5,6 +5,7 @@ import java.util.List;
 import com.ql.util.express.InstructionSet;
 import com.ql.util.express.InstructionSetRunner;
 import com.ql.util.express.OperateData;
+import com.ql.util.express.OperateDataCacheManager;
 import com.ql.util.express.RunEnvironment;
 
 
@@ -33,7 +34,7 @@ public class InstructionCallMacro extends Instruction{
 			if(result instanceof OperateData){
 				environment.push((OperateData)result);
 			}else{
-			   environment.push(new OperateData(result,null));
+			   environment.push(OperateDataCacheManager.fetchOperateData(result,null));
 			}
 			
 			environment.programPointAddOne();

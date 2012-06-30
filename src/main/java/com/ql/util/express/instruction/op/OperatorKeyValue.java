@@ -2,6 +2,7 @@ package com.ql.util.express.instruction.op;
 
 import com.ql.util.express.InstructionSetContext;
 import com.ql.util.express.OperateData;
+import com.ql.util.express.OperateDataCacheManager;
 import com.ql.util.express.instruction.opdata.OperateDataKeyValue;
 
 public class OperatorKeyValue extends OperatorBase {
@@ -15,7 +16,7 @@ public class OperatorKeyValue extends OperatorBase {
 		this.errorInfo = aErrorInfo;
 	}
 
-	public OperateData executeInner(InstructionSetContext<String,Object> context, OperateData[] list) throws Exception {
-		 return  new OperateDataKeyValue(list[0],list[1]);
+	public OperateData executeInner(InstructionSetContext context, OperateData[] list) throws Exception {
+		 return  OperateDataCacheManager.fetchOperateDataKeyValue(list[0],list[1]);
 	}
 }

@@ -5,6 +5,7 @@ import java.lang.reflect.Array;
 import com.ql.util.express.ExpressUtil;
 import com.ql.util.express.InstructionSetContext;
 import com.ql.util.express.OperateData;
+import com.ql.util.express.OperateDataCacheManager;
 
 public class OperatorAnonymousNewArray extends OperatorBase {
 	public OperatorAnonymousNewArray(String aName) {
@@ -16,7 +17,7 @@ public class OperatorAnonymousNewArray extends OperatorBase {
 		this.errorInfo = aErrorInfo;
 	}
 
-	public OperateData executeInner(InstructionSetContext<String,Object> context, OperateData[] list) throws Exception {
+	public OperateData executeInner(InstructionSetContext  context, OperateData[] list) throws Exception {
 		Class<?> type = Object.class;
 		if(list.length >0){
 		  type = list[0].getType(context);
@@ -28,6 +29,6 @@ public class OperatorAnonymousNewArray extends OperatorBase {
 		for(int i=0;i<list.length;i++){
 			Array.set(data, i, list[i].getObject(context));
 		}
-		return new OperateData(data,data.getClass());
+		return OperateDataCacheManager.fetchOperateData(data,data.getClass());
 	}
 }

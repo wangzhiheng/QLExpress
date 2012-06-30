@@ -14,7 +14,7 @@ public  class OperatorIf extends OperatorBase {
 		this.errorInfo = aErrorInfo;
 	}
 	
-	public  OperateData executeInner(InstructionSetContext<String,Object> parent, OperateData[] list) throws Exception {
+	public  OperateData executeInner(InstructionSetContext parent, OperateData[] list) throws Exception {
 		if(list.length <2){
 			throw new Exception("\"" + this.aliasName + "\"操作至少要两个操作数");
 		}

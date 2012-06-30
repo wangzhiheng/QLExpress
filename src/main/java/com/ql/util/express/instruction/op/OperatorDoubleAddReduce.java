@@ -3,6 +3,7 @@ package com.ql.util.express.instruction.op;
 import com.ql.util.express.ExpressUtil;
 import com.ql.util.express.InstructionSetContext;
 import com.ql.util.express.OperateData;
+import com.ql.util.express.OperateDataCacheManager;
 import com.ql.util.express.OperatorOfNumber;
 
 public    class OperatorDoubleAddReduce extends OperatorBase {
@@ -10,7 +11,7 @@ public    class OperatorDoubleAddReduce extends OperatorBase {
 		this.name = name;
 	}
 
-	public OperateData executeInner(InstructionSetContext<String,Object> parent,
+	public OperateData executeInner(InstructionSetContext parent,
 			OperateData[] list) throws Exception {
 		Object obj = list[0].getObject(parent);
 		Object result = null;
@@ -22,9 +23,9 @@ public    class OperatorDoubleAddReduce extends OperatorBase {
 		((OperateData)list[0]).setObject(parent, result);
 		
 		if(result == null){
-			return new OperateData(null,null);
+			return OperateDataCacheManager.fetchOperateData(null,null);
 		}else{
-			return new OperateData(result,ExpressUtil.getSimpleDataType(result.getClass()));
+			return OperateDataCacheManager.fetchOperateData(result,ExpressUtil.getSimpleDataType(result.getClass()));
 		}
 	}
 }

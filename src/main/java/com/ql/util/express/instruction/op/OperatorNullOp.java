@@ -18,7 +18,7 @@ public class OperatorNullOp extends OperatorBase {
 		this.aliasName = aAliasName;
 		this.errorInfo = aErrorInfo;
 	}
-	public OperateData executeInner(InstructionSetContext<String,Object> parent, OperateData[] list) throws Exception {
+	public OperateData executeInner(InstructionSetContext parent, OperateData[] list) throws Exception {
 		return executeInner(parent);
 	}
 
