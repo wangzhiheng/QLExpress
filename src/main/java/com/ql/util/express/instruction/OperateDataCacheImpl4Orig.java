@@ -15,7 +15,7 @@ import com.ql.util.express.instruction.opdata.OperateDataKeyValue;
 import com.ql.util.express.instruction.opdata.OperateDataLocalVar;
 
 
-class OperateDataCacheImpl4Orgi implements IOperateDataCache {	
+class OperateDataCacheImpl4Orig implements IOperateDataCache {	
 	
 	public  OperateData fetchOperateData(Object obj, Class<?> aType) {
 		return new OperateData(obj,aType);
