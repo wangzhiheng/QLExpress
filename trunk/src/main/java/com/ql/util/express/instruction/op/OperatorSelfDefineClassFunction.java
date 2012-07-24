@@ -73,7 +73,11 @@ public class OperatorSelfDefineClassFunction extends OperatorBase implements Can
       }
       Object[] parameres = new Object[list.length];
       for(int i=0;i<list.length;i++){
-        parameres[i] = list[i].getObject(context);
+    	if(list[i]==null){
+    		parameres[i]= null;
+    	}else{
+    		parameres[i] = list[i].getObject(context);
+    	}
       }
       Object obj = null;
       if( Modifier.isStatic(this.method.getModifiers())){
