@@ -82,6 +82,28 @@ public class MethodInvokeTest {
 		}
 	}
 	
+	@Test
+	public void testNullParameter4() throws Exception {
+		ExpressRunner runner = new ExpressRunner(false,true);
+		
+		runner.addFunctionOfClassMethod("getOnlinePersonalShopInfo", 
+				MethodInvokeTest.class.getName(), 
+				"getOnlinePersonalShopInfo", 
+				new Class[] {long.class}, 
+				null);
+		String express = "info = getOnlinePersonalShopInfo(127L);return info == null";
+
+		IExpressContext<String,Object> expressContext = new DefaultContext<String,Object>();		
+		try{
+			Object r = runner.execute(express, 
+					expressContext, null, false, false);
+			System.out.print("r=" + r);
+		}catch(Exception e){
+			e.printStackTrace();
+			throw new Exception(e);
+		}
+	}
+	
 	//查找在线的店铺信息
 	public PersonalShopInfo getOnlinePersonalShopInfo(long userId) {
 		return null;
