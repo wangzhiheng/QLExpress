@@ -89,7 +89,9 @@ public class OperatorSelfDefineClassFunction extends OperatorBase implements Can
       if(obj != null){
           return OperateDataCacheManager.fetchOperateData(obj,obj.getClass());
        }
-       return null;
+      
+      return OperateDataCacheManager.fetchOperateDataAttr("null", null);
+//       return null;
   }
 
 
