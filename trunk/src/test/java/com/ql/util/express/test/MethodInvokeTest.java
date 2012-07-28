@@ -91,7 +91,7 @@ public class MethodInvokeTest {
 				"getOnlinePersonalShopInfo", 
 				new Class[] {long.class}, 
 				null);
-		String express = "info = getOnlinePersonalShopInfo(127L);return info == null";
+		String express = "info = getOnlinePersonalShopInfo(127L);";
 
 		IExpressContext<String,Object> expressContext = new DefaultContext<String,Object>();		
 		try{
@@ -103,6 +103,31 @@ public class MethodInvokeTest {
 			throw new Exception(e);
 		}
 	}
+	
+	@Test
+	public void testNullParameter5() throws Exception {
+		ExpressRunner runner = new ExpressRunner(false,true);
+		
+		runner.addFunctionOfClassMethod("testVoidMethod", 
+				MethodInvokeTest.class.getName(), 
+				"testVoidMethod", 
+				new Class[] {Long.class}, 
+				null);
+		String express = "info = testVoidMethod(1L);";
+
+		IExpressContext<String,Object> expressContext = new DefaultContext<String,Object>();		
+		try{
+			Object r = runner.execute(express, 
+					expressContext, null, false, false);
+			System.out.println("r=" + r);
+		}catch(Exception e){
+			e.printStackTrace();
+			System.out.println("return void checked success!");
+		}
+		throw new Exception("return void exception not checked!");
+	}
+
+	
 	
 	//查找在线的店铺信息
 	public PersonalShopInfo getOnlinePersonalShopInfo(long userId) {
@@ -118,6 +143,11 @@ public class MethodInvokeTest {
 			return true;
 		}
 	}
+	
+	public void testVoidMethod(Long id){
+		System.out.println("testVoidMethod");
+	}
+
 }
 
 class PersonalShopInfo {
