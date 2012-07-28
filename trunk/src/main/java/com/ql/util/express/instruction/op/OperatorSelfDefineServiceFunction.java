@@ -18,6 +18,7 @@ public class OperatorSelfDefineServiceFunction extends OperatorBase implements C
   String[] parameterTypes;
   Class<?>[] parameterClasses ;
   Method method;
+  boolean isReturnVoid;
   
 	public OperatorSelfDefineServiceFunction(String aOperName,
 			Object aServiceObject, String aFunctionName,
@@ -38,7 +39,7 @@ public class OperatorSelfDefineServiceFunction extends OperatorBase implements C
 		}
 		Class<?> operClass = serviceObject.getClass();
 		method = operClass.getMethod(functionName, parameterClasses);
-
+		this.isReturnVoid = method.getReturnType().equals(void.class);
 	}
   
   public OperatorSelfDefineServiceFunction(String aOperName,Object aServiceObject, String aFunctionName,
@@ -84,6 +85,10 @@ public class OperatorSelfDefineServiceFunction extends OperatorBase implements C
       if(obj != null){
          return OperateDataCacheManager.fetchOperateData(obj,obj.getClass());
       }
-      return null;
+      if(this.isReturnVoid == true){
+    	  return null;
+      }else{
+    	  return OperateDataCacheManager.fetchOperateDataAttr("null", null);  
+      }
   }
 }

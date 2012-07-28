@@ -20,7 +20,7 @@ public class OperateDataCacheManager {
 	private static ThreadLocal<IOperateDataCache> m_OperateDataObjectCache = new ThreadLocal<IOperateDataCache>(){
 		protected IOperateDataCache initialValue() {
 	        return new OperateDataCacheImpl(30);
-			//return new OperateDataCacheImpl4Orgi();
+			//return new OperateDataCacheImpl4Orig();
 	    }
 	};
 	public static IOperateDataCache getOperateDataCache(){

@@ -19,6 +19,7 @@ public class OperatorSelfDefineClassFunction extends OperatorBase implements Can
   Class<?>[] parameterClasses ;
   Class<?> operClass;
   Method method;
+  boolean isReturnVoid;
 
   public OperatorSelfDefineClassFunction(String aOperName,String aClassName, String aFunctionName,
           Class<?>[] aParameterClassTypes,String[] aParameterDesc,String[] aParameterAnnotation,String aErrorInfo) throws Exception {
@@ -36,7 +37,8 @@ public class OperatorSelfDefineClassFunction extends OperatorBase implements Can
 	      this.parameterTypes[i] = this.parameterClasses[i].getName();
 	    }
 	    operClass = ExpressUtil.getJavaClass(aClassName);
-	    method = operClass.getMethod(functionName,parameterClasses);	  
+	    method = operClass.getMethod(functionName,parameterClasses);
+	    this.isReturnVoid = method.getReturnType().equals(void.class);
   }
 
   public OperatorSelfDefineClassFunction(String aOperName,String aClassName, String aFunctionName,
@@ -73,11 +75,7 @@ public class OperatorSelfDefineClassFunction extends OperatorBase implements Can
       }
       Object[] parameres = new Object[list.length];
       for(int i=0;i<list.length;i++){
-    	if(list[i]==null){
-    		parameres[i]= null;
-    	}else{
     		parameres[i] = list[i].getObject(context);
-    	}
       }
       Object obj = null;
       if( Modifier.isStatic(this.method.getModifiers())){
@@ -89,9 +87,11 @@ public class OperatorSelfDefineClassFunction extends OperatorBase implements Can
       if(obj != null){
           return OperateDataCacheManager.fetchOperateData(obj,obj.getClass());
        }
-      
-      return OperateDataCacheManager.fetchOperateDataAttr("null", null);
-//       return null;
+      if(this.isReturnVoid == true){
+    	  return null;
+      }else{
+    	  return OperateDataCacheManager.fetchOperateDataAttr("null", null);  
+      }
   }
 
 
