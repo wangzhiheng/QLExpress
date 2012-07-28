@@ -88,7 +88,7 @@ public class OperatorSelfDefineClassFunction extends OperatorBase implements Can
           return OperateDataCacheManager.fetchOperateData(obj,obj.getClass());
        }
       if(this.isReturnVoid == true){
-    	  return null;
+    	  return OperateDataCacheManager.fetchOperateDataAttr("null", void.class);
       }else{
     	  return OperateDataCacheManager.fetchOperateDataAttr("null", null);  
       }
