@@ -86,7 +86,7 @@ public class OperatorSelfDefineServiceFunction extends OperatorBase implements C
          return OperateDataCacheManager.fetchOperateData(obj,obj.getClass());
       }
       if(this.isReturnVoid == true){
-    	  return null;
+    	  return OperateDataCacheManager.fetchOperateDataAttr("null", void.class);
       }else{
     	  return OperateDataCacheManager.fetchOperateDataAttr("null", null);  
       }

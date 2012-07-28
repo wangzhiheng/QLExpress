@@ -148,7 +148,11 @@ public class InstructionSet implements Serializable{
 					environmen.quitExpress(null);
 				} else {
 					if(isReturnLastData == true){
-						environmen.quitExpress(tmpObject.getObject(context));
+						if(tmpObject.getType(context) != null && tmpObject.getType(context).equals(void.class)){
+							environmen.quitExpress(null);
+						}else{
+						    environmen.quitExpress(tmpObject.getObject(context));
+						}
 					}else{
 					    environmen.quitExpress(tmpObject);
 					}
