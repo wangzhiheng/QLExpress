@@ -120,11 +120,12 @@ public class MethodInvokeTest {
 			Object r = runner.execute(express, 
 					expressContext, null, false, false);
 			System.out.println("r=" + r);
-			throw new Exception("return void exception not checked!");
 		}catch(Exception e){
 			e.printStackTrace();
 			System.out.println("return void checked success!");
+			return;
 		}
+		throw new Exception("return void exception not checked!");
 	}
 
 	
