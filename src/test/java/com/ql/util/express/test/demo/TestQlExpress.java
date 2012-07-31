@@ -7,7 +7,7 @@ import org.unitils.UnitilsJUnit4;
 import org.unitils.spring.annotation.SpringApplicationContext;
 import org.unitils.spring.annotation.SpringBeanByName;
 
-@SpringApplicationContext("springConfig.xml")
+@SpringApplicationContext("classpath:spring-express-config.xml")
 public class TestQlExpress  extends UnitilsJUnit4{
 	
 	@SpringBeanByName
