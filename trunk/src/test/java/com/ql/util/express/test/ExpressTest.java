@@ -100,7 +100,8 @@ public class ExpressTest {
 				{ "testLong(abc)", "toString-long:1" },
 				{ "bean.testLongObject(abc)", "toString-LongObject:1" },
 				
-				{"sum=0;n=7.3;for(i=0;i<n;i=i+1){sum=sum+i;};sum;","28"}
+				{"sum=0;n=7.3;for(i=0;i<n;i=i+1){sum=sum+i;};sum;","28"},
+				{"0 in (16,50008090,9,8,7,50011397,50013864,28,1625,50006842,50020808,50020857,50008164,50020611,50008163,50023804,50020332,27)","false"}
 				};
 		IExpressContext<String,Object> expressContext = new ExpressContextExample(null);
 		expressContext.put("b", new Integer(200));
