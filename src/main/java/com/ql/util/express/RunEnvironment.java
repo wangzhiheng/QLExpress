@@ -147,7 +147,7 @@ public class RunEnvironment {
 					newCapacity = minCapacity;
 				}
 				OperateData[] tempList = new OperateData[newCapacity];
-				System.arraycopy(this.dataContainer,0,tempList,0,this.point + 1);
+				System.arraycopy(this.dataContainer,0,tempList,0,oldCapacity);
 				this.dataContainer = tempList;
 			}
 		}
