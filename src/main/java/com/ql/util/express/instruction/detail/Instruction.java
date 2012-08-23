@@ -12,7 +12,7 @@ public abstract class Instruction implements java.io.Serializable {
 	
 	private static final long serialVersionUID = 1361458333068300443L;
 	protected static transient  Log staticLog = LogFactory.getLog(Instruction.class);
-	protected Log log = staticLog;
+	protected static transient Log log = staticLog;
 	public void setLog(Log aLog) {
 		if (aLog != null) {
 			this.log = aLog;
