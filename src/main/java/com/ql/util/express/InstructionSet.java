@@ -34,7 +34,7 @@ public class InstructionSet implements Serializable{
 	 */
 	private static final long serialVersionUID = 1841743860792681669L;
 	
-	private static final Log log = LogFactory.getLog(InstructionSet.class);
+	private static final transient  Log log = LogFactory.getLog(InstructionSet.class);
 	public static AtomicInteger uniqIndex = new AtomicInteger(1);
 	public static String TYPE_MAIN ="main";
 	public static String TYPE_CLASS ="VClass";
