@@ -31,9 +31,9 @@ class OperatorInstructionFactory  extends InstructionFactory{
 		}else{	
 			OperatorBase op = aCompile.getOperatorFactory().newInstance(node);
 			result.addInstruction(new InstructionOperator(op,children.length));
-			if(node.isTypeEqualsOrChild("&&")){
+			if(node.isTypeEqualsOrChild("&&") && aCompile.isShortCircuit()){
 				result.insertInstruction(finishPoint[0]+1,new InstructionGoToWithCondition(false,result.getCurrentPoint() - finishPoint[0] + 1,false));
-			}else if(node.isTypeEqualsOrChild("||")){
+			}else if(node.isTypeEqualsOrChild("||") && aCompile.isShortCircuit()){
 				result.insertInstruction(finishPoint[0]+1,new InstructionGoToWithCondition(true,result.getCurrentPoint() - finishPoint[0] + 1,false));
 			}else if(node.isTypeEqualsOrChild("nor") ){
 				result.insertInstruction(finishPoint[0]+1,new InstructionGoToWithNotNull(result.getCurrentPoint() - finishPoint[0] + 1,false));
