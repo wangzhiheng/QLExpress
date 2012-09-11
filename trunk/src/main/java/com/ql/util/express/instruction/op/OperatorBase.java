@@ -15,6 +15,7 @@ import java.util.List;
 import com.ql.util.express.ExpressUtil;
 import com.ql.util.express.InstructionSetContext;
 import com.ql.util.express.OperateData;
+import com.ql.util.express.instruction.opdata.OperateDataAttr;
 
 /**
  * ²Ù×÷·ûºÅ¶¨Òå
@@ -49,7 +50,11 @@ public abstract class OperatorBase implements java.io.Serializable {
 		}
 		Object[] result = new Object[list.length];
 		for (int i = 0; i < list.length; i++) {
-			result[i] = list[i].getObject(parent);
+			if(list[i] instanceof OperateDataAttr){
+				result[i] = ((OperateDataAttr) list[i]).getName()+":"+list[i].getObject(parent);
+			}else{
+				result[i] = list[i].getObject(parent);
+			}
 		}
 		return result;
 	}	

@@ -39,6 +39,11 @@ public class ExpressRunner {
 	private boolean isTrace = false;
 	
 	/**
+	 * 是否使用逻辑短路特性增强质量的效率
+	 */
+	private boolean isShortCircuit = true;
+	
+	/**
 	 * 是否需要高精度计算
 	 */
 	private boolean isPrecise = false;
@@ -541,5 +546,11 @@ public class ExpressRunner {
 	 */
 	public String[] getOutVarNames(String express) throws Exception{
 		return this.parseInstructionSet(express).getOutAttrNames();
+	}
+	public boolean isShortCircuit() {
+		return isShortCircuit;
+	}
+	public void setShortCircuit(boolean isShortCircuit) {
+		this.isShortCircuit = isShortCircuit;
 	}
 }
