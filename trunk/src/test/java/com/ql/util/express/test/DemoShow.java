@@ -1,5 +1,8 @@
 package com.ql.util.express.test;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.ql.util.express.DefaultContext;
 import com.ql.util.express.ExpressRunner;
 import com.ql.util.express.Operator;
@@ -14,8 +17,7 @@ public class DemoShow {
 	@org.junit.Test
 	public void testArithmetic() throws Exception {
 		ExpressRunner runner = new ExpressRunner(true, true);
-		DefaultContext<String, Object> context = new DefaultContext<String, Object>();
-		runner.execute("1+2*3", context, null, false, true);
+		runner.execute("(1+2)*3", null, null, false, true);
 	}
 
 	/**
@@ -28,7 +30,7 @@ public class DemoShow {
 		ExpressRunner runner = new ExpressRunner(true, true);
 		DefaultContext<String, Object> context = new DefaultContext<String, Object>();
 		runner.execute("sum=0;for(i=0;i<10;i=i+1){sum=sum+i;}", context, null,
-				false, true);
+				true, true);
 	}
 
 	/**
@@ -80,7 +82,7 @@ public class DemoShow {
 	 */
 	@org.junit.Test
 	public void testHanoiMethod3() throws Exception {
-		ExpressRunner runner = new ExpressRunner(false, false);
+		ExpressRunner runner = new ExpressRunner(false, true);
 		runner.addFunctionOfServiceMethod("汉诺塔算法", new DemoShow(), "hanoi",
 				new Class[] { int.class, char.class, char.class, char.class },
 				null);
@@ -148,6 +150,42 @@ public class DemoShow {
 	}
 	
 	/**
+	 * 替换操作符
+	 * 
+	 * @throws Exception
+	 */
+	@org.junit.Test
+	public void testShortLogicAndErrorInfo() throws Exception {
+		ExpressRunner runner = new ExpressRunner(false, false);
+		DefaultContext<String, Object> context = new DefaultContext<String, Object>();
+		context.put("A类违规天数90天内", true);
+		context.put("虚假交易扣分", 11);
+		context.put("假冒扣分", 11);
+		context.put("待整改卖家", false);
+		context.put("宝贝相符DSR", 4.0);
+		String expression = 
+		"A类违规天数90天内 ==false and (虚假交易扣分<48 or 假冒扣分<12) and 待整改卖家 ==false and 宝贝相符DSR>4.6";
+		expression = initial(runner,expression);
+		List<String> errorInfo = new ArrayList<String>();
+		boolean result = (Boolean)runner.execute(expression, context, errorInfo, true, false);
+		if(result){
+			System.out.println("符合营销活动规则");
+		}else{
+			System.out.println("不符合营销活动规则");
+			for(String error : errorInfo){
+				System.out.println(error);
+			}
+		}		
+	}
+	public String initial(ExpressRunner runner,String expression) throws Exception{
+		runner.setShortCircuit(false);
+		runner.addOperatorWithAlias("小于","<","$1 < $2 不符合");
+		runner.addOperatorWithAlias("大于",">","$1 > $2 不符合");
+		runner.addOperatorWithAlias("等于","==","$1 == $2 不符合");
+		return expression.replaceAll("<", " 小于 ").replaceAll(">", " 大于 ").replaceAll("==", " 等于 ");
+	}
+	
+	/**
 	 * 预加载表达式 & 虚拟类
 	 * @throws Exception
 	 */
@@ -155,12 +193,13 @@ public class DemoShow {
 	public void testVirtualClass() throws Exception {
 		ExpressRunner runner = new ExpressRunner(false, true);
 		runner.loadMutilExpress("类初始化", "class People(){sex;height;money;skin};");
-		runner.loadMutilExpress("创建小强", "a = new People();a.sex='male';a.height=185;a.money=10000000;a.skin='white';return a;");
+		runner.loadMutilExpress("创建小强", "a = new People();a.sex='male';a.height=185;a.money=10000000;");
 		runner.loadMutilExpress("体检", "if(a.sex=='male' && a.height>180 && a.money>5000000) return '高富帅，鉴定完毕'");
 		DefaultContext<String, Object> context = new DefaultContext<String, Object>();
 		
-		Object r = runner.execute("类初始化;创建小强;体检", context, null, false, true);
+		Object r = runner.execute("类初始化;创建小强;体检", context, null, false, false);
 		System.out.println(r);
 	}
+	
 
 }
