@@ -78,6 +78,10 @@ public class BeanExample {
 		//System.out.println(" execute isVIP("+ name+ ") .....");
 		return false;
 	}
+	public static boolean isVIPTwo(String name) {
+		//System.out.println(" execute isVIP("+ name+ ") .....");
+		return true;
+	}
 	public static boolean isVIPFalse() {		
 		return false;
 	}
