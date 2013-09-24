@@ -372,7 +372,7 @@ public class ExpressRunner {
 	 * Ìæ»»²Ù×÷·û´¦Àí
 	 * @param name
 	 */
-    public OperatorBase replaceOperator(String name,Operator op){
+    public OperatorBase replaceOperator(String name,OperatorBase op){
     	return this.operatorManager.replaceOperator(name, op);
     }
     
