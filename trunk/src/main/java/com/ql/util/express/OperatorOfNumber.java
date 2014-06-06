@@ -259,7 +259,7 @@ class NormalNumberOperator {
 			if(type == NumberType.NUMBER_TYPE_LONG) return op1.longValue() / op2.longValue();
 			if(type == NumberType.NUMBER_TYPE_FLOAT) return op1.floatValue() / op2.floatValue();
 			if(type == NumberType.NUMBER_TYPE_DOUBLE) return op1.doubleValue() / op2.doubleValue();
-			if(type == NumberType.NUMBER_TYPE_BIGDECIMAL) return new BigDecimal(op1.toString()).divide(new BigDecimal(op2.toString()));
+			if(type == NumberType.NUMBER_TYPE_BIGDECIMAL) return new BigDecimal(op1.toString()).divide(new BigDecimal(op2.toString()), BigDecimal.ROUND_HALF_UP);
 			throw new Exception("不支持的对象执行了\"/\"操作");
 	    }
 
