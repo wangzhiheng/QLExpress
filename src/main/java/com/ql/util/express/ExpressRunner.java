@@ -513,6 +513,28 @@ public class ExpressRunner {
 	public ExportItem[] getExportInfo(){
 		return this.loader.getExportInfo();
 	}
+	
+	/**
+	 * 优先从本地指令集缓存获取指令集，没有的话生成并且缓存在本地
+	 * @param express
+	 * @return
+	 * @throws Exception
+	 */
+	public InstructionSet getInstructionSetFromLocalCache(String expressString)
+			throws Exception {
+		InstructionSet parseResult = expressInstructionSetCache.get(expressString);
+		if (parseResult == null) {
+			synchronized (expressInstructionSetCache) {
+				parseResult = expressInstructionSetCache.get(expressString);
+				if (parseResult == null) {
+					parseResult = this.parseInstructionSet(expressString);
+					expressInstructionSetCache.put(expressString,
+							parseResult);
+				}
+			}
+		}
+		return parseResult;
+	}
 
 	public InstructionSet createInstructionSet(ExpressNode root, String type)
 			throws Exception {
