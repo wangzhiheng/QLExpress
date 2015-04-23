@@ -41,6 +41,8 @@ public class InstructionSet implements Serializable{
 	public static String TYPE_FUNCTION ="function";
 	public static String TYPE_MARCO ="marco";
 	
+	public static boolean printInstructionError = true;
+	
 	
 	private String type ="main";
 	private String name;
@@ -176,9 +178,11 @@ public class InstructionSet implements Serializable{
 				try{
 					instruction.execute(environmen, errorList);
 				}catch(Exception e){
-					log.error("当前ProgramPoint = " + environmen.getProgramPoint());
-					log.error("当前指令" +  instruction);
-					log.error(e);
+					if(printInstructionError){
+						log.error("当前ProgramPoint = " + environmen.getProgramPoint());
+						log.error("当前指令" +  instruction);
+						log.error(e);
+					}
 		            throw e;
 				}
 			}

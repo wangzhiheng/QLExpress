@@ -18,6 +18,7 @@ public class OperatorSelfDefineClassFunction extends OperatorBase implements Can
   String[] parameterTypes;
   Class<?>[] parameterClasses ;
   Class<?> operClass;
+  Object operInstance;
   Method method;
   boolean isReturnVoid;
 
@@ -81,7 +82,10 @@ public class OperatorSelfDefineClassFunction extends OperatorBase implements Can
       if( Modifier.isStatic(this.method.getModifiers())){
          obj = this.method.invoke(null,ExpressUtil.transferArray(parameres,parameterClasses));
       }else{
-    	 obj = this.method.invoke(this.operClass.newInstance(),ExpressUtil.transferArray(parameres,parameterClasses));
+		  if(operInstance==null){
+			  operInstance =  operClass.newInstance();
+		  }
+    	 obj = this.method.invoke(operInstance,ExpressUtil.transferArray(parameres,parameterClasses));
       }
 
       if(obj != null){
