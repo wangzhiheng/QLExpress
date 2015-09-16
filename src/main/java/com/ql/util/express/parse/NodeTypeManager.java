@@ -34,6 +34,7 @@ public class NodeTypeManager implements INodeTypeManager {
 	    }
 	    public NodeTypeManager(KeyWordDefine4Java keyWorkdDefine){
 	    	this.splitWord = keyWorkdDefine.splitWord;
+	    	com.ql.util.express.parse.WordSplit.sortSplitWord(this.splitWord);
 			this.keyWords = keyWorkdDefine.keyWords;
 			this.nodeTypeDefines = keyWorkdDefine.nodeTypeDefines;
 			this.instructionFacotryMapping = keyWorkdDefine.instructionFacotryMapping;

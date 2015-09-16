@@ -26,7 +26,6 @@ public class WordSplit
 	    if (str == null){
 	        return new Word[0];
 	     }
-	     sortSplitWord(splitWord);
 	     char c;
 	     int line =1;
 	     List<Word> list = new ArrayList<Word>();
