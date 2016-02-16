@@ -9,7 +9,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.ql.util.express.instruction.ForRelBreakContinue;
+import com.ql.util.express.instruction.IOperateDataCache;
 import com.ql.util.express.instruction.InstructionFactory;
+import com.ql.util.express.instruction.OperateDataCacheImpl;
 import com.ql.util.express.instruction.op.OperatorBase;
 import com.ql.util.express.instruction.op.OperatorFactory;
 import com.ql.util.express.instruction.op.OperatorMinMax;
@@ -72,6 +74,15 @@ public class ExpressRunner {
 	 * 缺省的Class查找的包管理器
 	 */
 	ExpressPackage rootExpressPackage = new ExpressPackage(null);
+	
+	private ThreadLocal<IOperateDataCache> m_OperateDataObjectCache = new ThreadLocal<IOperateDataCache>(){
+		protected IOperateDataCache initialValue() {
+	        return new OperateDataCacheImpl(30);
+	    }
+	};
+	public IOperateDataCache getOperateDataCache(){
+		return this.m_OperateDataObjectCache.get();
+	}
 	
 	public ExpressRunner(){
 		this(false,false);

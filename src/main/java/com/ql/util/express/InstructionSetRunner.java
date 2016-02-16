@@ -14,10 +14,10 @@ public class InstructionSetRunner {
 				boolean isTrace,boolean isCatchException,
 				Log aLog,boolean isSupportDynamicFieldName) throws Exception{
 		 try{
-			 //OperateDataCacheManager.resetCache();
+			 OperateDataCacheManager.push(runner);
 			 return execute(runner,sets, loader, aContext, errorList, isTrace, isCatchException,true, aLog,isSupportDynamicFieldName);
 		 }finally{
-			 OperateDataCacheManager.resetCache();
+			 OperateDataCacheManager.resetCache(runner);
 		 }
 	  }
 	  

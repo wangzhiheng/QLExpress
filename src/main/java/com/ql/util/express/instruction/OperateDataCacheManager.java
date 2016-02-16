@@ -1,5 +1,7 @@
 package com.ql.util.express.instruction;
 
+import java.util.Stack;
+
 import com.ql.util.express.CallResult;
 import com.ql.util.express.ExpressLoader;
 import com.ql.util.express.ExpressRunner;
@@ -16,15 +18,17 @@ import com.ql.util.express.instruction.opdata.OperateDataLocalVar;
 
 
 public class OperateDataCacheManager {
-	
-	private static ThreadLocal<IOperateDataCache> m_OperateDataObjectCache = new ThreadLocal<IOperateDataCache>(){
-		protected IOperateDataCache initialValue() {
-	        return new OperateDataCacheImpl(30);
-			//return new OperateDataCacheImpl4Orig();
+
+	private static ThreadLocal<RunnerDataCache> m_OperateDataObjectCache = new ThreadLocal<RunnerDataCache>(){
+		protected RunnerDataCache initialValue() {
+	        return new RunnerDataCache();
 	    }
 	};
+	public static void push(ExpressRunner aRunner){
+		m_OperateDataObjectCache.get().push(aRunner);
+	}
 	public static IOperateDataCache getOperateDataCache(){
-		return m_OperateDataObjectCache.get();
+		return m_OperateDataObjectCache.get().getOperateDataCache();
 	}
 	public static OperateData fetchOperateData(Object obj, Class<?> aType) {
 		return getOperateDataCache().fetchOperateData(obj, aType);
@@ -58,10 +62,32 @@ public class OperateDataCacheManager {
 	public static long getFetchCount(){
 		return getOperateDataCache().getFetchCount();
 	}
-
-	public static void resetCache(){
+    
+	public static void resetCache(ExpressRunner aRunner){
 		getOperateDataCache().resetCache();
+		m_OperateDataObjectCache.get().pop(aRunner);
+		
 	}
+		
 	
+
+}
+
+class RunnerDataCache{
+	IOperateDataCache cache;
+	
+	Stack<ExpressRunner> stack = new Stack<ExpressRunner>();
+	
+	public void push(ExpressRunner aRunner){
+		this.cache = aRunner.getOperateDataCache();
+		this.stack.push(aRunner);
+	}
+	public IOperateDataCache getOperateDataCache(){
+		return this.cache;
+	}
+	public void pop(ExpressRunner aRunner){
+		this.cache = this.stack.pop().getOperateDataCache();
+		
+	}
 
 }
