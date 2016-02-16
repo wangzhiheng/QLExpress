@@ -14,7 +14,7 @@ import com.ql.util.express.instruction.opdata.OperateDataField;
 import com.ql.util.express.instruction.opdata.OperateDataKeyValue;
 import com.ql.util.express.instruction.opdata.OperateDataLocalVar;
 
-class OperateDataCacheImpl implements IOperateDataCache{
+public class OperateDataCacheImpl implements IOperateDataCache{
 		OperateData[] dataList;
 		OperateDataAttr[] attrList;
 		OperateDataLocalVar[] localVarList;
