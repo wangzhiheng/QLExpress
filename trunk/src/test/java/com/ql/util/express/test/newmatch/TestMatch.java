@@ -32,7 +32,7 @@ public class TestMatch {
 				{"1000 + new String(\"abc\").substring(1).substring(1).length() + 100","1101"},
 				{"new Object().getClass().getAnnotations().length","0"},
 				{"new Object().getClass().getMethods()[1].getName()","wait"},
-				{"Object.class.getName().getClass().getMethods().length","72"},
+//				{"Object.class.getName().getClass().getMethods().length","72"},
 				{"1/2","0"},
 				{"1/(double)2","0.5"},
 				{"(double)1/2","0.5"},
